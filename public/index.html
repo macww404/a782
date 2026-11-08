@@ -467,6 +467,19 @@ body.calm .home-vip-beacon:after{animation:none!important}
 body.calm .nexus-landing:after,body.calm .nexus-landing h1 em,body.calm .nexus-stage-halo,body.calm .nexus-stage-rings,body.calm .nexus-stage-card,body.calm .nexus-stage-emblem,body.calm .nexus-stage-sticker,body.calm .nexus-stage-card:before,body.calm .nexus-pass:before,body.calm .nexus-tier-pass:before,body.calm .nexus-preview-card:before,body.calm .nexus-tier-pass-icon,body.calm .nexus-pass,body.calm .nexus-member-aura,body.calm .nexus-studio-orb{animation:none!important}
 body.calm .nexus-tier,body.calm .nexus-tier:hover,body.calm .nexus-tier-pass,body.calm .nexus-tier:hover .nexus-tier-pass{transform:none!important}
 
+
+/* Premium Studio open + editor experience (V4.1) */
+.nexus-member-open,.nexus-desk-edit{cursor:pointer;font-family:inherit}
+.nexus-studio{scroll-margin-top:100px;transition:box-shadow .4s ease,border-color .4s ease}
+.nexus-studio.studio-focused{border-color:#e7baff;box-shadow:0 0 0 2px rgba(193,142,255,.36),0 18px 80px rgba(125,85,232,.25)}
+.studio-feedback{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin:12px 0 4px;font-size:11px;color:#bbb1d1}
+#studioShortcutCount{padding:5px 10px;border:1px solid rgba(255,255,255,.16);border-radius:50px;color:#e3d4ff;font-weight:800}
+#studioShortcutCount.at-limit{border-color:var(--preview-color);color:var(--preview-color)}
+.studio-actions{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:9px;align-items:stretch;margin-top:12px}
+.studio-actions .nexus-save{margin:0;min-width:0}
+.studio-actions .studio-reset{padding:10px 8px;border-radius:14px;font-size:12px;min-width:0}
+.studio-actions button:disabled{opacity:.55;cursor:wait}
+@media(max-width:540px){.studio-actions{grid-template-columns:1fr}.nexus-studio{scroll-margin-top:70px}.studio-feedback{align-items:start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -902,7 +915,7 @@ function membershipHero(u){
        <p class="nexus-member-description">${tri('Сенің жеке тақырыптарың, статусың және таңдаулыларың — енді барлығы бір Premium кеңістікте.','Твои темы, статус и избранное — всё в одном Premium-пространстве.','Your themes, status and saved items — all inside one Premium space.')}</p>
        <div class="nexus-member-stats"><span><strong>${cap.themes.length}</strong><small>${tri('Тақырып','Тем','Themes')}</small></span><span><strong>${cap.count}</strong><small>${tri('Жылдам сілтеме','Быстрых ссылок','Shortcuts')}</small></span><span><strong>${saves}</strong><small>${tri('Сақталған','Сохранено','Saved')}</small></span></div>
        <div class="nexus-member-expiry">${ic('clock')} ${expiry}</div>
-       <a href="#me" class="nexus-member-open">${ic('palette')} ${tri('Premium Studio ашу','Открыть Premium Studio','Open Premium Studio')} ${ic('arrow')}</a>
+       <button type="button" class="nexus-member-open" data-open-studio="1" aria-controls="premiumStudio">${ic('palette')} ${tri('Premium Studio ашу','Открыть Premium Studio','Open Premium Studio')} ${ic('arrow')}</button>
      </div>
      <div class="nexus-member-art" aria-hidden="true"><div class="nexus-member-aura"></div>
        <div class="nexus-pass tilt-card"><div class="nexus-pass-top"><span>A782 <b>·</b> DIGITAL</span>${ic('star')}</div>
@@ -1010,7 +1023,8 @@ function vipStudioUI(){
    ${caps.count>1?`<label class="field">${tri('Профиль ұраны','Подпись профиля','Profile headline')}<input name="headline" maxlength="70" value="${esc(v.headline||'')}" placeholder="My Minecraft world ✦"></label>`:''}
    <div class="nexus-field-title"><span>03</span><strong>${tri('Жылдам бөлімдер','Быстрые разделы','Quick access')}</strong><small>${caps.count} MAX</small></div>
    <fieldset class="studio-links"><legend>${tri('Таңдаулы бөлімдер','Избранные разделы','Favorite sections')}</legend>${links.map(([id,label])=>`<label><input type="checkbox" name="shortcuts" value="${id}" ${(v.shortcuts||[]).includes(id)?'checked':''}><span>${label}</span></label>`).join('')}</fieldset>
-   <button class="btn nexus-save" type="submit">${ic('check')} ${tri('Өзгерістерді сақтау','Сохранить изменения','Save changes')} ${ic('arrow')}</button>
+   <div class="studio-feedback"><span id="studioShortcutCount" aria-live="polite">${(v.shortcuts||[]).length} / ${caps.count}</span><span id="studioSaveStatus" role="status">${tri('Өзгерісті сақтасаң, профильге қолданылады','Сохрани изменения, чтобы применить их','Save changes to apply to your profile')}</span></div>
+   <div class="studio-actions"><button class="btn nexus-save" type="submit">${ic('check')} ${tri('Өзгерістерді сақтау','Сохранить изменения','Save changes')} ${ic('arrow')}</button><button class="btn ghost studio-reset" data-studio-reset="1" type="button">${ic('refresh')} ${tri('Бастапқы күйге қайтару','Сбросить изменения','Reset changes')}</button></div>
    <p class="nexus-studio-note">${ic('shield')} ${tri('Баптаулар аккаунтыңда бұлтқа сақталады.','Настройки сохраняются в облаке аккаунта.','Settings are saved to your cloud account.')}</p>
   </form></div></section>`;
 }
@@ -1027,7 +1041,7 @@ function homeVipDesk(){
  const names={home:tri('Басты бет','Главная','Home'),mc:'Minecraft',store:tri('Дүкен','Магазин','Store'),streams:tri('Стрим','Стрим','Streams'),vip:'VIP',me:tri('Профиль','Профиль','Profile')};
  const list=shortcuts.length?shortcuts:['mc','store','me'];
  const count=Array.isArray(ME.library)?ME.library.length:0;
- return `<section class="nexus-desk rv"><div class="nexus-desk-head"><div><span class="nexus-kicker">${ic('bolt')} PREMIUM COMMAND CENTER</span><h2>${esc(ME.vipPrefs?.statusEmoji||'✦')} ${esc(ME.vipPrefs?.status||tri('Менің A782 әлемім','Мой мир A782','My A782 world'))}</h2><p>${esc(ME.vipPrefs?.headline||tri('Таңдаулыларың мен керек бөлімдерің бір жерде.','Избранное и быстрые переходы в одном месте.','Your saved items and favorite places, in one spot.'))}</p></div><a href="#me" class="nexus-desk-edit">${ic('palette')} ${tri('Баптау','Настроить','Customize')}</a></div>
+ return `<section class="nexus-desk rv"><div class="nexus-desk-head"><div><span class="nexus-kicker">${ic('bolt')} PREMIUM COMMAND CENTER</span><h2>${esc(ME.vipPrefs?.statusEmoji||'✦')} ${esc(ME.vipPrefs?.status||tri('Менің A782 әлемім','Мой мир A782','My A782 world'))}</h2><p>${esc(ME.vipPrefs?.headline||tri('Таңдаулыларың мен керек бөлімдерің бір жерде.','Избранное и быстрые переходы в одном месте.','Your saved items and favorite places, in one spot.'))}</p></div><button type="button" class="nexus-desk-edit" data-open-studio="1">${ic('palette')} ${tri('Баптау','Настроить','Customize')}</button></div>
  <div class="nexus-desk-grid"><div class="nexus-desk-saved"><span>${ic('star')} A782 LIBRARY</span><strong>${count}<small> / ${ME.libraryLimit||12}</small></strong><a href="#me">${tri('Таңдаулыларды ашу','Открыть избранное','View saved items')} ${ic('arrow')}</a></div><div class="nexus-desk-links">${list.map((k,i)=>`<a href="#${k}" style="--i:${i}">${ic(k==='mc'?'cube':k==='store'?'bag':k==='streams'?'radio':k==='vip'?'crown':k==='me'?'user':'home')}<span>${esc(names[k]||k)}</span>${ic('arrow')}</a>`).join('')}</div></div></section>`;
 }
 async function toggleLibrary(spec,btn){
@@ -1048,7 +1062,7 @@ function pVip(){
   'VIP-ULTRA':{num:'03',kind:'THE COMPLETE EXPERIENCE',face:'ULTRA',desc:tri('Барлық мүмкіндіктің толық жиынтығы.','Все Premium-возможности без компромиссов.','Everything A782 Premium can offer, unlocked.'),color:'#ffd281',count:'500',themes:'9',links:'5'}
  };
  return `<section class="nexus-landing rv"><div class="nexus-landing-lines" aria-hidden="true"></div>
-   <div class="nexus-landing-copy"><span class="nexus-kicker">${ic('sparkles')} A782 / EXCLUSIVE ACCESS</span><h1>MORE THAN<br><em>A BADGE.</em></h1><p>${tri('Премиум — жай алтын белгі емес. Жеке стиль, сүйікті жинақтар, жылдам басқару және ерекше ойыншы профилі.','Премиум — это не просто золотой значок. Свой стиль, избранное, удобное управление и особый игровой профиль.','Premium is more than a golden badge. Your style, saved items, quick access and a unique gaming identity.')}</p>
+   <div class="nexus-landing-copy"><span class="nexus-kicker">${ic('sparkles')} A782 / EXCLUSIVE ACCESS</span><h1>${tri('VIP ДЕГЕН','НЕ ПРОСТО','MORE THAN')}<br><em>${tri('БӨЛЕК ӘЛЕМ.','ЗНАЧОК.','A BADGE.')}</em></h1><p>${tri('Премиум — жай алтын белгі емес. Жеке стиль, сүйікті жинақтар, жылдам басқару және ерекше ойыншы профилі.','Премиум — это не просто золотой значок. Свой стиль, избранное, удобное управление и особый игровой профиль.','Premium is more than a golden badge. Your style, saved items, quick access and a unique gaming identity.')}</p>
      <div class="nexus-landing-actions"><a href="#vip-levels" class="btn">${tri('Деңгейлерді қарау','Смотреть уровни','Explore levels')} ${ic('arrow')}</a><a href="#me" class="nexus-simple-link">${ic('user')} ${tri('Менің профилім','Мой профиль','My profile')}</a></div><div class="nexus-landing-foot"><span>FOUR LEVELS</span><i></i><span>ONE UNIVERSE</span><i></i><span>YOUR WAY</span></div>
    </div>
    <div class="nexus-landing-stage" aria-hidden="true"><div class="nexus-stage-halo"></div><div class="nexus-stage-rings"></div><div class="nexus-stage-card tilt-card"><div class="nexus-stage-head"><span>A782</span><span>✦ NEXUS</span></div><div class="nexus-stage-emblem">${ic('crown')}</div><div class="nexus-stage-caption"><span>PREMIUM ACCESS</span><strong>ULTRA</strong></div></div><span class="nexus-stage-sticker">✦ UNLOCK YOUR STYLE</span></div>
@@ -1061,7 +1075,7 @@ function pVip(){
    return `<article class="nexus-tier rv tilt-card" data-tier="${esc(p.tier)}" style="--nexus-tier:${esc(data.color)}"><div class="nexus-tier-top"><span>EDITION ${data.num}</span>${ultra?'<span class="nexus-tier-best">✦ TOP LEVEL</span>':`<span>${data.kind}</span>`}</div>
    <div class="nexus-tier-pass"><span class="nexus-tier-pass-a">A782 <b>✦</b></span><span class="nexus-tier-pass-icon">${ic(free?'sparkles':p.tier==='VIP-PLUS'?'bolt':p.tier==='VIP-PRO'?'gem':'crown')}</span><span class="nexus-tier-pass-name">${esc(data.face)}</span><span class="nexus-tier-pass-bottom">DIGITAL MEMBERSHIP <b>✦ ${data.num}</b></span></div>
    <div class="nexus-tier-body"><div class="nexus-tier-name"><div><small>VIP / ${data.num}</small><h3>${esc(p.name)}</h3></div><span>${ic('arrow')}</span></div><p class="nexus-tier-description">${data.desc}</p>
-   <div class="nexus-tier-price">${free?tri('ТЕГІН','БЕСПЛАТНО','FREE'):ready?money(p.price):tri('Баға қойылмаған','Цена не установлена','Price not set')}<small> / ${free?'7':Number(p.durationDays)||0} ${tri('күн','дней','days')}</small></div>
+   <div class="nexus-tier-price">${free?tri('ТЕГІН','БЕСПЛАТНО','FREE'):ready?money(p.price):tri('Баға қойылмаған','Цена не установлена','Price not set')}<small> / ${!free&&Number(p.durationDays)===0?tri('мерзімсіз','бессрочно','lifetime'):`${free?'7':Number(p.durationDays)||30} ${tri('күн','дней','days')}`}</small></div>
    <div class="nexus-tier-features">${features.map(x=>`<span>${ic('check')} ${esc(x)}</span>`).join('')}</div>
    <div class="nexus-tier-buttons"><button class="btn nexus-tier-buy" type="button" ${locked||!ready||p.active===false?'disabled':''} ${free?'data-viptrial="1"':`data-vipbuy="${esc(p.id)}"`}>${locked?tri('Сынақ қолданылған','Пробный период использован','Trial used'):p.active===false?tri('Қолжетімсіз','Недоступно','Unavailable'):!ready?tri('Бағаны күту','Ожидание цены','Price pending'):free?tri('7 күнге қосу','Активировать на 7 дней','Activate 7 days'):tri('VIP-ке тапсырыс беру','Заказать VIP','Order VIP')} ${ic('arrow')}</button><button class="nexus-tier-preview" type="button" data-premiumpreview="${esc(p.tier)}">${ic('eye')} ${tri('Дизайнды көру','Предпросмотр','Preview look')}</button></div></div></article>`}).join('')}</div>
  <div class="nexus-levels-footnote">${ic('shield')} ${tri('VIP-FREE әр аккаунтқа бір рет, 7 күн ULTRA мүмкіндіктерімен беріледі. Мерзім біткен соң автоматты тоқтайды.','VIP-FREE предоставляется один раз на аккаунт: 7 дней функций ULTRA, после чего доступ заканчивается.','VIP-FREE is a one-time 7-day ULTRA trial per account. Access expires automatically.')}</div></section>
@@ -1413,7 +1427,12 @@ async function loadAdmin(){
     const ub=$("#usersBox"),ob=$("#ordersAdm");
     if(ub) ub.innerHTML=users.length?`<div class="table"><table><tr><th>${t("nick")||"Nick"}</th><th>${t("email")}</th><th>${t("tickets")}</th><th>${t("tokens")}</th><th>${t("diamonds")}</th></tr>
       ${users.map(u=>`<tr><td>${esc(u.nick)} ${u.vip?`<span class="tag a">${ic('crown')} ${esc(u.vip.tier||u.vip.name||'VIP')}</span>`:""}<small class="mute" style="display:block">${esc(u.id)}</small></td><td>${esc(u.email)}</td>
-        <td>${u.tickets} <button class="btn ghost sm" data-bal="${u.id}|tickets|1">+1</button></td>
+        <td><div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">
+          <b style="min-width:20px;text-align:center;font-variant-numeric:tabular-nums">${u.tickets}</b>
+          <button type="button" class="btn ghost sm" data-bal="${u.id}|tickets|1" aria-label="${tri('1 билет қосу','Добавить 1 билет','Add 1 ticket')}">+1</button>
+          <button type="button" class="btn red sm" data-bal="${u.id}|tickets|-1" ${Number(u.tickets)<1?'disabled':''} aria-label="${tri('1 билет алу','Убрать 1 билет','Remove 1 ticket')}">−1</button>
+          <button type="button" class="btn red sm" data-bal="${u.id}|tickets|-5" ${Number(u.tickets)<5?'disabled':''} aria-label="${tri('5 билет алу','Убрать 5 билетов','Remove 5 tickets')}">−5</button>
+        </div></td>
         <td>${u.tokens} <button class="btn ghost sm" data-bal="${u.id}|tokens|100">+100</button></td>
         <td>${u.diamonds} <button class="btn ghost sm" data-bal="${u.id}|diamonds|100">+100</button></td></tr>`).join("")}</table></div>`:`<p class="mute">${t("nousers")}</p>`;
     if(ob) ob.innerHTML=orders.length?`<div class="table"><table><tr><th>#</th><th>${t("nick")||"Nick"}</th><th>${t("total")}</th><th>${t("pend")}</th><th></th></tr>
@@ -1479,6 +1498,10 @@ async function submitAdminForm(form){
 
 /* ===================== ОҚИҒАЛАР ===================== */
 document.addEventListener("click",async e=>{
+  const openStudio=e.target.closest('[data-open-studio]');if(openStudio){e.preventDefault();focusPremiumStudio();return}
+  const resetStudio=e.target.closest('[data-studio-reset]');if(resetStudio){
+    e.preventDefault();const form=document.getElementById('vipStudioForm');if(form){form.reset();syncNexusPreview(form);studioFeedback(form,false);const t=document.getElementById('studioSaveStatus');if(t)t.textContent=tri('Соңғы сақталған баптаулар қалпына келді','Возвращены последние сохранённые настройки','Last saved settings restored');}return;
+  }
   const go=e.target.closest("[data-go]");if(go){location.hash="#"+go.dataset.go;return}
   const lg=e.target.closest("[data-lang]");if(lg){LANG=lg.dataset.lang;localStorage.setItem("a782-lang",LANG);render(true);return}
   if(e.target.closest("[data-close]")){closeSheet();return}
@@ -1566,6 +1589,26 @@ document.addEventListener("change",e=>{
     img.src=url;
   }
 });
+function focusPremiumStudio(){
+ if(!ME?.vip){toast(tri('Алдымен VIP іске қосу керек','Сначала активируйте VIP','Activate VIP first'),true);location.hash='#vip';return}
+ const open=()=>{
+  const studio=document.getElementById('premiumStudio');if(!studio){toast(tri('Studio табылмады','Studio не найдена','Studio not found'),true);return}
+  studio.classList.add('studio-focused');
+  studio.scrollIntoView({behavior:S.motion?'smooth':'auto',block:'start'});
+  setTimeout(()=>{studio.querySelector('input[name="preset"]:checked')?.focus({preventScroll:true});studio.classList.remove('studio-focused')},S.motion?550:60);
+ };
+ if(ROUTE!=='me'){
+  location.hash='#me';setTimeout(open,100);
+ }else open();
+}
+function studioFeedback(form,changed){
+ const count=form.querySelectorAll('input[name="shortcuts"]:checked').length;
+ const max=vipCapsClient().count;
+ const el=document.getElementById('studioShortcutCount');
+ if(el){el.textContent=count+' / '+max;el.classList.toggle('at-limit',count===max)}
+ const status=document.getElementById('studioSaveStatus');
+ if(status&&changed)status.textContent=tri('Сақталмаған өзгерістер бар','Есть несохранённые изменения','You have unsaved changes');
+}
 function syncNexusPreview(form){
  const preview=document.getElementById('nexusPreviewCard');
  if(!preview||!form)return;
@@ -1580,8 +1623,17 @@ function syncNexusPreview(form){
  const headline=document.getElementById('nexusPreviewHeadline');
  if(headline)headline.textContent=form.elements.headline?.value||'A782 DIGITAL MEMBER';
 }
-document.addEventListener('input',e=>{const form=e.target.closest('#vipStudioForm');if(form)syncNexusPreview(form)});
-document.addEventListener('change',e=>{const form=e.target.closest('#vipStudioForm');if(form)syncNexusPreview(form)});
+document.addEventListener('input',e=>{const form=e.target.closest('#vipStudioForm');if(form){syncNexusPreview(form);studioFeedback(form,true)}});
+document.addEventListener('change',e=>{
+ const form=e.target.closest('#vipStudioForm');if(!form)return;
+ if(e.target.matches('input[name="shortcuts"]')&&e.target.checked){
+  const max=vipCapsClient().count;
+  if(form.querySelectorAll('input[name="shortcuts"]:checked').length>max){
+   e.target.checked=false;toast(tri('Бұл тарифте тек '+max+' бөлім таңдауға болады','Для тарифа доступно только '+max+' ссылок','This tier allows only '+max+' shortcuts'),true);
+  }
+ }
+ syncNexusPreview(form);studioFeedback(form,true);
+});
 document.addEventListener("input",e=>{
   if(e.target.id==="mcQ")MC.q=e.target.value.trim();
   const form=e.target.closest('form');
@@ -1618,8 +1670,18 @@ document.addEventListener("submit",async e=>{
         const shortcuts=[...f.querySelectorAll('input[name="shortcuts"]:checked')].map(x=>x.value);
         const caps=vipCapsClient();
         if(shortcuts.length>caps.count){toast(tri('Жылдам сілтемелер шегінен асты','Слишком много быстрых ссылок','Too many shortcuts'),true);return}
-        const r=await api('POST','/api/vip/preferences',{preset:o.preset,statusEmoji:o.statusEmoji,status:o.status||'',headline:o.headline||'',shortcuts});
-        ME=r.user;toast(tri('Studio сақталды ✦','Studio сохранена ✦','Studio saved ✦'));render(true);return;
+        const submit=f.querySelector('button[type="submit"]');if(submit?.disabled)return;
+        if(submit)submit.disabled=true;
+        const message=document.getElementById('studioSaveStatus');
+        if(message)message.textContent=tri('Сақталып жатыр…','Сохраняется…','Saving…');
+        try{
+          const r=await api('POST','/api/vip/preferences',{preset:o.preset,statusEmoji:o.statusEmoji,status:o.status||'',headline:o.headline||'',shortcuts});
+          ME=r.user;toast(tri('Studio сақталды ✦','Studio сохранена ✦','Studio saved ✦'));
+          render(true);const status=document.getElementById('studioSaveStatus');
+          if(status)status.textContent=tri('Сақталды ✓','Сохранено ✓','Saved ✓');
+        }catch(error){if(message)message.textContent=tri('Сақталмады. Қайта көр.','Не сохранено. Попробуй снова.','Could not save. Try again.');throw error}
+        finally{if(submit?.isConnected)submit.disabled=false}
+        return;
       }
       case "profForm":{
         const r=await api("PUT","/api/me",{nick:o.nick,mc:o.mc,ff:o.ff,so2:o.so2,tg:o.tg,bio:o.bio,avatar:o.avatar,banner:o.banner,icon:pendingIcon||ME.icon});
@@ -1663,10 +1725,26 @@ async function adminDraw(id){
   try{ await api("POST",`/api/admin/giveaways/${id}/draw`,null,true); await loadData(); render(true) }
   catch(e){ toast(errMsg(e),true) }
 }
+const busyBalanceActions = new Set();
 async function adminBal(spec){
-  const [id,field,delta]=spec.split("|");
-  try{ await api("POST",`/api/admin/users/${id}/balance`,{field,delta:+delta},true); loadAdmin() }
-  catch(e){ toast(errMsg(e),true) }
+  // All balance changes go through the existing admin-only server endpoint.
+  // A pending click is locked so double-clicking can't subtract twice by accident.
+  if(busyBalanceActions.has(spec))return;
+  const [id,field,amount]=spec.split("|");
+  const delta=Number(amount);
+  if(!/^[a-zA-Z0-9_-]+$/.test(id)||!["tickets","tokens","diamonds"].includes(field)||!Number.isInteger(delta)||delta===0)return;
+  busyBalanceActions.add(spec);
+  const btn=[...document.querySelectorAll('[data-bal]')].find(b=>b.dataset.bal===spec);
+  if(btn)btn.disabled=true;
+  try{
+    await api("POST",`/api/admin/users/${id}/balance`,{field,delta},true);
+    await loadAdmin();
+    toast(delta<0?tri('Билет алынды ✓','Билеты списаны ✓','Tickets removed ✓'):tri('Баланс жаңартылды ✓','Баланс обновлён ✓','Balance updated ✓'));
+  }catch(e){toast(errMsg(e),true)}
+  finally{
+    busyBalanceActions.delete(spec);
+    if(btn&&btn.isConnected)btn.disabled=false;
+  }
 }
 async function adminOrder(spec){
   const [id,status]=spec.split("|");
