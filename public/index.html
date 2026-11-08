@@ -228,6 +228,148 @@ body.vip-view .aurora i:first-child{background:var(--vip-accent)}
 @media(max-width:550px){.vip-cards{grid-template-columns:1fr}.vip-card{min-height:0}.vip-card h3{font-size:24px}}
 @media(prefers-reduced-motion:reduce){.vip-card:after,.vip-status:after,.vip-identity .avatar,.vip-identity .prof-banner,.toast.on{animation:none!important}.glass.tilt-card:hover{transform:none!important}}
 body.calm .vip-card:after,body.calm .vip-status:after,body.calm .vip-identity .avatar,body.calm .vip-identity .prof-banner{animation:none!important}
+
+/* A782 ELITE — a genuinely distinct active membership experience */
+:root{--ultra-gold:#ffdb88;--ultra-violet:#9175ff}
+.nav-vip-marker{display:inline-flex;align-items:center;gap:5px;padding:8px 11px;border-radius:999px;white-space:nowrap;border:1px solid color-mix(in srgb,var(--vip-accent) 60%,transparent);font:800 11px var(--fh);letter-spacing:.07em;color:var(--vip-accent);background:color-mix(in srgb,var(--vip-accent) 13%,var(--bg2));box-shadow:0 0 24px color-mix(in srgb,var(--vip-accent) 15%,transparent)}
+.nav-vip-marker .ic{width:15px;height:15px}
+body.vip-view .mark{background:linear-gradient(130deg,var(--vip-accent),#9972fe,#f6bc5d);box-shadow:0 0 22px color-mix(in srgb,var(--vip-accent) 26%,transparent)}
+body.vip-view .top{border-bottom-color:color-mix(in srgb,var(--vip-accent) 28%,var(--line))}
+.profile-heading{display:flex;align-items:center;flex-wrap:wrap;gap:10px 20px}
+.profile-heading .eyebrow{width:100%}
+.profile-heading h1{margin:0}
+.profile-rank{display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb,var(--rank) 55%,transparent);padding:9px 13px;border-radius:99px;color:var(--rank);font-weight:800;letter-spacing:.065em;background:color-mix(in srgb,var(--rank) 12%,transparent)}
+.profile-rank .ic{width:18px;height:18px}
+.membership-hero{--m:#ffd67c;--m2:#a37aff;position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(255,213,125,.57);border-radius:30px;min-height:385px;color:#fff;padding:24px 28px 15px;margin:12px 0 24px;background:radial-gradient(ellipse 75% 100% at 88% 46%,rgba(255,196,68,.2),transparent 67%),radial-gradient(ellipse 65% 100% at 12% 15%,rgba(136,88,232,.33),transparent 68%),linear-gradient(125deg,#100c1c 0%,#1b1231 44%,#120b16 100%);box-shadow:0 28px 75px -29px rgba(169,105,255,.35),inset 0 1px rgba(255,237,197,.24)}
+.membership-hero[data-tier="VIP-PLUS"]{--m:#4be0ff;--m2:#2171e9;border-color:rgba(75,224,255,.52);background:radial-gradient(ellipse at 88% 54%,rgba(37,172,218,.26),transparent 62%),linear-gradient(130deg,#081423,#071c2a 63%,#111b39);box-shadow:0 28px 75px -29px rgba(75,224,255,.25)}
+.membership-hero[data-tier="VIP-PRO"]{--m:#cb93ff;--m2:#706aff;border-color:rgba(191,143,255,.52);background:radial-gradient(ellipse at 88% 54%,rgba(136,73,243,.3),transparent 62%),linear-gradient(130deg,#120b2d,#1c1141 64%,#160b29);box-shadow:0 28px 75px -29px rgba(155,102,255,.35)}
+.membership-hero:before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.08) 44%,transparent 58%);background-size:220% 100%;animation:memberFoil 8s linear infinite}
+.membership-grid{position:absolute;inset:0;z-index:-1;opacity:.32;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to right,transparent 17%,#000 100%)}
+.membership-sheen{position:absolute;inset:-2px;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 80% 32%,color-mix(in srgb,var(--m) 14%,transparent),transparent 47%)}
+@keyframes memberFoil{to{background-position:-220% 0}}
+.membership-topline,.membership-bottomline{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font:700 11px var(--fh);letter-spacing:.14em;color:rgba(255,255,255,.72)}
+.member-live{display:inline-flex;align-items:center;gap:9px;color:var(--m)}
+.member-live i{width:9px;height:9px;background:#54efa9;box-shadow:0 0 0 5px rgba(66,233,153,.1),0 0 16px #54efa9;border-radius:50%}
+.member-serial{opacity:.64}
+.membership-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(230px,.8fr);align-items:center;gap:5px;padding:18px 0 8px}
+.membership-copy{position:relative;z-index:1;min-width:0}
+.membership-pretitle{display:flex;align-items:center;gap:7px;font:800 11px var(--fh);letter-spacing:.19em;color:var(--m);margin-bottom:10px}
+.membership-pretitle .ic{width:17px;height:17px}
+.membership-title{font:800 clamp(38px,5.8vw,70px)/.99 var(--fh);letter-spacing:-.07em;margin:0;text-transform:uppercase;max-width:740px;background:linear-gradient(125deg,#fff4d0 4%,var(--m) 36%,#fff 50%,var(--m2) 86%);background-clip:text;-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 10px 22px rgba(0,0,0,.2))}
+.membership-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:600 20px var(--fh);margin:13px 0;color:#fff}
+.member-verified{display:inline-flex;gap:4px;align-items:center;border-radius:99px;border:1px solid color-mix(in srgb,var(--m) 50%,transparent);color:var(--m);padding:4px 9px;font-size:10px;letter-spacing:.12em}
+.member-verified .ic{width:13px;height:13px}
+.membership-intro{max-width:530px;color:rgba(255,255,255,.75);font-size:14px;line-height:1.65}
+.membership-pills{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}
+.membership-pills span{display:inline-flex;align-items:center;gap:5px;border:1px solid color-mix(in srgb,var(--m) 32%,transparent);padding:6px 9px;background:rgba(255,255,255,.055);border-radius:999px;color:#f5edff;font-size:11px;font-weight:600}
+.membership-pills .ic{color:var(--m);width:13px;height:13px}
+.membership-expiry{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:var(--m);font-weight:700;font-size:13px}
+.membership-expiry .ic{width:16px;height:16px}
+.membership-expiry small{color:rgba(255,255,255,.58)}
+.membership-orbit{width:min(280px,100%);aspect-ratio:1;position:relative;margin:auto;display:grid;place-items:center;filter:drop-shadow(0 22px 22px rgba(0,0,0,.33));transform:translateZ(0)}
+.membership-orbit:before,.membership-orbit:after{content:"";position:absolute;inset:6%;border-radius:50%;background:conic-gradient(from var(--ang),transparent,var(--m),transparent,var(--m2),transparent);opacity:.6;filter:blur(18px);animation:orbitTurn 16s linear infinite}
+.membership-orbit:after{inset:21%;filter:blur(40px);opacity:.65;animation-direction:reverse}
+.membership-orbit-a,.membership-orbit-b,.membership-orbit-c{position:absolute;border-radius:50%;border:1px solid color-mix(in srgb,var(--m) 50%,transparent);box-shadow:inset 0 0 22px color-mix(in srgb,var(--m) 8%,transparent)}
+.membership-orbit-a{inset:5%;border-style:dashed;animation:orbitTurn 30s linear infinite}
+.membership-orbit-b{inset:15%;border:2px solid color-mix(in srgb,var(--m) 38%,transparent);border-top-color:var(--m);border-bottom-color:var(--m2);animation:orbitTurn 11s linear infinite reverse}
+.membership-orbit-c{inset:27%;background:radial-gradient(circle at 35% 25%,color-mix(in srgb,var(--m) 35%,transparent),#1a1531 75%);box-shadow:0 0 40px color-mix(in srgb,var(--m) 32%,transparent),inset 0 0 35px color-mix(in srgb,var(--m) 15%,transparent)}
+.membership-core{z-index:1;display:grid;justify-items:center;gap:2px;color:var(--m);text-shadow:0 1px 10px rgba(0,0,0,.3)}
+.membership-core .ic{width:78px;height:78px;stroke-width:1.25;filter:drop-shadow(0 0 17px color-mix(in srgb,var(--m) 72%,transparent));animation:crestFloat 4s ease-in-out infinite alternate}
+.membership-core span{font:800 19px var(--fh);letter-spacing:.23em}
+.orbit-star{position:absolute;width:7px;height:7px;background:#fff6cf;box-shadow:0 0 20px 7px color-mix(in srgb,var(--m) 55%,transparent);border-radius:50%;animation:starTwinkle 2.7s ease-in-out infinite alternate}
+.orbit-star-1{left:11%;top:25%}.orbit-star-2{right:4%;bottom:31%;animation-delay:-.9s}.orbit-star-3{right:22%;top:2%;animation-delay:-2.1s}
+@keyframes orbitTurn{to{transform:rotate(360deg)}}
+@keyframes crestFloat{to{transform:translateY(-9px) scale(1.075)}}
+@keyframes starTwinkle{to{opacity:.15;transform:scale(.5)}}
+.membership-bottomline{padding-top:13px;border-top:1px solid rgba(255,255,255,.16);font-size:10px}
+/* Secondary identity card receives a real tier design, not only a thin border. */
+.vip-identity{border:1px solid color-mix(in srgb,var(--vip-accent) 40%,transparent);box-shadow:0 20px 56px -28px color-mix(in srgb,var(--vip-accent) 35%,transparent)}
+.vip-identity .prof-banner{height:190px;position:relative;background-image:radial-gradient(ellipse at 75% 30%,color-mix(in srgb,var(--vip-accent) 48%,transparent),transparent 55%),linear-gradient(110deg,#101021,#33204b,#0e1027)!important;overflow:hidden}
+.vip-identity .prof-banner:before{content:"";position:absolute;inset:0;background-image:var(--profile-art);background-position:center;background-size:cover;opacity:.37;filter:saturate(.8)}
+.vip-identity .prof-banner:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(110deg,transparent 0 26px,rgba(255,255,255,.04) 26px 27px);mask-image:linear-gradient(90deg,transparent,#000)}
+.prof-banner-vip-top{position:relative;z-index:1;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:20px;color:#f9eaff;font-size:11px;letter-spacing:.15em;font-weight:800}
+.prof-banner-vip-top span{display:inline-flex;align-items:center;gap:5px}
+.prof-banner-vip-top .ic{width:15px;height:15px;color:var(--vip-accent)}
+.prof-banner-huge{position:absolute;right:18px;bottom:-25px;opacity:.16;color:white;font:900 clamp(80px,16vw,170px)/1 var(--fh);letter-spacing:-.075em;pointer-events:none}
+.avatar-shell{position:relative;flex:0 0 auto;display:inline-flex}
+.avatar-shell-vip{border-radius:34px;padding:4px;background:conic-gradient(from var(--ang),var(--vip-accent),#fff, #8971fa,var(--vip-accent));box-shadow:0 0 24px color-mix(in srgb,var(--vip-accent) 45%,transparent);animation:ang 5s linear infinite}
+.avatar-shell-vip .avatar{border:3px solid var(--bg2);width:95px;height:95px;border-radius:29px;position:relative;z-index:1;box-shadow:none}
+.avatar-crown{position:absolute;z-index:3;top:-15px;right:-13px;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:var(--vip-accent);color:#18101c;box-shadow:0 7px 25px color-mix(in srgb,var(--vip-accent) 55%,transparent);transform:rotate(12deg)}
+.avatar-crown .ic{width:22px;height:22px}
+.vip-identity-title{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;padding:0 22px 16px;color:var(--vip-accent);font:800 14px var(--fh);letter-spacing:.03em}
+.vip-identity-title>span{display:flex;align-items:center;gap:6px}
+.vip-identity-title small{font-size:10px;letter-spacing:.12em;color:var(--mute)}
+/* Premium tiers have visibly different preview cards even before purchase. */
+.vip-mini-preview{margin:13px 0 5px;border:1px solid color-mix(in srgb,var(--tier) 40%,transparent);border-radius:16px;padding:11px;display:flex;align-items:center;gap:9px;background:linear-gradient(125deg,color-mix(in srgb,var(--tier) 17%,#10111b),#10111b 72%);color:var(--tier);transform:perspective(600px) rotateX(5deg);box-shadow:0 10px 22px -15px var(--tier)}
+.vip-mini-ring{width:39px;height:39px;flex:0 0 39px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--tier) 17%,transparent);border:1px solid color-mix(in srgb,var(--tier) 45%,transparent)}
+.vip-mini-ring .ic{width:23px;height:23px}
+.vip-mini-preview small,.vip-mini-preview b{display:block;font:700 9px var(--fh);letter-spacing:.15em}
+.vip-mini-preview b{font-size:14px;letter-spacing:.04em;margin-top:2px}
+.vip-mini-preview>span{margin-left:auto;font-size:22px;animation:starTwinkle 3s ease-in-out infinite alternate}
+.vip-card[data-tier="VIP-ULTRA"]{background:radial-gradient(ellipse at 80% 2%,rgba(255,205,100,.22),transparent 62%),linear-gradient(150deg,#261a26,#130f20 70%);box-shadow:0 16px 48px -29px rgba(255,202,108,.65)}
+.vip-card[data-tier="VIP-PRO"]{background:radial-gradient(ellipse at 80% 2%,rgba(177,140,255,.21),transparent 62%),linear-gradient(150deg,#1b1436,#0f1121 70%)}
+.vip-card[data-tier="VIP-PLUS"]{background:radial-gradient(ellipse at 80% 2%,rgba(80,224,255,.18),transparent 62%),linear-gradient(150deg,#0a2333,#0e1421 70%)}
+.vip-card[data-tier="VIP-FREE"]{background:radial-gradient(ellipse at 80% 2%,rgba(130,236,255,.2),transparent 62%),linear-gradient(150deg,#122637,#0e1221 70%)}
+/* Toast has a readable icon and a timed progress indicator. */
+.toast{display:flex;align-items:center;gap:10px;min-width:min(325px,92vw);text-align:left;border:1px solid color-mix(in srgb,var(--ok) 45%,transparent);background:color-mix(in srgb,var(--bg2) 90%,#17152e);color:var(--ink);padding:13px 19px 16px;border-radius:18px;box-shadow:0 15px 50px rgba(0,0,0,.45);overflow:hidden}
+.toast.bad{background:color-mix(in srgb,var(--bg2) 90%,#2d1021);border-color:rgba(248,113,113,.4);color:var(--ink)}
+.toast-emblem{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;border-radius:11px;background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.toast.bad .toast-emblem{background:rgba(248,113,113,.15);color:var(--bad)}
+.toast-emblem .ic{width:19px;height:19px}
+.toast-message{font-size:13px;font-weight:650;line-height:1.5}
+.toast-timer{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--ok);transform-origin:left;animation:toastTime 3.3s linear forwards}
+.toast.bad .toast-timer{background:var(--bad)}
+@keyframes toastTime{to{transform:scaleX(0)}}
+/* One-time celebratory activation screen (shown only for active server VIP). */
+.vip-reveal{--m:#ffd882;position:fixed;inset:0;z-index:210;display:grid;place-items:center;padding:20px;background:rgba(3,3,11,.79);backdrop-filter:blur(12px);opacity:0;transition:opacity .55s}
+.vip-reveal[data-tier="VIP-PRO"]{--m:#c59bff}.vip-reveal[data-tier="VIP-PLUS"]{--m:#55dcff}
+.vip-reveal.show{opacity:1}
+.vip-reveal-card{position:relative;isolation:isolate;display:grid;justify-items:center;text-align:center;gap:10px;width:min(500px,100%);padding:35px 20px 30px;border:1px solid color-mix(in srgb,var(--m) 48%,transparent);border-radius:30px;background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,var(--m) 22%,transparent),transparent 60%),#13111e;box-shadow:0 0 90px color-mix(in srgb,var(--m) 22%,transparent);transform:scale(.65) translateY(30px);transition:transform .75s cubic-bezier(.17,.89,.32,1.3);overflow:hidden;color:#fff}
+.vip-reveal.show .vip-reveal-card{transform:scale(1) translateY(0)}
+.vip-reveal-card:before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 45%,transparent 0 15deg,color-mix(in srgb,var(--m) 8%,transparent) 15deg 18deg);z-index:-1;animation:orbitTurn 35s linear infinite}
+.vip-reveal-crown{height:122px;width:122px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--m) 50%,transparent);border-radius:50%;color:var(--m);box-shadow:0 0 38px color-mix(in srgb,var(--m) 23%,transparent),inset 0 0 30px color-mix(in srgb,var(--m) 17%,transparent)}
+.vip-reveal-crown .ic{width:68px;height:68px;animation:crestFloat 2s ease-in-out infinite alternate}
+.vip-reveal-card>p{color:var(--m);font-size:11px;font-weight:800;letter-spacing:.24em;margin-top:8px}
+.vip-reveal-card>strong{font:900 clamp(34px,8vw,56px)/1 var(--fh);letter-spacing:-.06em;color:#fff3df;text-shadow:0 0 20px color-mix(in srgb,var(--m) 39%,transparent)}
+.vip-reveal-card>span{color:rgba(255,255,255,.75);font-size:14px}
+.vip-reveal-card .btn{margin-top:12px}
+@media(max-width:760px){.membership-hero{padding:18px 17px 14px;min-height:0;border-radius:24px}.membership-layout{grid-template-columns:minmax(0,1fr);gap:0}.membership-orbit{width:min(195px,58vw);margin:-5px auto -10px}.membership-title{font-size:clamp(36px,10vw,53px)}.membership-name{font-size:17px}.membership-intro{font-size:12px}.membership-pretitle{font-size:10px}.membership-bottomline>span:last-child{display:none}.membership-pills span{font-size:10px}.prof-banner-huge{font-size:clamp(85px,22vw,130px)}.vip-mini-preview{min-height:64px}}
+@media(max-width:400px){.membership-topline{font-size:9px;letter-spacing:.07em}.member-serial{display:none}.membership-hero{padding:16px}.membership-orbit{width:178px}}
+@media(prefers-reduced-motion:reduce){.membership-hero:before,.membership-orbit-a,.membership-orbit-b,.membership-orbit:before,.membership-orbit:after,.membership-core .ic,.orbit-star,.vip-mini-preview>span,.avatar-shell-vip,.toast-timer,.vip-reveal-card:before,.vip-reveal-crown .ic{animation:none!important}}
+body.calm .membership-hero:before,body.calm .membership-orbit-a,body.calm .membership-orbit-b,body.calm .membership-orbit:before,body.calm .membership-orbit:after,body.calm .membership-core .ic,body.calm .orbit-star,body.calm .vip-mini-preview>span,body.calm .avatar-shell-vip,body.calm .toast-timer{animation:none!important}
+
+/* VIP feels different throughout the whole site, not only on #me. */
+body.vip-view[data-active-tier="VIP-PLUS"]{--acc:#42dfff;--acc2:#87e8ff;--acc3:#6c95ff}
+body.vip-view[data-active-tier="VIP-PRO"]{--acc:#c18cff;--acc2:#e1b0ff;--acc3:#846fff}
+body.vip-view[data-active-tier="VIP-ULTRA"]{--acc:#ffce70;--acc2:#c2a0ff;--acc3:#f7a76a}
+.home-vip-beacon{--vb:var(--vip-accent);display:flex;align-items:center;gap:14px;margin:17px 0 22px;padding:15px 19px;border:1px solid color-mix(in srgb,var(--vb) 52%,transparent);border-radius:22px;background:radial-gradient(ellipse at 83% -30%,color-mix(in srgb,var(--vb) 22%,transparent),transparent 64%),linear-gradient(110deg,#161321,#0e111a);box-shadow:0 15px 45px -30px color-mix(in srgb,var(--vb) 70%,transparent);position:relative;overflow:hidden}
+.home-vip-beacon:after{content:"";height:160%;width:90px;transform:translateX(-200px) rotate(24deg);position:absolute;background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);animation:homeVipGlint 7s linear infinite;pointer-events:none}
+@keyframes homeVipGlint{to{transform:translateX(1400px) rotate(24deg)}}
+.home-vip-emblem{width:56px;height:56px;flex:0 0 56px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--vb) 60%,transparent);border-radius:18px;color:var(--vb);background:color-mix(in srgb,var(--vb) 13%,transparent);box-shadow:0 0 25px color-mix(in srgb,var(--vb) 20%,transparent)}
+.home-vip-emblem .ic{width:28px;height:28px}
+.home-vip-beacon .home-vip-title{display:block;color:var(--vb);font:900 21px var(--fh);line-height:1.2}
+.home-vip-beacon .home-vip-sub{display:block;color:#d9d5e6;font-size:12px;margin-top:3px}
+.home-vip-beacon .home-vip-arr{color:var(--vb);margin-left:auto}
+.home-vip-beacon .home-vip-arr .ic{width:22px;height:22px}
+.vip-order-note{font-size:11px;line-height:1.45;color:var(--mute);max-width:260px}
+@media(max-width:550px){
+ .top{padding:9px 10px;gap:6px}
+ .brand{gap:7px;font-size:14px;letter-spacing:-.025em}
+ .mark{width:31px;height:31px;border-radius:10px}
+ .tools{gap:5px;flex-wrap:nowrap}
+ .tools>.seg{gap:1px;flex-wrap:nowrap;padding:2px}
+ .tools>.seg button{padding:6px 8px;font-size:12px}
+ .nav-vip-marker{padding:8px;width:33px;height:33px;display:grid;place-items:center}
+ .nav-vip-marker span{display:none}
+ .tools .icon-btn{width:33px;height:33px;border-radius:11px}
+ .tools .icon-btn .ic{width:17px;height:17px}
+ .home-vip-beacon{padding:12px;gap:10px;border-radius:17px}
+ .home-vip-emblem{width:47px;height:47px;flex-basis:47px}
+ .home-vip-beacon .home-vip-title{font-size:17px}
+ .home-vip-beacon .home-vip-sub{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.home-vip-beacon:after{animation:none!important}}
+body.calm .home-vip-beacon:after{animation:none!important}
 </style>
 </head>
 <body>
@@ -474,7 +616,7 @@ async function api(m,p,b,admin){
   if(!r.ok){const e=new Error(j.error||"generic");e.code=j.error||"generic";throw e}
   return j;
 }
-function toast(msg,bad){const el=$("#toast");el.textContent=msg;el.className="toast on"+(bad?" bad":"");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),2600)}
+function toast(msg,bad){const el=$("#toast");el.innerHTML=`<span class="toast-emblem">${ic(bad?'x':'check')}</span><span class="toast-message">${esc(msg)}</span><span class="toast-timer"></span>`;el.className="toast on"+(bad?" bad":"");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),3300)}
 function openSheet(h){$("#sheet").innerHTML=h;$("#sheetWrap").classList.add("on")}
 function closeSheet(){$("#sheetWrap").classList.remove("on")}
 async function loadData(){D=await api("GET","/api/data")}
@@ -499,7 +641,7 @@ function chrome(){
   $("#dnav").innerHTML=[["home","home"],["giveaways","gw"],["minecraft","mc"],["streams","st"],["store","store"],["vip","vip"],["me","me"]].map(([k,l])=>`<a href="#${k}" data-r="${k}">${l==="vip"?"👑 VIP":t(l)}</a>`).join("");
   $("#tabbar").innerHTML=`<span class="ind"></span>`+[["home","home","home"],["gw","gift","gw"],["mc","cube","mc"],["store","bag","store"],["me","user","me"]].map(([k,i,l])=>`<a href="#${k}" data-r="${k}">${ic(i)}<span>${t(l)}</span></a>`).join("");
   $("#lang").innerHTML=[["kk","KZ"],["ru","RU"],["en","EN"]].map(([k,l])=>`<button class="${LANG===k?"on":""}" data-lang="${k}">${l}</button>`).join("");
-  $("#gear").innerHTML=`<a class="icon-btn" href="#vip" title="VIP CLUB" aria-label="VIP CLUB" style="color:var(--acc)">${ic("crown")}</a><button class="icon-btn" data-go="settings" aria-label="settings">${ic("gear")}</button>`;
+  $("#gear").innerHTML=`${ME?.vip?`<a class="nav-vip-marker" href="#me" title="${esc(ME.vip.name)}">${ic('crown')}<span>${esc(ME.vip.tier==='VIP-FREE'?'TRIAL':(ME.vip.visualTier||ME.vip.tier).replace('VIP-',''))}</span></a>`:`<a class="icon-btn" href="#vip" title="VIP CLUB" aria-label="VIP CLUB" style="color:var(--acc)">${ic("crown")}</a>`}<button class="icon-btn" data-go="settings" aria-label="settings">${ic("gear")}</button>`;
 }
 const footer=()=>`<footer class="rv"><div class="links"><a href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener">TikTok ${esc(D.owner.handle)}</a><a href="${esc(D.owner.telegram)}" target="_blank" rel="noopener">${t("tg")}</a><a href="#giveaways">${t("gw")}</a><a href="#minecraft">${t("mc")}</a><a href="#vip">👑 VIP CLUB</a></div><span>© 2026 ${esc(D.owner.name)}</span></footer>`;
 
@@ -554,7 +696,7 @@ function mrHTML(){
 const winsHTML=()=>ME&&ME.wins.length?ME.wins.map(w=>`<div class="glass ex" style="margin:0"><div><b>${esc(L(w.title))}</b><small class="mute" style="display:block">${esc(w.date)}</small></div>${w.code?`<span class="tag">${esc(w.code)}</span>`:""}</div>`).join(""):`<p class="mute">${t("nowins")}</p>`;
 function ordersTable(list){
   if(!list.length) return `<p class="mute">${t("noorders")}</p>`;
-  return `<div class="glass table"><table><tr><th>#</th><th>${t("total")}</th><th>—</th></tr>${list.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${money(o.total)}</td><td><span class="tag ${o.status==="paid"?"g":""}">${o.status==="paid"?t("paid"):t("pend")}</span></td></tr>`).join("")}</table></div>`;
+  return `<div class="glass table"><table><tr><th>#</th><th>${t("total")}</th><th>—</th></tr>${list.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${money(o.total)}</td><td><span class="tag ${o.status==="paid"?"g":""}">${o.type==='vip'?(o.approvedAt?tri('VIP расталды','VIP активирован','VIP approved'):tri('VIP күтілуде','VIP ожидает','VIP pending')):o.status==="paid"?t("paid"):t("pend")}</span></td></tr>`).join("")}</table></div>`;
 }
 
 function pHome(){
@@ -571,6 +713,7 @@ function pHome(){
       <div class="glass stat"><b data-count="${dl}">0</b><span>${t("sdl")}</span></div>
     </div>
   </section>
+  ${ME?.vip?`<a class="home-vip-beacon rv" href="#me"><div class="home-vip-emblem">${ic('crown')}</div><div><b class="home-vip-title">${esc(ME.vip.tier==='VIP-FREE'?'ULTRA TRIAL':ME.vip.name)} ✦</b><span class="home-vip-sub">${tri('VIP профилің іске қосылған • Толық көру','VIP-профиль активен • Открыть','VIP profile active • View now')}</span></div><span class="home-vip-arr">${ic('arrow')}</span></a>`:""}
   <a class="glass rv" href="#streams" style="display:flex;align-items:center;gap:14px;margin-top:26px"><span class="dot ${D.stream.live?"on":""}"></span>
     <div style="flex:1;min-width:0"><b>${esc(L(D.stream.title))}</b><small class="mute" style="display:block">${D.stream.live?t("live"):t("next")}</small>
       <div class="cd" id="cd" style="margin-top:10px"></div></div><span style="margin-left:auto;color:var(--acc)">${ic("arrow")}</span></a>
@@ -641,6 +784,48 @@ function pStore(){
   <h2 class="bl rv">${t("orders")}</h2><div id="ordersBox">${ME?"":`<p class="notice">${t("login")}</p>`}</div>
   ${footer()}`;
 }
+// Tier-specific, server-authorized visual membership experience.
+function membershipHero(u){
+  const v=u.vip;if(!v)return "";
+  const tier=v.visualTier||v.tier||"VIP-PLUS";
+  const ultra=tier==="VIP-ULTRA";
+  const isTrial=v.tier==="VIP-FREE";
+  const label=ultra?"ULTRA":tier==="VIP-PRO"?"PRO":"PLUS";
+  const title=isTrial?"VIP-FREE · ULTRA TRIAL":v.name||tier;
+  const perks=tier==="VIP-PLUS"
+     ?[tri("NEON CYAN","НЕОНОВЫЙ CYAN","NEON CYAN"),tri("Аватар жақтауы","Рамка аватара","Avatar frame"),tri("VIP белгі","Значок VIP","VIP badge")]
+     :tier==="VIP-PRO"
+     ?[tri("Голографиялық дизайн","Голографический дизайн","Holographic design"),tri("Анимациялық рамка","Анимированная рамка","Animated frame"),tri("VIP белгі","Значок VIP","VIP badge")]
+     :[tri("Алтын голограмма","Золотая голограмма","Golden hologram"),tri("Анимациялық ULTRA профиль","Анимированный ULTRA профиль","Animated ULTRA profile"),tri("Эксклюзивті тәж","Эксклюзивная корона","Exclusive crown")];
+  const until=v.expiresAt?`<span data-vip-countdown="${esc(v.expiresAt)}">${vipEndText(v)}</span>`:tri("Мерзімсіз","Бессрочно","Lifetime");
+  return `<section class="membership-hero rv" data-tier="${esc(tier)}">
+    <div class="membership-grid" aria-hidden="true"></div><div class="membership-sheen" aria-hidden="true"></div>
+    <div class="membership-topline"><span class="member-live"><i></i> A782 PREMIUM • ${tri("БЕЛСЕНДІ","АКТИВЕН","ACTIVE")}</span><span class="member-serial">ID / ${esc(String(u.id).slice(0,14))}</span></div>
+    <div class="membership-layout"><div class="membership-copy">
+      <p class="membership-pretitle">${ic('sparkles')} ${ultra?"THE ULTIMATE EXPERIENCE":"EXCLUSIVE DIGITAL IDENTITY"}</p>
+      <h2 class="membership-title">${esc(title)}</h2>
+      <p class="membership-name">@${esc(u.nick)} <span class="member-verified">${ic('check')} VERIFIED</span></p>
+      <p class="membership-intro">${ultra?tri("Бұл жай белгі емес — сенің профилің енді A782 ULTRA стилінде.","Это не просто значок — твой профиль оформлен в стиле A782 ULTRA.","More than a badge — your profile now has the full A782 ULTRA look."):tri("VIP профиліңнің ерекше дизайны іске қосылды.","Твой особый VIP-стиль активирован.","Your distinctive VIP profile style is now active.")}</p>
+      <div class="membership-pills">${perks.map(q=>`<span>${ic('check')}${esc(q)}</span>`).join('')}</div>
+      <div class="membership-expiry">${ic('clock')} ${until}${isTrial?`<small>${tri("7 күндік сынақ","Пробный доступ на 7 дней","7-day trial")}</small>`:""}</div>
+    </div>
+    <div class="membership-orbit" aria-hidden="true"><div class="membership-orbit-a"></div><div class="membership-orbit-b"></div><div class="membership-orbit-c"></div><div class="membership-core">${ic(ultra?'crown':tier==='VIP-PRO'?'gem':'star')}<span>${label}</span></div><i class="orbit-star orbit-star-1"></i><i class="orbit-star orbit-star-2"></i><i class="orbit-star orbit-star-3"></i></div></div>
+    <div class="membership-bottomline"><span>${isTrial?"ULTRA TRIAL • 7D":"A782 • ELITE MEMBERSHIP"}</span><span>✦ &nbsp; GAMING IDENTITY UNLOCKED &nbsp; ✦</span></div>
+  </section>`;
+}
+function maybeVipReveal(){
+  if(!ME?.vip||!S.motion||!['me','vip'].includes(ROUTE))return;
+  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+  const v=ME.vip, key=`a782-reveal-${ME.id}-${v.startedAt||v.planId}`;
+  if(sessionStorage.getItem(key))return;
+  sessionStorage.setItem(key,'1');
+  const level=v.visualTier||v.tier;
+  const layer=document.createElement('div');layer.className='vip-reveal';layer.dataset.tier=level;
+  layer.innerHTML=`<div class="vip-reveal-card"><div class="vip-reveal-crown">${ic('crown')}</div><p>ACCESS GRANTED</p><strong>${esc(v.tier==='VIP-FREE'?'ULTRA TRIAL':v.name||level)}</strong><span>${tri('VIP мәртебең белсенді','VIP-статус активирован','Your VIP status is active')}</span><button class="btn sm" type="button" data-revealclose="1">${tri('Профильді көру','Открыть профиль','View profile')}</button></div>`;
+  document.body.appendChild(layer);requestAnimationFrame(()=>layer.classList.add('show'));
+  const timer=setTimeout(()=>layer.remove(),4900);
+  layer.addEventListener('click',e=>{if(e.target===layer||e.target.closest('[data-revealclose]')){clearTimeout(timer);layer.remove()}});
+}
 function pMe(){
   if(!ME) return `<header class="ph rv"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${t("me_t")}</h1></header>
   <section class="glass auth rv">
@@ -654,12 +839,13 @@ function pMe(){
     <p class="mute sm" style="margin-top:12px">${t("authnote")}</p></section>
   ${footer()}`;
   const u=ME;
-  return `<header class="ph rv"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1></header>
-  ${u.vip?`<div class="vip-status rv" style="--tier:${vipColor(u.vip)};margin-bottom:16px"><div class="row" style="gap:16px"><div class="vip-crest">${ic("crown")}</div><div><b style="color:var(--tier);font:700 22px var(--fh)">${esc(u.vip.name)}</b><p class="mute sm">${u.vip.tier==="VIP-FREE"?tri("ULTRA-ның 7 күндік сынағы","7 дней ULTRA","7-day ULTRA trial"):tri("VIP белсенді","VIP активен","VIP active")}</p><p class="sm" data-vip-countdown="${esc(u.vip.expiresAt||"")}">${vipEndText(u.vip)}</p></div></div></div>`:`<div class="glass rv" style="margin-bottom:16px"><div class="row between"><span class="mute">${tri("VIP әлі қосылмаған","VIP пока не активирован","VIP not active yet")}</span><a class="btn sm" href="#vip">VIP CLUB ✨</a></div></div>`}
+  return `<header class="ph rv profile-heading"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1>${u.vip?`<span class="profile-rank" style="--rank:${vipColor(u.vip)}">${ic('crown')} ${esc(u.vip.tier==='VIP-FREE'?'ULTRA TRIAL':u.vip.name)}</span>`:''}</header>
+  ${u.vip?membershipHero(u):`<div class="glass rv" style="margin-bottom:16px"><div class="row between"><span class="mute">${tri("VIP әлі қосылмаған","VIP пока не активирован","VIP not active yet")}</span><a class="btn sm" href="#vip">VIP CLUB ✨</a></div></div>`}
   <section class="glass rv ${u.vip?'vip-identity':''}" ${u.vip?`data-vip="${esc(u.vip.visualTier||u.vip.tier||'VIP-PLUS')}" style="--vip-accent:${vipColor(u.vip)};padding:0;overflow:hidden"`:'style="padding:0;overflow:hidden"'}>
-    <div class="prof-banner" style="${u.banner?`background-image:url('${esc(u.banner)}')`:""}"></div>
-    <div class="prof-top"><div class="avatar">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:ic(u.icon||"user")}</div>
+    <div class="prof-banner ${u.vip?'prof-banner-vip':''}" style="${u.banner?`--profile-art:url('${esc(u.banner)}')`:""}">${u.vip?`<div class="prof-banner-vip-top"><span>${ic('sparkles')} PREMIUM PLAYER</span><span>${ic('crown')} ${esc(u.vip.visualTier||u.vip.tier)}</span></div><div class="prof-banner-huge">${esc((u.vip.visualTier||u.vip.tier).replace('VIP-',''))}</div>`:""}</div>
+    <div class="prof-top"><div class="avatar-shell ${u.vip?'avatar-shell-vip':''}"><div class="avatar">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:ic(u.icon||"user")}</div>${u.vip?`<span class="avatar-crown">${ic('crown')}</span>`:""}</div>
       <div class="row"><span class="tag">${t("tickets")} <b>${u.tickets}</b></span><span class="tag">${t("tokens")} <b>${u.tokens}</b></span><span class="tag">${t("diamonds")} <b>${u.diamonds}</b></span></div></div>
+    ${u.vip?`<div class="vip-identity-title"><span>${ic('shield')} ${esc(u.nick)} · ${esc(u.vip.tier==='VIP-FREE'?'ULTRA TRIAL':u.vip.name)}</span><small>✦ VERIFIED A782 VIP</small></div>`:""}
     <form id="profForm" class="form" style="padding:0 22px 22px">
       <div class="icons">${["user","gem","bolt","cube","trophy","shield","star","swords"].map(k=>`<button type="button" class="ibtn ${!u.avatar&&u.icon===k?"on":""}" data-icon="${k}">${ic(k)}</button>`).join("")}</div>
       <div class="g2">
@@ -687,13 +873,13 @@ const vipEndText=v=>v.expiresAt?tri("Аяқталады: ","Истекает: ",
 function pVip(){
  const plans=D.vipPlans||[];
  return `<header class="ph rv"><p class="eyebrow">${ic("crown")} A782 DIGITAL ACCESS</p><h1 class="grad">VIP LEVELS</h1><p class="lead">${tri("FREE — 7 күн ULTRA дизайны. PLUS / PRO / ULTRA бағаларын админ белгілейді. Төлемді админ тексеріп, растаған соң VIP қосылады.","FREE — 7 дней дизайна ULTRA. Цены PLUS / PRO / ULTRA задаёт админ. Платные уровни активируются после подтверждения.","FREE gives 7 days of ULTRA visuals. Admin sets PLUS / PRO / ULTRA prices, and confirms paid orders.")}</p></header>
- ${ME&&ME.vip?`<div class="vip-status rv" style="--tier:${vipColor(ME.vip)};margin:15px 0"><b>${ic('crown')} ${esc(ME.vip.name)}</b><div class="sm" data-vip-countdown="${esc(ME.vip.expiresAt||"")}">${vipEndText(ME.vip)}</div></div>`:""}
+ ${ME&&ME.vip?membershipHero(ME):""}
  <div class="vip-cards">${plans.map(p=>{
  const isFree=p.tier==="VIP-FREE", perks=(p.perks?.[LANG]||"").split("|").filter(Boolean);
  const priceReady=isFree||p.price>0;
  const trialUsed=!!(ME&&ME.vipTrialUsed);
  const locked=isFree&&(trialUsed||!!ME?.vip);
- return `<article class="glass tilt-card vip-card rv" data-tier="${esc(p.tier)}" style="--tier:${esc(p.color)}"><div class="vip-crest">${ic(p.icon||'crown')}</div><span class="tag" style="color:var(--tier);border-color:var(--tier)">${isFree?tri("7 КҮН ТЕГІН","7 ДНЕЙ БЕСПЛАТНО","7 DAYS FREE"):p.tier==="VIP-ULTRA"?"ULTIMATE":"EXCLUSIVE"}</span><h3>${esc(p.name)}</h3><div class="vip-price">${isFree?tri("ТЕГІН","БЕСПЛАТНО","FREE"):priceReady?money(p.price):"— ₸"}</div><p class="mute sm">${p.durationDays} ${tri("күн","дней","days")}${isFree?" · ULTRA ACCESS":""}</p><ul class="vip-perks">${perks.map(f=>`<li>${ic('check')}<span>${esc(f)}</span></li>`).join("")}</ul><button class="btn" ${!priceReady||locked?'disabled':''} ${isFree?'data-viptrial="1"':`data-vipbuy="${esc(p.id)}"`}>${locked?tri("Сынақ қолданылған","Пробный период использован","Trial already used"):!priceReady?tri("Бағаны админ орнатады","Цена ещё не установлена","Price not set yet"):isFree?tri("7 күнге қосу","Активировать на 7 дней","Activate 7-day trial"):tri("Telegram арқылы алу","Оформить через Telegram","Order via Telegram")}</button></article>`}).join("")}</div><p class="mute sm" style="margin:18px 0">${tri("VIP-FREE бір аккаунтқа бір-ақ рет беріледі. 7 күн біткенде сервер оны автоматты тоқтатады.","VIP-FREE доступен один раз на аккаунт. После 7 дней сервер автоматически отключит доступ.","VIP-FREE is once per account. Access automatically expires after seven days.")}</p>${footer()}`;
+ return `<article class="glass tilt-card vip-card rv" data-tier="${esc(p.tier)}" style="--tier:${esc(p.color)}"><div class="vip-crest">${ic(p.icon||'crown')}</div><div class="vip-mini-preview"><div class="vip-mini-ring">${ic(p.icon||'crown')}</div><div><small>YOUR PROFILE</small><b>${isFree?'ULTRA TRIAL':p.tier.replace('VIP-','')}</b></div><span>✦</span></div><span class="tag" style="color:var(--tier);border-color:var(--tier)">${isFree?tri("7 КҮН ТЕГІН","7 ДНЕЙ БЕСПЛАТНО","7 DAYS FREE"):p.tier==="VIP-ULTRA"?"ULTIMATE":"EXCLUSIVE"}</span><h3>${esc(p.name)}</h3><div class="vip-price">${isFree?tri("ТЕГІН","БЕСПЛАТНО","FREE"):priceReady?money(p.price):"— ₸"}</div><p class="mute sm">${p.durationDays} ${tri("күн","дней","days")}${isFree?" · ULTRA ACCESS":""}</p><ul class="vip-perks">${perks.map(f=>`<li>${ic('check')}<span>${esc(f)}</span></li>`).join("")}</ul><button class="btn" ${!priceReady||locked?'disabled':''} ${isFree?'data-viptrial="1"':`data-vipbuy="${esc(p.id)}"`}>${locked?tri("Сынақ қолданылған","Пробный период использован","Trial already used"):!priceReady?tri("Бағаны админ орнатады","Цена ещё не установлена","Price not set yet"):isFree?tri("7 күнге қосу","Активировать на 7 дней","Activate 7-day trial"):tri("Telegram арқылы алу","Оформить через Telegram","Order via Telegram")}</button></article>`}).join("")}</div><p class="mute sm" style="margin:18px 0">${tri("VIP-FREE бір аккаунтқа бір-ақ рет беріледі. 7 күн біткенде сервер оны автоматты тоқтатады.","VIP-FREE доступен один раз на аккаунт. После 7 дней сервер автоматически отключит доступ.","VIP-FREE is once per account. Access automatically expires after seven days.")}</p>${footer()}`;
 }
 async function claimVipTrial(){
  if(!ME){toast(t("login"),true);location.hash="#me";return}
@@ -709,7 +895,7 @@ async function buyVip(id){
   const o=r.order;
   const msg=`A782 VIP\nOrder: ${o.id}\nUser ID: ${o.userId}\nNick: ${o.nick}\nPlan: ${o.planName}\nPrice: ${o.total} KZT\nPlease confirm payment manually.`;
   const ok=await copyText(msg);
-  openSheet(`<h3>✦ VIP ${esc(o.planName)}</h3><p class="mute">${esc(o.id)} · ${money(o.total)}</p><p style="margin:12px 0">${LANG==="kk"?"Тапсырыс мәтінін Telegram-ға жіберіңіз. Админ төлемді тексеріп, VIP береді.":"Send the order details on Telegram. Admin verifies payment before activating VIP."}</p><textarea id="vipMsg" rows="7" readonly>${esc(msg)}</textarea><div class="row" style="margin-top:12px"><button class="btn ghost" id="vipCopy">${t("copy")}</button><a class="btn" href="${esc(r.telegram)}" target="_blank" rel="noopener">Telegram ↗</a></div>`);
+  openSheet(`<h3>✦ VIP ${esc(o.planName)}</h3><p class="mute">${esc(o.id)} · ${money(o.total)}</p><p style="margin:12px 0">${LANG==="kk"?"Тапсырысты Telegram-ға жіберіңіз. VIP тек админ төлемді растағаннан кейін қосылады; «Төленді» деген жазудың өзі VIP іске қосылды дегенді білдірмейді.":"Send the order details on Telegram. Admin verifies payment before activating VIP."}</p><textarea id="vipMsg" rows="7" readonly>${esc(msg)}</textarea><div class="row" style="margin-top:12px"><button class="btn ghost" id="vipCopy">${t("copy")}</button><a class="btn" href="${esc(r.telegram)}" target="_blank" rel="noopener">Telegram ↗</a></div>`);
   if(ok)toast(t("copied"));
  }catch(e){toast(errMsg(e),true)}
 }
@@ -846,6 +1032,7 @@ function render(keep){
   ROUTE=key;
   const y=scrollY;
   document.body.classList.toggle("vip-view",!!ME?.vip);
+  document.body.dataset.activeTier=ME?.vip?(ME.vip.visualTier||ME.vip.tier||''):'';
   document.documentElement.style.setProperty("--vip-accent",ME?.vip?vipColor(ME.vip):"#ffc76d");
   applySettings(); chrome();
   $$("[data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r===(key==="gw"?"giveaways":key==="mc"?"minecraft":key==="streams"?"streams":key)));
@@ -853,6 +1040,7 @@ function render(keep){
   $("#main").innerHTML=`<section class="pg" style="--dir:${dir}">${fn()}</section>`;
   scrollTo(0,keep?y:0);
   bindPage(key);
+  maybeVipReveal();
   $$(".grid > .glass, .grid > article.glass, .stats .glass").forEach(el=>el.classList.add("tilt-card"));
   reveal();
 }
@@ -1031,14 +1219,14 @@ async function loadAdmin(){
     const vp=$("#vipAdminPlans");if(vp)vp.innerHTML=plans.filter(p=>p.tier).sort((a,b)=>["VIP-FREE","VIP-PLUS","VIP-PRO","VIP-ULTRA"].indexOf(a.tier)-["VIP-FREE","VIP-PLUS","VIP-PRO","VIP-ULTRA"].indexOf(b.tier)).map(p=>`<div class="ex-row"><span>${ic(p.icon||"crown")} <b>${esc(p.name)}</b> · ${money(p.price)} · ${p.durationDays} ${tri("күн","дней","days")} ${p.active?"✓":"(off)"}</span><span class="row"><button class="btn ghost sm" data-vipedit="${esc(p.id)}">${t("edit")}</button><button class="btn red sm" data-vipdel="${esc(p.id)}">${t("del")}</button></span></div>`).join("");
     const ub=$("#usersBox"),ob=$("#ordersAdm");
     if(ub) ub.innerHTML=users.length?`<div class="table"><table><tr><th>${t("nick")||"Nick"}</th><th>${t("email")}</th><th>${t("tickets")}</th><th>${t("tokens")}</th><th>${t("diamonds")}</th></tr>
-      ${users.map(u=>`<tr><td>${esc(u.nick)} ${u.vip?"✦ VIP":""}<small class="mute" style="display:block">${esc(u.id)}</small></td><td>${esc(u.email)}</td>
+      ${users.map(u=>`<tr><td>${esc(u.nick)} ${u.vip?`<span class="tag a">${ic('crown')} ${esc(u.vip.tier||u.vip.name||'VIP')}</span>`:""}<small class="mute" style="display:block">${esc(u.id)}</small></td><td>${esc(u.email)}</td>
         <td>${u.tickets} <button class="btn ghost sm" data-bal="${u.id}|tickets|1">+1</button></td>
         <td>${u.tokens} <button class="btn ghost sm" data-bal="${u.id}|tokens|100">+100</button></td>
         <td>${u.diamonds} <button class="btn ghost sm" data-bal="${u.id}|diamonds|100">+100</button></td></tr>`).join("")}</table></div>`:`<p class="mute">${t("nousers")}</p>`;
     if(ob) ob.innerHTML=orders.length?`<div class="table"><table><tr><th>#</th><th>${t("nick")||"Nick"}</th><th>${t("total")}</th><th>${t("pend")}</th><th></th></tr>
       ${orders.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${esc(o.nick)}</td><td>${money(o.total)}</td>
         <td>${o.type==="vip"?"✦ VIP "+esc(o.planName):esc(o.method)} · ${o.status==="paid"?t("paid"):t("pend")}</td>
-        <td>${o.type==="vip"?`<button class="btn sm" data-vipapprove="${esc(o.id)}">${o.status==="paid"?"VIP іске қосу / тексеру":"VIP растау"}</button>`:`<button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button>`}</td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
+        <td>${o.type==="vip"?`<button class="btn sm" data-vipapprove="${esc(o.id)}">${o.approvedAt?"VIP расталды · тексеру":"VIP растау / қосу"}</button>`:`<button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button>`}</td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
   }catch(e){ toast(errMsg(e),true) }
 }
 const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
