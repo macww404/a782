@@ -193,6 +193,41 @@ body.calm .w>span{transform:none}
   .sheet{border-radius:28px}
   .toast{bottom:24px}
 }
+/* A782 NEON EXPERIENCE — accessible subtle 3D & motion */
+:root{--vip-accent:#ffc76d}
+body{background-image:radial-gradient(ellipse at 78% -10%,rgba(125,211,252,.08),transparent 43%),radial-gradient(ellipse at 6% 38%,rgba(167,139,250,.08),transparent 50%)}
+.glass{transform-style:preserve-3d;will-change:transform}
+@media(hover:hover) and (pointer:fine){.glass.tilt-card:hover{transform:perspective(980px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-5px);box-shadow:0 24px 70px -32px rgba(136,108,255,.55)}}
+.tilt-card{transition:transform .28s ease,border-color .4s,box-shadow .4s}
+.vip-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:24px}
+.vip-card{--tier:#8be9fd;position:relative;isolation:isolate;min-height:405px;padding:25px 18px;border-color:color-mix(in srgb,var(--tier) 36%,var(--line));background:linear-gradient(155deg,color-mix(in srgb,var(--tier) 11%,var(--glass)),var(--glass) 45%,var(--glass))}
+.vip-card:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(110deg,transparent 12%,color-mix(in srgb,var(--tier) 16%,transparent) 48%,transparent 72%);transform:translateX(-130%);animation:vipSweep 8s ease-in-out infinite}
+.vip-card:nth-child(2):after{animation-delay:1s}.vip-card:nth-child(3):after{animation-delay:2s}.vip-card:nth-child(4):after{animation-delay:3s}
+@keyframes vipSweep{0%,60%{transform:translateX(-130%)}86%,100%{transform:translateX(130%)}}
+.vip-card .vip-crest{width:59px;height:59px;border-radius:20px;display:grid;place-items:center;margin-bottom:10px;background:color-mix(in srgb,var(--tier) 16%,transparent);color:var(--tier);border:1px solid color-mix(in srgb,var(--tier) 45%,transparent);box-shadow:0 0 25px color-mix(in srgb,var(--tier) 16%,transparent)}
+.vip-crest .ic{width:30px;height:30px}.vip-card h3{font-size:25px;margin:6px 0}
+.vip-card .vip-price{font:700 30px var(--fh);letter-spacing:-.05em;color:var(--tier)}
+.vip-perks{list-style:none;display:grid;gap:9px;margin:14px 0 22px}.vip-perks li{display:flex;gap:8px;font-size:12px;line-height:1.5}.vip-perks .ic{width:16px;height:16px;color:var(--tier)}
+.vip-card .btn{margin-top:auto;width:100%;background:linear-gradient(120deg,var(--tier),var(--acc3));color:#0a0b10}
+.vip-card[data-tier="VIP-ULTRA"]{box-shadow:0 10px 65px -35px rgba(255,199,109,.45)}
+.vip-card[data-tier="VIP-PRO"]{box-shadow:0 10px 55px -35px rgba(177,140,255,.4)}
+.vip-status{--tier:#ffc76d;border:1px solid color-mix(in srgb,var(--tier) 45%,var(--line));background:linear-gradient(125deg,color-mix(in srgb,var(--tier) 13%,var(--bg2)),var(--glass));padding:20px;border-radius:23px;position:relative;overflow:hidden}
+.vip-status:after{content:"";position:absolute;right:-25px;top:-55px;width:200px;height:200px;border:1px solid color-mix(in srgb,var(--tier) 32%,transparent);border-radius:50%;box-shadow:0 0 0 24px color-mix(in srgb,var(--tier) 4%,transparent),0 0 0 56px color-mix(in srgb,var(--tier) 3%,transparent);pointer-events:none;animation:halo 6s ease-in-out infinite alternate}
+@keyframes halo{to{transform:scale(1.17) rotate(15deg)}}
+.vip-identity .avatar{border-color:var(--vip-accent);box-shadow:0 0 20px color-mix(in srgb,var(--vip-accent) 55%,transparent)}
+.vip-identity[data-vip="VIP-PRO"] .avatar,.vip-identity[data-vip="VIP-ULTRA"] .avatar{animation:avatarPulse 3s ease-in-out infinite alternate}
+@keyframes avatarPulse{to{box-shadow:0 0 15px 5px color-mix(in srgb,var(--vip-accent) 38%,transparent),0 0 38px color-mix(in srgb,var(--vip-accent) 35%,transparent)}}
+.vip-identity .prof-banner{background-image:linear-gradient(125deg,color-mix(in srgb,var(--vip-accent) 82%,#373d88),#141724 66%,var(--vip-accent));background-size:230% 230%;animation:profileWave 9s ease-in-out infinite alternate}
+@keyframes profileWave{to{background-position:100% 60%}}
+body.vip-view .aurora i:first-child{background:var(--vip-accent)}
+.toast{border:1px solid var(--line);box-shadow:0 15px 40px rgba(0,0,0,.35);transition:transform .55s cubic-bezier(.17,.89,.32,1.35),opacity .35s;opacity:0;backdrop-filter:blur(18px)}
+.toast.on{opacity:1;animation:toastBounce .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes toastBounce{0%{filter:blur(5px);scale:.86}75%{filter:blur(0);scale:1.035}100%{scale:1}}
+.notice{animation:noticeFloat .55s var(--e)}@keyframes noticeFloat{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@media(max-width:1000px){.vip-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.vip-cards{grid-template-columns:1fr}.vip-card{min-height:0}.vip-card h3{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.vip-card:after,.vip-status:after,.vip-identity .avatar,.vip-identity .prof-banner,.toast.on{animation:none!important}.glass.tilt-card:hover{transform:none!important}}
+body.calm .vip-card:after,body.calm .vip-status:after,body.calm .vip-identity .avatar,body.calm .vip-identity .prof-banner{animation:none!important}
 </style>
 </head>
 <body>
@@ -211,6 +246,8 @@ body.calm .w>span{transform:none}
 
 <script>
 const ICON={
+crown:'<path d="M2 8l5 4 5-8 5 8 5-4-2 12H4z"/><path d="M4 20h16"/>',
+sparkles:'<path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/><path d="M19 2v5M16.5 4.5h5"/>',
 home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',
 gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zm0 0c2-4 6-4 6-1.5S14 8 12 8z"/>',
 cube:'<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>',
@@ -256,7 +293,7 @@ const ic=(n,c="")=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke=
 const T={
 kk:{home:"Басты бет",gw:"Ұтыс ойындары",mc:"Minecraft",st:"Стрим",store:"Дүкен",me:"Профиль",set:"Баптаулар",adm:"Админ",
 tag:"Ойыншылар порталы",htitle:"Модпактар, Ұтыс-ойындар, стрим",hlead:"Модпактарды жүктеп алыңыз, билет жинап Ұтыс ойындарға қатысыңыз, ойын каналдарына өтіңіз.",
-bgw:"Ұтыс ойындарына өту",bmc:"Minecraft Hub",bgw:"Ұтыс ойындарына өту",smp:"модпак",sdl:"жүктеу",
+bgw:"Ұтыс ойындарына өту",bmc:"Minecraft Hub",smp:"модпак",sdl:"жүктеу",
 live:"Эфирде",off:"Эфирде емес",next:"Келесі стрим",secgw:"Белсенді ұтыс ойындары",secmp:"Модпактар",secg:"Ойындар және жеке чаттар",all:"Барлығы",
 ck:"Тапсырыс",ct:"Сайт және стрим дизайны",cp:"Қажетті нәрсені жазыңыз, бағасын Telegram-да келісеміз.",ctg:"Telegram-да жазу",
 follow:"TikTok-қа жазылу",tg:"Telegram",chan:"Каналға өту",gamechat:"Чатқа кіру",soon:"Жақында",
@@ -459,12 +496,12 @@ function applySettings(){document.documentElement.dataset.theme=S.theme;document
 
 function chrome(){
   $("#brand").textContent=D.owner.name;
-  $("#dnav").innerHTML=[["home","home"],["giveaways","gw"],["minecraft","mc"],["streams","st"],["store","store"],["me","me"]].map(([k,l])=>`<a href="#${k}" data-r="${k}">${t(l)}</a>`).join("");
+  $("#dnav").innerHTML=[["home","home"],["giveaways","gw"],["minecraft","mc"],["streams","st"],["store","store"],["vip","vip"],["me","me"]].map(([k,l])=>`<a href="#${k}" data-r="${k}">${l==="vip"?"👑 VIP":t(l)}</a>`).join("");
   $("#tabbar").innerHTML=`<span class="ind"></span>`+[["home","home","home"],["gw","gift","gw"],["mc","cube","mc"],["store","bag","store"],["me","user","me"]].map(([k,i,l])=>`<a href="#${k}" data-r="${k}">${ic(i)}<span>${t(l)}</span></a>`).join("");
   $("#lang").innerHTML=[["kk","KZ"],["ru","RU"],["en","EN"]].map(([k,l])=>`<button class="${LANG===k?"on":""}" data-lang="${k}">${l}</button>`).join("");
-  $("#gear").innerHTML=`<button class="icon-btn" data-go="settings" aria-label="settings">${ic("gear")}</button>`;
+  $("#gear").innerHTML=`<a class="icon-btn" href="#vip" title="VIP CLUB" aria-label="VIP CLUB" style="color:var(--acc)">${ic("crown")}</a><button class="icon-btn" data-go="settings" aria-label="settings">${ic("gear")}</button>`;
 }
-const footer=()=>`<footer class="rv"><div class="links"><a href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener">TikTok ${esc(D.owner.handle)}</a><a href="${esc(D.owner.telegram)}" target="_blank" rel="noopener">${t("tg")}</a><a href="#giveaways">${t("gw")}</a><a href="#minecraft">${t("mc")}</a></div><span>© 2026 ${esc(D.owner.name)}</span></footer>`;
+const footer=()=>`<footer class="rv"><div class="links"><a href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener">TikTok ${esc(D.owner.handle)}</a><a href="${esc(D.owner.telegram)}" target="_blank" rel="noopener">${t("tg")}</a><a href="#giveaways">${t("gw")}</a><a href="#minecraft">${t("mc")}</a><a href="#vip">👑 VIP CLUB</a></div><span>© 2026 ${esc(D.owner.name)}</span></footer>`;
 
 function gameCard(g,i=0){
   const live=g.status==="live";
@@ -618,8 +655,8 @@ function pMe(){
   ${footer()}`;
   const u=ME;
   return `<header class="ph rv"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1></header>
-  ${u.vip?`<div class="glass glow rv" style="margin-bottom:14px"><span class="tag a">✦ VIP ${esc(u.vip.name)}</span><p class="mute sm">${u.vip.expiresAt?esc(new Date(u.vip.expiresAt).toLocaleDateString()):"Lifetime ∞"}</p></div>`:""}
-  <section class="glass rv" style="padding:0;overflow:hidden">
+  ${u.vip?`<div class="vip-status rv" style="--tier:${vipColor(u.vip)};margin-bottom:16px"><div class="row" style="gap:16px"><div class="vip-crest">${ic("crown")}</div><div><b style="color:var(--tier);font:700 22px var(--fh)">${esc(u.vip.name)}</b><p class="mute sm">${u.vip.tier==="VIP-FREE"?tri("ULTRA-ның 7 күндік сынағы","7 дней ULTRA","7-day ULTRA trial"):tri("VIP белсенді","VIP активен","VIP active")}</p><p class="sm" data-vip-countdown="${esc(u.vip.expiresAt||"")}">${vipEndText(u.vip)}</p></div></div></div>`:`<div class="glass rv" style="margin-bottom:16px"><div class="row between"><span class="mute">${tri("VIP әлі қосылмаған","VIP пока не активирован","VIP not active yet")}</span><a class="btn sm" href="#vip">VIP CLUB ✨</a></div></div>`}
+  <section class="glass rv ${u.vip?'vip-identity':''}" ${u.vip?`data-vip="${esc(u.vip.visualTier||u.vip.tier||'VIP-PLUS')}" style="--vip-accent:${vipColor(u.vip)};padding:0;overflow:hidden"`:'style="padding:0;overflow:hidden"'}>
     <div class="prof-banner" style="${u.banner?`background-image:url('${esc(u.banner)}')`:""}"></div>
     <div class="prof-top"><div class="avatar">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:ic(u.icon||"user")}</div>
       <div class="row"><span class="tag">${t("tickets")} <b>${u.tickets}</b></span><span class="tag">${t("tokens")} <b>${u.tokens}</b></span><span class="tag">${t("diamonds")} <b>${u.diamonds}</b></span></div></div>
@@ -644,10 +681,26 @@ function pMe(){
   <div class="row bl"><a class="btn ghost sm" href="#settings">${ic("gear")} ${t("setl")}</a></div>
   ${footer()}`;
 }
+const tri=(kk,ru,en)=>LANG==="ru"?ru:LANG==="en"?en:kk;
+const vipColor=v=>({"VIP-FREE":"#ffc76d","VIP-PLUS":"#48d5ff","VIP-PRO":"#b18cff","VIP-ULTRA":"#ffc76d"})[v.visualTier||v.tier||v.name]||"#ffc76d";
+const vipEndText=v=>v.expiresAt?tri("Аяқталады: ","Истекает: ","Expires: ")+new Date(v.expiresAt).toLocaleString(LANG==="kk"?"kk-KZ":LANG==="ru"?"ru-RU":"en-US"):"∞";
 function pVip(){
  const plans=D.vipPlans||[];
- return `<header class="ph rv"><p class="eyebrow">✦ A782 VIP</p><h1 class="grad">VIP CLUB</h1><p class="lead">${LANG==="ru"?"Выберите план. Оплата согласуется в Telegram и подтверждается администратором.":LANG==="en"?"Choose a plan. Payment is arranged in Telegram and verified by an admin.":"Тариф таңдаңыз. Төлем Telegram-да келісіліп, админ растаған соң VIP қосылады."}</p></header>
- <div class="grid">${plans.map(p=>`<article class="glass glow card rv"><span class="tag a">✦ VIP</span><h3>${esc(p.name)}</h3><div style="font:700 32px var(--fh)">${money(p.price)}</div><p class="mute">${p.durationDays===0?"∞ Lifetime":p.durationDays+" күн / дней / days"}</p><button class="btn wide" data-vipbuy="${esc(p.id)}">${LANG==="ru"?"Оформить":LANG==="en"?"Order":"Тапсырыс беру"}</button></article>`).join("")||`<div class="empty">${LANG==="kk"?"Тарифтерді админ панелінен қосыңыз":"Add plans from the admin panel"}</div>`}</div>${footer()}`;
+ return `<header class="ph rv"><p class="eyebrow">${ic("crown")} A782 DIGITAL ACCESS</p><h1 class="grad">VIP LEVELS</h1><p class="lead">${tri("FREE — 7 күн ULTRA дизайны. PLUS / PRO / ULTRA бағаларын админ белгілейді. Төлемді админ тексеріп, растаған соң VIP қосылады.","FREE — 7 дней дизайна ULTRA. Цены PLUS / PRO / ULTRA задаёт админ. Платные уровни активируются после подтверждения.","FREE gives 7 days of ULTRA visuals. Admin sets PLUS / PRO / ULTRA prices, and confirms paid orders.")}</p></header>
+ ${ME&&ME.vip?`<div class="vip-status rv" style="--tier:${vipColor(ME.vip)};margin:15px 0"><b>${ic('crown')} ${esc(ME.vip.name)}</b><div class="sm" data-vip-countdown="${esc(ME.vip.expiresAt||"")}">${vipEndText(ME.vip)}</div></div>`:""}
+ <div class="vip-cards">${plans.map(p=>{
+ const isFree=p.tier==="VIP-FREE", perks=(p.perks?.[LANG]||"").split("|").filter(Boolean);
+ const priceReady=isFree||p.price>0;
+ const trialUsed=!!(ME&&ME.vipTrialUsed);
+ const locked=isFree&&(trialUsed||!!ME?.vip);
+ return `<article class="glass tilt-card vip-card rv" data-tier="${esc(p.tier)}" style="--tier:${esc(p.color)}"><div class="vip-crest">${ic(p.icon||'crown')}</div><span class="tag" style="color:var(--tier);border-color:var(--tier)">${isFree?tri("7 КҮН ТЕГІН","7 ДНЕЙ БЕСПЛАТНО","7 DAYS FREE"):p.tier==="VIP-ULTRA"?"ULTIMATE":"EXCLUSIVE"}</span><h3>${esc(p.name)}</h3><div class="vip-price">${isFree?tri("ТЕГІН","БЕСПЛАТНО","FREE"):priceReady?money(p.price):"— ₸"}</div><p class="mute sm">${p.durationDays} ${tri("күн","дней","days")}${isFree?" · ULTRA ACCESS":""}</p><ul class="vip-perks">${perks.map(f=>`<li>${ic('check')}<span>${esc(f)}</span></li>`).join("")}</ul><button class="btn" ${!priceReady||locked?'disabled':''} ${isFree?'data-viptrial="1"':`data-vipbuy="${esc(p.id)}"`}>${locked?tri("Сынақ қолданылған","Пробный период использован","Trial already used"):!priceReady?tri("Бағаны админ орнатады","Цена ещё не установлена","Price not set yet"):isFree?tri("7 күнге қосу","Активировать на 7 дней","Activate 7-day trial"):tri("Telegram арқылы алу","Оформить через Telegram","Order via Telegram")}</button></article>`}).join("")}</div><p class="mute sm" style="margin:18px 0">${tri("VIP-FREE бір аккаунтқа бір-ақ рет беріледі. 7 күн біткенде сервер оны автоматты тоқтатады.","VIP-FREE доступен один раз на аккаунт. После 7 дней сервер автоматически отключит доступ.","VIP-FREE is once per account. Access automatically expires after seven days.")}</p>${footer()}`;
+}
+async function claimVipTrial(){
+ if(!ME){toast(t("login"),true);location.hash="#me";return}
+ try{
+   const r=await api("POST","/api/vip/trial",{});
+   ME=r.user;toast(tri("ULTRA сынағы 7 күнге қосылды ✨","Пробный ULTRA активирован на 7 дней ✨","ULTRA trial activated for 7 days ✨"));render(true);
+ }catch(e){toast(({trial_used:tri("Тегін сынақ бұрын қолданылған","Пробный период уже использован","Trial already used"),vip_active:tri("Сізде VIP белсенді","У вас уже есть VIP","VIP already active")})[e.code]||errMsg(e),true)}
 }
 async function buyVip(id){
  if(!ME){toast(t("login"),true);location.hash="#me";return}
@@ -753,10 +806,11 @@ function pAdmin(){
       <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div></form></section>
 
   <section class="glass rv bl"><h3>✦ VIP тарифтері</h3><div id="vipAdminPlans"></div>
+    <p class="mute sm">${tri("Деңгейді «Өңдеу» арқылы таңдаңыз. VIP-FREE әрқашан 7 күн және тегін.","Нажмите «Изменить» для нужного уровня. FREE всегда бесплатен на 7 дней.","Select a tier via Edit. FREE is always a 7-day free trial.")}</p>
     <form id="vipPlanForm" class="form"><input type="hidden" name="id"><div class="g3">
-    <label class="field">Атауы / Name<input name="name" required maxlength="70" placeholder="VIP GOLD"></label>
+    <label class="field">VIP деңгейі<input name="name" readonly required placeholder="Алдымен Өңдеу бас"></label>
     <label class="field">Бағасы ₸<input name="price" type="number" min="0" max="10000000" required></label>
-    <label class="field">Күн (0 = мәңгі)<input name="durationDays" type="number" min="0" max="36500" required value="30"></label></div>
+    <label class="field">Мерзімі (күн)<input name="durationDays" type="number" min="1" max="36500" required value="30"></label></div>
     <label class="row"><input type="checkbox" name="active" checked> Белсенді / Active</label>
     <div class="row"><button class="btn sm" type="button" id="vipSaveBtn">${t("save")}</button><button class="btn ghost sm" type="reset">${t("cancel")}</button></div></form></section>
   <section class="glass rv bl"><h3>${t("sec_b")}</h3><div id="usersBox"></div></section>
@@ -791,12 +845,15 @@ function render(keep){
   const dir=(TABS.indexOf(key)>=TABS.indexOf(ROUTE)||TABS.indexOf(ROUTE)<0)?1:-1;
   ROUTE=key;
   const y=scrollY;
+  document.body.classList.toggle("vip-view",!!ME?.vip);
+  document.documentElement.style.setProperty("--vip-accent",ME?.vip?vipColor(ME.vip):"#ffc76d");
   applySettings(); chrome();
   $$("[data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r===(key==="gw"?"giveaways":key==="mc"?"minecraft":key==="streams"?"streams":key)));
   const ti=TABS.indexOf(key); if(ti>=0) $("#tabbar").style.setProperty("--i",ti);
   $("#main").innerHTML=`<section class="pg" style="--dir:${dir}">${fn()}</section>`;
   scrollTo(0,keep?y:0);
   bindPage(key);
+  $$(".grid > .glass, .grid > article.glass, .stats .glass").forEach(el=>el.classList.add("tilt-card"));
   reveal();
 }
 function bindPage(key){
@@ -971,7 +1028,7 @@ async function loadAdmin(){
   try{
     const [{users},{orders},{plans}]=await Promise.all([api("GET","/api/admin/users",null,true),api("GET","/api/admin/orders",null,true),api("GET","/api/admin/vip-plans",null,true)]);
     window.vipAdminPlans=plans;
-    const vp=$("#vipAdminPlans");if(vp)vp.innerHTML=plans.map(p=>`<div class="ex-row"><span>${esc(p.name)} · ${money(p.price)} · ${p.durationDays||"∞"} ${p.active?"✓":"(off)"}</span><span class="row"><button class="btn ghost sm" data-vipedit="${esc(p.id)}">${t("edit")}</button><button class="btn red sm" data-vipdel="${esc(p.id)}">${t("del")}</button></span></div>`).join("");
+    const vp=$("#vipAdminPlans");if(vp)vp.innerHTML=plans.filter(p=>p.tier).sort((a,b)=>["VIP-FREE","VIP-PLUS","VIP-PRO","VIP-ULTRA"].indexOf(a.tier)-["VIP-FREE","VIP-PLUS","VIP-PRO","VIP-ULTRA"].indexOf(b.tier)).map(p=>`<div class="ex-row"><span>${ic(p.icon||"crown")} <b>${esc(p.name)}</b> · ${money(p.price)} · ${p.durationDays} ${tri("күн","дней","days")} ${p.active?"✓":"(off)"}</span><span class="row"><button class="btn ghost sm" data-vipedit="${esc(p.id)}">${t("edit")}</button><button class="btn red sm" data-vipdel="${esc(p.id)}">${t("del")}</button></span></div>`).join("");
     const ub=$("#usersBox"),ob=$("#ordersAdm");
     if(ub) ub.innerHTML=users.length?`<div class="table"><table><tr><th>${t("nick")||"Nick"}</th><th>${t("email")}</th><th>${t("tickets")}</th><th>${t("tokens")}</th><th>${t("diamonds")}</th></tr>
       ${users.map(u=>`<tr><td>${esc(u.nick)} ${u.vip?"✦ VIP":""}<small class="mute" style="display:block">${esc(u.id)}</small></td><td>${esc(u.email)}</td>
@@ -1016,7 +1073,8 @@ document.addEventListener("click",async e=>{
   if(e.target.closest("#vipSaveBtn")){
     e.preventDefault();
     const f=document.getElementById("vipPlanForm");
-    if(!f || !f.reportValidity())return;
+    if(!f || !f.elements.id.value){toast(tri("Алдымен VIP тарифінің «Өңдеу» батырмасын бас","Сначала нажмите «Изменить» у тарифа","Select a VIP plan with Edit first"),true);return}
+    if(!f.reportValidity())return;
     const btn=e.target.closest("#vipSaveBtn");
     const b=Object.fromEntries(new FormData(f));b.active=f.elements.active.checked;
     btn.disabled=true;
@@ -1025,9 +1083,10 @@ document.addEventListener("click",async e=>{
     finally{btn.disabled=false}
     return;
   }
+  if(d.viptrial){claimVipTrial();return}
   if(d.vipbuy){buyVip(d.vipbuy);return}
   if(d.vipapprove){if(confirm("Төлемді тексердіңіз бе? VIP берілсін бе?"))api("POST",`/api/admin/vip-orders/${d.vipapprove}/approve`,{},true).then(r=>{if(ME&&r.user&&ME.id===r.user.id)ME=r.user;toast("VIP тексерілді / іске қосылды");loadAdmin()}).catch(e=>toast(errMsg(e),true));return}
-  if(d.vipedit){const p=(window.vipAdminPlans||[]).find(x=>x.id===d.vipedit),f=$("#vipPlanForm");if(p&&f){fillForm(f,p);f.elements.active.checked=p.active;f.scrollIntoView({behavior:"smooth"})}return}
+  if(d.vipedit){const p=(window.vipAdminPlans||[]).find(x=>x.id===d.vipedit),f=$("#vipPlanForm");if(p&&f){fillForm(f,p);f.elements.active.checked=p.active;const free=p.tier==="VIP-FREE";f.elements.price.readOnly=free;f.elements.durationDays.readOnly=free;f.scrollIntoView({behavior:"smooth"})}return}
   if(d.vipdel){if(confirm("Тарифті өшіру керек пе?"))api("DELETE",`/api/admin/vip-plans/${d.vipdel}`,null,true).then(async()=>{await loadData();render(true)}).catch(e=>toast(errMsg(e),true));return}
   switch(btn.id){
     case "vipCopy":copyText($("#vipMsg").value).then(ok=>toast(ok?t("copied"):"Copy failed",!ok));return;
@@ -1064,6 +1123,17 @@ document.addEventListener("change",e=>{
   }
 });
 document.addEventListener("input",e=>{if(e.target.id==="mcQ")MC.q=e.target.value.trim()});
+if(matchMedia("(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)").matches){
+ document.addEventListener("pointermove",e=>{
+  if(!S.motion)return;
+  const card=e.target.closest(".tilt-card");if(!card)return;
+  const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  card.style.setProperty("--ry",(x*7).toFixed(2)+"deg");card.style.setProperty("--rx",(-y*7).toFixed(2)+"deg");
+ },{passive:true});
+ document.addEventListener("pointerout",e=>{const card=e.target.closest(".tilt-card");if(card&&!card.contains(e.relatedTarget)){card.style.removeProperty("--rx");card.style.removeProperty("--ry")}});
+}
+// Countdown is cosmetic; the server is the authority and revokes expired VIP access.
+setInterval(()=>{document.querySelectorAll("[data-vip-countdown]").forEach(el=>{const end=Date.parse(el.dataset.vipCountdown);if(!Number.isFinite(end))return;let sec=Math.max(0,Math.floor((end-Date.now())/1000));const d=Math.floor(sec/86400);sec%=86400;const hrs=Math.floor(sec/3600);sec%=3600;el.textContent=d+tri(" күн "," дн. "," days ")+hrs+":"+String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")+(d===0&&hrs===0&&sec===0?" · expired":"")})},1000);
 
 document.addEventListener("submit",async e=>{
   e.preventDefault();
