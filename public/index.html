@@ -370,6 +370,103 @@ body.vip-view[data-active-tier="VIP-ULTRA"]{--acc:#ffce70;--acc2:#c2a0ff;--acc3:
 }
 @media(prefers-reduced-motion:reduce){.home-vip-beacon:after{animation:none!important}}
 body.calm .home-vip-beacon:after{animation:none!important}
+
+/* PREMIUM STUDIO: utility first, with strong and calm visuals. */
+.studio{border-color:color-mix(in srgb,var(--studio-color) 55%,var(--line));background:radial-gradient(ellipse at 95% 0%,color-mix(in srgb,var(--studio-color) 15%,transparent),transparent 52%),var(--glass)}
+.studio-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}.studio-head h3{font-size:26px;margin:5px 0}
+.studio-status{color:var(--studio-color);border:1px solid color-mix(in srgb,var(--studio-color) 55%,transparent);background:color-mix(in srgb,var(--studio-color) 10%,transparent);padding:7px 11px;border-radius:40px;font-weight:700;font-size:12px}
+.studio-colors{display:grid;grid-template-columns:repeat(auto-fit,minmax(65px,1fr));gap:9px;margin-top:5px}.studio-colors label{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:9px 5px;border:1px solid var(--line);border-radius:14px;min-width:0;transition:transform .22s,border-color .22s;background:var(--glass)}
+.studio-colors input{position:absolute;opacity:0;width:1px;height:1px}.studio-colors label:has(input:checked){border-color:var(--studio-color);box-shadow:0 0 0 1px var(--studio-color) inset}.studio-colors label:hover{transform:translateY(-3px)}.studio-colors label:focus-within{outline:2px solid var(--studio-color);outline-offset:2px}
+.studio-colors small{color:var(--mute);font-size:10px}.color-dot{display:block;width:34px;height:34px;border-radius:12px;background:linear-gradient(145deg,var(--c1),var(--c2));box-shadow:0 3px 13px color-mix(in srgb,var(--c1) 32%,transparent)}
+.studio-links{border:1px solid var(--line);padding:11px 12px;border-radius:17px;display:flex;gap:8px;flex-wrap:wrap}.studio-links legend{color:var(--mute);font-size:12px;padding:0 7px}.studio-links label{display:inline-flex;gap:5px;align-items:center;border:1px solid var(--line);padding:8px 10px;border-radius:25px;cursor:pointer;font-size:12px}.studio-links label:has(input:checked){color:var(--acc);border-color:var(--acc)}.studio-links input{accent-color:var(--acc)}
+.my-library .library-list{display:grid;gap:8px}.library-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:15px;background:var(--glass)}.library-item>div:nth-child(2){flex:1;min-width:0}.library-item b{font-size:13px;display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.library-item small{display:block;font-size:11px;color:var(--mute)}.library-icon{display:grid;place-items:center;color:var(--acc);background:var(--glass);width:38px;height:38px;border-radius:12px;flex:0 0 auto}.library-item .btn{padding:7px 9px}.library-item .btn .ic{width:14px;height:14px}
+.lib-toggle{white-space:nowrap}.lib-toggle.is-saved{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.vip-desk{margin:10px 0 23px;border-color:color-mix(in srgb,var(--vip-accent) 36%,var(--line));background:radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--vip-accent) 14%,transparent),transparent 50%),var(--glass)}.vip-desk h3{margin:0 0 3px}.vip-desk-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.vip-desk-links a{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line));border-radius:14px;background:var(--glass);transition:transform .2s,border-color .2s}.vip-desk-links a:hover{transform:translateY(-2px);border-color:var(--acc)}.vip-desk-links .ic{width:17px;height:17px;color:var(--acc)}.profile-custom-status{margin:7px 0}
+@media(max-width:550px){.studio{padding:16px}.studio-colors{grid-template-columns:repeat(3,minmax(0,1fr))}.library-item{gap:6px}.library-item .btn{font-size:11px;padding:6px}.library-item .library-icon{display:none}}
+@media(prefers-reduced-motion:reduce){.studio-colors label,.vip-desk-links a{transition:none!important;transform:none!important}}
+.mr-save{flex-shrink:0}.mr-save .lib-toggle{font-size:11px;padding:7px 10px}.mr-save .lib-toggle .ic{width:14px;height:14px}@media(max-width:550px){.mr-save .lib-toggle{font-size:0;padding:8px}.mr-save .lib-toggle .ic{width:17px;height:17px}}
+
+/* A782 NEXUS V4: premium visual system. All tiers still use existing server entitlements. */
+:root{--nx-ink:#f6f2ff;--nx-gold:#ffd281;--nx-violet:#b49aff}
+.nexus-kicker{display:inline-flex;align-items:center;gap:8px;color:#ccb8fd;font:800 10px/1.5 var(--fh);letter-spacing:.21em;text-transform:uppercase}.nexus-kicker .ic{width:15px;height:15px}
+.nexus-landing,.nexus-member,.nexus-studio,.nexus-desk{font-family:Inter,system-ui,sans-serif}
+.nexus-landing{position:relative;isolation:isolate;display:grid;grid-template-columns:1.03fr .97fr;gap:14px;min-height:550px;overflow:hidden;border:1px solid rgba(168,139,250,.28);border-radius:32px;margin:5px 0 58px;background:radial-gradient(ellipse at 64% 24%,rgba(119,82,208,.29),transparent 48%),radial-gradient(ellipse at 0 90%,rgba(42,106,182,.18),transparent 52%),linear-gradient(130deg,#0e0d1a,#090b17 70%,#141025);box-shadow:0 36px 95px -65px rgba(139,100,255,.56);color:var(--nx-ink)}
+.nexus-landing:before{position:absolute;inset:0;z-index:-1;content:"";opacity:.38;background:radial-gradient(circle,rgba(255,255,255,.32) .65px,transparent 1px) 0 0/29px 29px;mask-image:linear-gradient(100deg,transparent 20%,#000 100%)}
+.nexus-landing:after{position:absolute;inset:-1px;z-index:-1;content:"";background:linear-gradient(110deg,transparent 22%,rgba(190,158,255,.06) 45%,transparent 65%);background-size:240% 100%;animation:nx-foil 13s ease-in-out infinite}
+.nexus-landing-lines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 48px,rgba(156,123,234,.025) 48px 49px)}
+.nexus-landing-copy{position:relative;z-index:2;padding:69px 0 39px 46px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.nexus-landing h1{font:900 clamp(47px,5.5vw,87px)/.96 var(--fh);letter-spacing:-.074em;margin:28px 0 22px;white-space:nowrap;color:#fcfaff}
+.nexus-landing h1 em{font-style:normal;background:linear-gradient(115deg,#eee1ff,#b59eff 31%,#fff4d3 70%,#ffaedb);background-size:180% 180%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:nx-holo 9s ease-in-out infinite}
+.nexus-landing-copy>p{font-size:15px;color:#c1bcce;max-width:445px;line-height:1.85}
+.nexus-landing-actions{display:flex;gap:13px;align-items:center;flex-wrap:wrap;margin-top:29px}.nexus-landing-actions .btn{background:linear-gradient(115deg,#e6d6ff,#c3a1ff);border-radius:13px;color:#161020;padding:13px 18px;box-shadow:0 11px 40px -16px #c3a1ff}
+.nexus-simple-link{display:inline-flex;gap:7px;align-items:center;color:#ddd8ea;font-size:13px;font-weight:700;padding:12px}.nexus-simple-link .ic{width:16px;height:16px}
+.nexus-landing-foot{display:flex;gap:11px;align-items:center;margin-top:46px;color:#847b9f;font-size:9px;letter-spacing:.14em;font-weight:800}.nexus-landing-foot i{width:3px;height:3px;border-radius:50%;background:#83719d}
+.nexus-landing-stage{position:relative;min-width:0;display:flex;align-items:center;justify-content:center;perspective:1300px}.nexus-stage-halo{position:absolute;width:430px;height:430px;max-width:100%;border-radius:50%;background:conic-gradient(from 35deg,rgba(255,214,136,.01),rgba(179,132,255,.5),rgba(126,196,255,.03),rgba(255,226,172,.31),rgba(255,214,136,.01));filter:blur(52px);animation:nx-breathe 8s ease-in-out infinite alternate}
+.nexus-stage-rings{position:absolute;width:470px;max-width:98%;aspect-ratio:1;border:1px solid rgba(210,188,255,.18);border-radius:50%;box-shadow:0 0 0 44px rgba(159,120,249,.022),0 0 0 85px rgba(159,120,249,.021);transform:rotateX(65deg);animation:nx-ring 16s linear infinite}
+.nexus-stage-card,.nexus-pass,.nexus-tier-pass,.nexus-preview-card{position:relative;isolation:isolate;overflow:hidden;border-radius:26px;box-shadow:0 36px 45px -29px rgba(0,0,0,.83),0 8px 34px -12px rgba(171,113,244,.3),inset 0 1px rgba(255,255,255,.31)}
+.nexus-stage-card{width:min(310px,76%);aspect-ratio:.71;padding:27px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,219,157,.62);background:radial-gradient(ellipse at 95% -5%,rgba(255,230,181,.67),transparent 35%),radial-gradient(ellipse at 0 89%,rgba(171,110,240,.63),transparent 57%),linear-gradient(145deg,#2d203b,#221a2e 50%,#0c0d20);transform:rotate(-12deg) rotateY(-13deg);animation:nx-float 6s ease-in-out infinite alternate}
+.nexus-stage-card:before,.nexus-pass:before,.nexus-tier-pass:before,.nexus-preview-card:before{content:"";position:absolute;inset:-90%;pointer-events:none;background:linear-gradient(106deg,transparent 44%,rgba(255,255,255,.24) 49%,transparent 54%);transform:translateX(-40%) rotate(7deg);animation:nx-foil 7s ease-in-out infinite}
+.nexus-stage-card:after,.nexus-pass:after,.nexus-tier-pass:after{content:"";position:absolute;inset:0;z-index:-1;background:repeating-linear-gradient(110deg,transparent 0 20px,rgba(255,255,255,.035) 20px 21px)}
+.nexus-stage-head,.nexus-pass-top{display:flex;justify-content:space-between;align-items:center;font:800 13px var(--fh);letter-spacing:.14em;color:#fdf4e7}.nexus-stage-head span:last-child{font-size:10px;color:#fce0ad}
+.nexus-stage-emblem{width:145px;height:145px;display:grid;place-items:center;align-self:center;border:1px solid rgba(255,226,189,.6);border-radius:50%;color:#ffdda7;box-shadow:0 0 0 16px rgba(255,218,158,.055),0 0 0 34px rgba(255,218,158,.035),inset 0 0 37px rgba(255,218,158,.19);animation:nx-emblem 5s ease-in-out infinite alternate}.nexus-stage-emblem .ic{width:74px;height:74px;filter:drop-shadow(0 0 19px #f7ce89)}
+.nexus-stage-caption span{display:block;color:#e4d6e9;letter-spacing:.16em;font-size:9px;font-weight:800}.nexus-stage-caption strong{display:block;font:900 47px/1.1 var(--fh);letter-spacing:-.04em;color:#fff0c9}
+.nexus-stage-sticker{position:absolute;right:20px;bottom:50px;z-index:3;transform:rotate(7deg);border:1px solid rgba(255,244,221,.5);border-radius:30px;padding:10px 13px;background:#fcdfa9;color:#241827;font:900 10px var(--fh);letter-spacing:.09em;box-shadow:0 15px 25px rgba(0,0,0,.2);animation:nx-sticker 5s ease-in-out infinite alternate}
+@keyframes nx-float{to{transform:translateY(-15px) rotate(-8deg) rotateY(-6deg)}}@keyframes nx-foil{to{background-position:-240% 0;transform:translateX(45%) rotate(7deg)}}@keyframes nx-holo{to{background-position:100% 100%}}@keyframes nx-ring{to{transform:rotateX(65deg) rotate(360deg)}}@keyframes nx-breathe{to{transform:scale(1.17);opacity:.67}}@keyframes nx-emblem{to{transform:scale(1.06);box-shadow:0 0 0 24px rgba(255,218,158,.055),0 0 0 46px rgba(255,218,158,.035),inset 0 0 45px rgba(255,218,158,.26)}}@keyframes nx-sticker{to{transform:rotate(2deg) translateY(-9px)}}
+/* Four actual plans: metallic passes have independent visual hierarchy. */
+.nexus-levels{scroll-margin-top:86px;margin-top:35px}.nexus-section-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:24px}.nexus-section-heading h2,.nexus-why h2,.nexus-studio-intro h2{font:850 clamp(29px,4.5vw,47px)/1.1 var(--fh);letter-spacing:-.055em;margin-top:9px}.nexus-section-heading>p{font-size:13px;max-width:350px;color:var(--mute)}
+.nexus-tier-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.nexus-tier{--nexus-tier:#aed7ff;min-width:0;position:relative;isolation:isolate;display:flex;flex-direction:column;padding:14px 14px 16px;border:1px solid color-mix(in srgb,var(--nexus-tier) 27%,var(--line));border-radius:24px;background:radial-gradient(ellipse at 50% -10%,color-mix(in srgb,var(--nexus-tier) 15%,transparent),transparent 60%),linear-gradient(150deg,#171725,#0e111b 75%);box-shadow:0 22px 35px -38px var(--nexus-tier);transition:transform .25s,box-shadow .35s,border-color .3s;transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.nexus-tier:hover{border-color:color-mix(in srgb,var(--nexus-tier) 65%,transparent);box-shadow:0 35px 60px -40px color-mix(in srgb,var(--nexus-tier) 64%,transparent);transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-7px)}
+.nexus-tier[data-tier="VIP-ULTRA"]{background:radial-gradient(ellipse at 50% -10%,rgba(255,213,142,.18),transparent 60%),linear-gradient(160deg,#292027,#121018 75%)}
+.nexus-tier-top{display:flex;justify-content:space-between;gap:5px;min-height:26px;color:var(--nexus-tier);font:850 9px var(--fh);letter-spacing:.1em}.nexus-tier-top span:last-child{text-align:right;font-size:8px;opacity:.83}.nexus-tier-best{border-radius:30px;padding:2px 6px;background:rgba(255,214,134,.15)}
+.nexus-tier-pass{--t:var(--nexus-tier);height:188px;padding:14px 14px 11px;margin:3px 0 15px;border:1px solid color-mix(in srgb,var(--t) 64%,transparent);border-radius:17px;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(ellipse at 85% 0%,color-mix(in srgb,var(--t) 42%,transparent),transparent 55%),radial-gradient(ellipse at 0% 90%,color-mix(in srgb,var(--t) 18%,transparent),transparent 60%),linear-gradient(135deg,#1a1f33,#0b101c);color:#f9f5ff;transform:rotate(-3deg);transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s}.nexus-tier:hover .nexus-tier-pass{transform:rotate(0deg) translateY(-5px);box-shadow:0 22px 30px -25px var(--t)}
+.nexus-tier[data-tier="VIP-ULTRA"] .nexus-tier-pass{background:radial-gradient(ellipse at 85% 0%,rgba(255,219,144,.5),transparent 52%),radial-gradient(ellipse at 0% 90%,rgba(196,135,255,.34),transparent 65%),linear-gradient(135deg,#513d44,#1d1a2a)}
+.nexus-tier[data-tier="VIP-PRO"] .nexus-tier-pass{background:radial-gradient(ellipse at 85% 0%,rgba(190,146,255,.38),transparent 58%),linear-gradient(130deg,#342447,#13192a)}
+.nexus-tier[data-tier="VIP-PLUS"] .nexus-tier-pass{background:radial-gradient(ellipse at 85% 0%,rgba(70,213,255,.4),transparent 58%),linear-gradient(130deg,#183c50,#0c1728)}
+.nexus-tier-pass-a{font:800 10px var(--fh);letter-spacing:.15em}.nexus-tier-pass-a b{color:var(--t)}
+.nexus-tier-pass-icon{align-self:center;display:grid;place-items:center;color:var(--t);width:69px;height:69px;border-radius:50%;border:1px solid color-mix(in srgb,var(--t) 52%,transparent);box-shadow:0 0 0 13px color-mix(in srgb,var(--t) 6%,transparent),0 0 31px color-mix(in srgb,var(--t) 24%,transparent);animation:nx-pass-pulse 5s ease-in-out infinite alternate}.nexus-tier-pass-icon .ic{width:36px;height:36px;filter:drop-shadow(0 0 10px var(--t))}
+.nexus-tier-pass-name{position:absolute;right:13px;bottom:32px;color:rgba(255,255,255,.15);font:900 37px/1 var(--fh);letter-spacing:-.08em;pointer-events:none}
+.nexus-tier-pass-bottom{display:flex;justify-content:space-between;gap:4px;font:700 8px var(--fh);letter-spacing:.09em;color:rgba(255,255,255,.69)}.nexus-tier-pass-bottom b{color:var(--t)}
+@keyframes nx-pass-pulse{to{transform:scale(1.06);box-shadow:0 0 0 19px color-mix(in srgb,var(--t) 8%,transparent),0 0 44px color-mix(in srgb,var(--t) 31%,transparent)}}
+.nexus-tier-body{display:flex;flex-direction:column;flex:1}.nexus-tier-name{display:flex;align-items:center;justify-content:space-between;color:var(--nexus-tier)}.nexus-tier-name small{font:850 10px var(--fh);letter-spacing:.15em}.nexus-tier-name h3{font:850 21px var(--fh);letter-spacing:-.045em;color:#f4f0ff;margin:3px 0}.nexus-tier-name>span .ic{width:19px;height:19px}
+.nexus-tier-description{min-height:55px;color:#afafc2;font-size:12px;line-height:1.65}.nexus-tier-price{font:900 24px var(--fh);letter-spacing:-.045em;color:var(--nexus-tier);margin:7px 0 13px;word-break:break-word}.nexus-tier-price small{display:block;color:#a4a4b6;font:600 11px Inter;letter-spacing:0;margin-top:3px}
+.nexus-tier-features{display:grid;gap:9px;padding:14px 0 18px;border-top:1px solid rgba(255,255,255,.1);margin-top:auto}.nexus-tier-features span{display:flex;gap:8px;align-items:center;color:#dedbe8;font-size:11px;line-height:1.35}.nexus-tier-features .ic{width:15px;height:15px;color:var(--nexus-tier)}
+.nexus-tier-buttons{display:grid;gap:7px}.nexus-tier-buy{width:100%;padding:12px 7px;border-radius:12px;background:linear-gradient(125deg,var(--nexus-tier),#e8d8ff);color:#12131a;font-size:12px}.nexus-tier-buy .ic{width:14px;height:14px}.nexus-tier-preview{cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;color:#b5b2c8;background:none;border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:9px 6px;font:700 11px Inter;transition:border-color .25s,color .25s}.nexus-tier-preview .ic{width:14px;height:14px}.nexus-tier-preview:hover{border-color:var(--nexus-tier);color:var(--nexus-tier)}
+.nexus-levels-footnote{display:flex;align-items:flex-start;gap:9px;margin:20px 0;color:var(--mute);font-size:12px}.nexus-levels-footnote .ic{width:17px;height:17px;flex-shrink:0;color:#baa3ff}
+.nexus-why{display:grid;grid-template-columns:.8fr 1.2fr;gap:30px;align-items:center;margin:55px 0 28px;padding:29px 33px;border:1px solid var(--line);border-radius:26px;background:radial-gradient(ellipse at 2% 0%,rgba(153,113,241,.13),transparent 60%),var(--glass)}.nexus-why-items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.nexus-why-items>div{display:grid;gap:6px;align-content:start;padding:14px 11px;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(255,255,255,.028)}.nexus-why-items .ic{width:25px;height:25px;color:#bea4ff}.nexus-why-items b{font:800 11px var(--fh);letter-spacing:.04em}.nexus-why-items small{color:var(--mute);font-size:10px;line-height:1.55}
+/* Server-active account identity, radically different from the default profile. */
+.nexus-member{--nexus-tier:#ffd281;position:relative;overflow:hidden;isolation:isolate;color:#f9f5ff;border:1px solid color-mix(in srgb,var(--nexus-tier) 45%,transparent);border-radius:28px;margin:15px 0 25px;background:radial-gradient(ellipse at 92% 0%,color-mix(in srgb,var(--nexus-tier) 21%,transparent),transparent 52%),radial-gradient(ellipse at 0 100%,rgba(118,83,210,.2),transparent 65%),linear-gradient(135deg,#181522,#090c17 75%);box-shadow:0 30px 70px -48px color-mix(in srgb,var(--nexus-tier) 72%,transparent)}
+.nexus-member[data-tier="VIP-PLUS"]{--nexus-tier:#56dfff}.nexus-member[data-tier="VIP-PRO"]{--nexus-tier:#c29aff}.nexus-member[data-tier="VIP-ULTRA"]{--nexus-tier:#ffd281}
+.nexus-member-noise{position:absolute;inset:0;pointer-events:none;opacity:.3;background:radial-gradient(circle,rgba(255,255,255,.25) .7px,transparent .9px) 0 0/23px 23px;mask-image:linear-gradient(90deg,transparent 30%,#000)}
+.nexus-member-header,.nexus-member-footer{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 24px;font:800 10px var(--fh);letter-spacing:.13em;color:rgba(255,255,255,.58)}.nexus-member-header{border-bottom:1px solid rgba(255,255,255,.1)}.nexus-member-footer{border-top:1px solid rgba(255,255,255,.1)}.nexus-live{display:inline-flex;gap:7px;align-items:center;color:var(--nexus-tier)}.nexus-live .ic{width:15px;height:15px}
+.nexus-member-body{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.13fr) minmax(250px,.87fr);min-height:420px;gap:20px;align-items:center;padding:22px 34px 29px}
+.nexus-micro{font:700 10px var(--fh);color:#9d91b6;letter-spacing:.18em}.nexus-micro b{color:var(--nexus-tier)}.nexus-member-title{font:900 clamp(65px,8.3vw,114px)/.98 var(--fh);letter-spacing:-.075em;color:var(--nexus-tier);margin:15px 0 7px}.nexus-member-title span{display:block;font:850 11px var(--fh);letter-spacing:.18em;color:#ded9eb;margin-top:8px}.nexus-member-user{display:flex;align-items:center;gap:6px;font:700 18px var(--fh);color:#faf8ff;margin:14px 0}.nexus-member-user .ic{width:18px;height:18px;color:var(--nexus-tier)}.nexus-verified{border:1px solid color-mix(in srgb,var(--nexus-tier) 40%,transparent);border-radius:30px;padding:4px 7px;font:800 9px var(--fh);letter-spacing:.1em;color:var(--nexus-tier)}.nexus-member-description{max-width:500px;font-size:13px;line-height:1.75;color:#bfb9cf}
+.nexus-member-stats{display:flex;gap:24px;margin:20px 0 14px}.nexus-member-stats>span{display:grid;gap:2px}.nexus-member-stats strong{font:850 27px var(--fh);color:#fdf9ff}.nexus-member-stats small{color:#a6a0b6;font-size:10px}.nexus-member-expiry{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;font-weight:650;color:var(--nexus-tier)}.nexus-member-expiry .ic{width:16px;height:16px}.nexus-member-open{display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb,var(--nexus-tier) 46%,transparent);color:var(--nexus-tier);padding:11px 13px;border-radius:12px;margin-top:19px;background:color-mix(in srgb,var(--nexus-tier) 8%,transparent);font-size:12px;font-weight:750;transition:transform .2s,background .2s}.nexus-member-open:hover{transform:translateY(-2px);background:color-mix(in srgb,var(--nexus-tier) 15%,transparent)}.nexus-member-open .ic{width:15px;height:15px}
+.nexus-member-art{position:relative;min-height:338px;display:grid;place-items:center;perspective:1100px}.nexus-member-aura{position:absolute;width:95%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--nexus-tier) 27%,transparent),transparent 60%);filter:blur(24px);animation:nx-breathe 6s ease-in-out infinite alternate}.nexus-pass{width:min(258px,80%);aspect-ratio:.73;display:flex;flex-direction:column;justify-content:space-between;padding:21px;border:1px solid color-mix(in srgb,var(--nexus-tier) 75%,transparent);background:radial-gradient(ellipse at 90% 3%,color-mix(in srgb,var(--nexus-tier) 52%,transparent),transparent 49%),linear-gradient(140deg,#35263a,#151424 72%);transform:rotate(-10deg) rotateY(-14deg);animation:nx-pass-float 6s ease-in-out infinite alternate}
+.nexus-pass-top .ic{color:var(--nexus-tier);width:18px;height:18px}.nexus-pass-symbol{align-self:center;display:grid;place-items:center;width:130px;height:130px;border:1px solid color-mix(in srgb,var(--nexus-tier) 66%,transparent);border-radius:50%;box-shadow:0 0 0 17px color-mix(in srgb,var(--nexus-tier) 7%,transparent),inset 0 0 37px color-mix(in srgb,var(--nexus-tier) 24%,transparent)}.nexus-pass-symbol-inner .ic{width:68px;height:68px;color:var(--nexus-tier);filter:drop-shadow(0 0 17px var(--nexus-tier))}.nexus-pass-bottom{display:flex;justify-content:space-between;align-items:end;gap:10px;font-size:9px;line-height:1.7;letter-spacing:.12em;color:#dfd6e5}.nexus-pass-bottom b{font:900 32px/1 var(--fh);letter-spacing:-.05em;color:var(--nexus-tier)}.nexus-pass-bottom small{font-size:9px;text-align:right}.nexus-pass-shadow{position:absolute;bottom:13px;left:22%;width:62%;height:17px;border-radius:50%;background:#000;filter:blur(14px);opacity:.5}
+@keyframes nx-pass-float{to{transform:rotate(-5deg) rotateY(-8deg) translateY(-16px)}}
+/* The home page command center uses actual saved data and shortcuts. */
+.nexus-desk{position:relative;overflow:hidden;margin:18px 0 25px;padding:24px;border-radius:25px;border:1px solid rgba(162,134,246,.33);background:radial-gradient(ellipse at 90% 0%,rgba(161,119,243,.15),transparent 65%),linear-gradient(115deg,#151525,#0c1019);color:#f6f2ff}
+.nexus-desk-head{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.nexus-desk-head h2{font:850 clamp(24px,3.6vw,35px) var(--fh);letter-spacing:-.05em;margin:7px 0}.nexus-desk-head p{font-size:12px;color:#a8a5b8;max-width:530px}.nexus-desk-edit{display:inline-flex;gap:6px;align-items:center;align-self:start;border:1px solid rgba(189,158,255,.45);padding:9px 12px;border-radius:11px;font-size:12px;font-weight:700;color:#c4a8ff}.nexus-desk-edit .ic{width:15px;height:15px}
+.nexus-desk-grid{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;margin-top:21px}.nexus-desk-saved{display:grid;gap:9px;padding:15px;border:1px solid rgba(191,155,255,.19);border-radius:15px;background:rgba(188,145,255,.07)}.nexus-desk-saved>span{display:flex;gap:6px;align-items:center;font:700 10px var(--fh);letter-spacing:.08em;color:#b99dff}.nexus-desk-saved .ic{width:14px;height:14px}.nexus-desk-saved strong{font:900 41px var(--fh);letter-spacing:-.07em}.nexus-desk-saved strong small{font:600 12px Inter;color:#aaa2be}.nexus-desk-saved>a{font-size:10px;color:#ddd3ff;font-weight:700}.nexus-desk-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-content:stretch}.nexus-desk-links a{display:flex;align-items:center;gap:9px;min-width:0;padding:15px 11px;border:1px solid rgba(255,255,255,.105);border-radius:13px;background:rgba(255,255,255,.035);transition:background .2s,transform .2s,border-color .2s}.nexus-desk-links a:hover{background:rgba(188,149,255,.1);border-color:#a98eff;transform:translateY(-3px)}.nexus-desk-links a>.ic:first-child{color:#c5a8ff;width:20px;height:20px;flex:0 0 auto}.nexus-desk-links a>.ic:last-child{margin-left:auto;width:14px;height:14px;color:#82758f;flex:0 0 auto}.nexus-desk-links a>span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;font-weight:750}
+/* Studio: live avatar preview, with no changes persisted until Save. */
+.nexus-studio{margin:30px 0 0;border:1px solid rgba(151,128,233,.26);background:linear-gradient(135deg,#141321,#0b0e18);border-radius:26px;padding:28px;overflow:hidden;color:#f6f2ff}.nexus-studio-intro h2{margin:9px 0 10px}.nexus-studio-intro p{color:#a9a8b7;font-size:13px;max-width:710px;line-height:1.75}.nexus-studio-grid{display:grid;grid-template-columns:minmax(260px,.75fr) minmax(0,1fr);gap:28px;margin-top:27px;align-items:stretch}.nexus-studio-preview{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;border-radius:24px;background:radial-gradient(ellipse at 50% 10%,color-mix(in srgb,var(--preview-color) 26%,transparent),transparent 65%),#0d1020;border:1px solid color-mix(in srgb,var(--preview-color) 29%,transparent)}
+.nexus-studio-orb{position:absolute;top:2%;left:50%;width:250px;height:250px;transform:translateX(-50%);border:1px solid color-mix(in srgb,var(--preview-color) 30%,transparent);border-radius:50%;box-shadow:0 0 0 26px color-mix(in srgb,var(--preview-color) 4%,transparent),0 0 0 54px color-mix(in srgb,var(--preview-color) 3%,transparent);animation:nx-orbit-bob 8s ease-in-out infinite alternate}.nexus-preview-label{z-index:1;align-self:flex-start;display:flex;gap:6px;align-items:center;color:#dbd2ec;font:800 10px var(--fh);letter-spacing:.12em}.nexus-preview-label .ic{width:14px;height:14px}.nexus-preview-label i{width:7px;height:7px;border-radius:50%;background:#7df3be;box-shadow:0 0 10px #7df3be}
+.nexus-preview-card{display:flex;align-items:center;flex-direction:column;gap:6px;width:min(270px,100%);margin:30px 0;padding:18px;border:1px solid color-mix(in srgb,var(--preview-color) 65%,transparent);background:radial-gradient(ellipse at 95% 0%,color-mix(in srgb,var(--preview-color) 39%,transparent),transparent 51%),linear-gradient(155deg,#272239,#111325 75%);transform:rotate(-4deg);transition:border-color .3s,background .3s;color:#f8f2ff}
+.nexus-preview-card .nexus-preview-top{display:flex;justify-content:space-between;align-self:stretch;font:900 10px var(--fh);letter-spacing:.11em;margin-bottom:12px}.nexus-preview-top span{color:var(--preview-color);font-size:9px}.nexus-preview-avatar{width:70px;height:70px;border:2px solid var(--preview-color);border-radius:20px;display:grid;place-items:center;overflow:hidden;background:color-mix(in srgb,var(--preview-color) 13%,#121423);box-shadow:0 0 20px color-mix(in srgb,var(--preview-color) 24%,transparent)}.nexus-preview-avatar .ic{width:35px;height:35px;color:var(--preview-color)}.nexus-preview-avatar img{width:100%;height:100%;object-fit:cover}.nexus-preview-card>b{font:850 23px var(--fh);letter-spacing:-.04em;margin-top:5px}.nexus-preview-status{border-radius:40px;padding:6px 11px;background:color-mix(in srgb,var(--preview-color) 13%,transparent);border:1px solid color-mix(in srgb,var(--preview-color) 30%,transparent);color:var(--preview-color);font-size:11px;font-weight:700;text-align:center;overflow-wrap:anywhere}.nexus-preview-card>p{text-align:center;color:#b8b0c8;font-size:11px;min-height:17px;overflow-wrap:anywhere}.nexus-preview-bottom{display:flex;justify-content:space-between;gap:6px;align-self:stretch;width:100%;margin-top:23px;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;color:#aba2bd;font:700 9px var(--fh);letter-spacing:.08em}.nexus-preview-bottom>span:last-child{color:var(--preview-color)}.nexus-preview-tip{display:flex;align-items:center;gap:6px;color:#a9a4b8;font-size:10px;text-align:center}.nexus-preview-tip .ic{width:14px;height:14px}
+.nexus-studio-form{min-width:0;align-content:start}.nexus-field-title{display:flex;align-items:center;gap:9px;margin:5px 0 11px}.nexus-field-title>span{display:grid;place-items:center;width:27px;height:27px;border-radius:9px;border:1px solid color-mix(in srgb,var(--preview-color) 37%,transparent);background:color-mix(in srgb,var(--preview-color) 13%,transparent);color:var(--preview-color);font:900 11px var(--fh)}.nexus-field-title strong{font:750 13px Inter}.nexus-field-title small{color:#a9a1b8;font-size:10px;margin-left:auto}
+.nexus-studio .studio-colors{grid-template-columns:repeat(auto-fit,minmax(58px,1fr));margin:0 0 12px}.nexus-studio .studio-colors label{border-color:rgba(255,255,255,.105);background:rgba(255,255,255,.035)}.nexus-studio .studio-colors label:has(input:checked){border-color:var(--preview-color);box-shadow:0 0 0 1px var(--preview-color) inset}.nexus-studio .studio-links{margin-top:2px;border-color:rgba(255,255,255,.13);background:rgba(255,255,255,.02)}.nexus-studio .studio-links label{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.12)}.nexus-studio .studio-links label:has(input:checked){color:var(--preview-color);border-color:var(--preview-color)}.nexus-studio .field{color:#c0bcca}.nexus-studio input,.nexus-studio select{background:#141624;border:1px solid rgba(255,255,255,.13);color:#f7f4ff;min-width:0}
+.nexus-save{width:100%;margin-top:7px;border-radius:14px;background:linear-gradient(110deg,var(--preview-color),#e6d1ff);color:#12101b}.nexus-studio-note{display:flex;align-items:flex-start;gap:6px;color:#9894aa;font-size:10px;line-height:1.55}.nexus-studio-note .ic{width:14px;height:14px;flex:0 0 auto}
+@keyframes nx-orbit-bob{to{transform:translateX(-50%) scale(1.13);opacity:.65}}
+.nexus-modal-preview{text-align:center;display:grid;justify-items:center;gap:12px;padding:8px 0 20px;color:var(--ink)}.nexus-modal-preview h2{font:900 38px var(--fh);letter-spacing:-.06em;color:var(--nexus-tier)}.nexus-modal-preview p{font-size:12px;color:var(--mute);max-width:390px}.nexus-modal-preview .nexus-tier-pass{--t:var(--nexus-tier);width:min(300px,100%);height:225px;margin:13px 0;transform:rotate(-4deg)}.nexus-modal-preview .nexus-tier-pass-name{font-size:43px}.nexus-modal-preview .nexus-tier-pass-icon{width:80px;height:80px}.nexus-modal-preview .nexus-tier-pass-icon .ic{width:40px;height:40px}
+/* Accessibility and mobile performance. */
+.nexus-tier-preview:focus-visible,.nexus-tier-buy:focus-visible,.nexus-studio input:focus-visible,.nexus-studio select:focus-visible,.nexus-member-open:focus-visible,.nexus-desk-links a:focus-visible{outline:2px solid #e0ccff;outline-offset:3px}
+@media(max-width:1060px){.nexus-tier-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nexus-tier-pass{height:216px}.nexus-tier-pass-name{font-size:45px}.nexus-landing-copy{padding-left:32px}.nexus-landing h1{font-size:clamp(42px,6vw,70px)}.nexus-why{grid-template-columns:1fr}.nexus-member-body{grid-template-columns:minmax(0,1fr) minmax(210px,.8fr)}}
+@media(max-width:760px){.nexus-landing{grid-template-columns:minmax(0,1fr);gap:0;margin-top:5px;min-height:0;border-radius:24px}.nexus-landing-copy{padding:33px 23px 0}.nexus-landing h1{font-size:clamp(45px,10vw,72px);margin:17px 0}.nexus-landing-copy>p{font-size:13px;line-height:1.75}.nexus-landing-actions{margin-top:19px}.nexus-landing-foot{margin-top:25px}.nexus-landing-stage{height:320px}.nexus-stage-card{width:198px;padding:17px;border-radius:21px}.nexus-stage-emblem{width:96px;height:96px}.nexus-stage-emblem .ic{width:49px;height:49px}.nexus-stage-caption strong{font-size:34px}.nexus-stage-halo{width:250px;height:250px}.nexus-stage-sticker{right:12%;bottom:30px;font-size:8px}.nexus-section-heading{align-items:start;flex-direction:column;gap:10px}.nexus-section-heading h2{font-size:32px}.nexus-levels{margin-top:25px}.nexus-member-body{grid-template-columns:minmax(0,1fr);gap:4px;padding:23px 20px 12px}.nexus-member-title{font-size:clamp(68px,17vw,94px)}.nexus-member-art{min-height:290px}.nexus-pass{width:194px;padding:16px;border-radius:20px}.nexus-pass-symbol{width:93px;height:93px}.nexus-pass-symbol-inner .ic{width:50px;height:50px}.nexus-pass-bottom b{font-size:26px}.nexus-member-header,.nexus-member-footer{padding:13px 17px;font-size:9px}.nexus-member-description{font-size:12px}.nexus-studio{padding:18px;border-radius:22px}.nexus-studio-grid{grid-template-columns:minmax(0,1fr);gap:16px}.nexus-studio-preview{min-height:355px;padding:16px}.nexus-studio-intro h2{font-size:32px}.nexus-desk-grid{grid-template-columns:minmax(0,1fr)}.nexus-desk-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.nexus-tier-grid{grid-template-columns:minmax(0,1fr);gap:14px}.nexus-tier{padding:16px}.nexus-tier-pass{height:200px;max-width:340px;width:100%;align-self:center}.nexus-tier-pass-name{font-size:44px}.nexus-tier-description{min-height:0}.nexus-tier-price{font-size:26px}.nexus-tier-features{gap:7px}.nexus-why{padding:18px}.nexus-why-items{grid-template-columns:minmax(0,1fr)}.nexus-why-items>div{grid-template-columns:28px 1fr;align-items:center}.nexus-why-items .ic{grid-row:span 2}.nexus-why-items small{grid-column:2}.nexus-desk{padding:17px}.nexus-desk-head h2{font-size:25px}.nexus-desk-saved{grid-template-columns:1fr auto;align-items:center}.nexus-desk-saved>strong{grid-column:2;grid-row:1/3;font-size:34px}.nexus-desk-saved>a{grid-column:1}.nexus-member-stats{gap:14px}.nexus-member-stats strong{font-size:23px}.nexus-member-open{font-size:11px}.nexus-serial{display:none}.nexus-tier-buy{font-size:12px}.nexus-studio .studio-colors{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.nexus-landing:after,.nexus-landing h1 em,.nexus-stage-halo,.nexus-stage-rings,.nexus-stage-card,.nexus-stage-emblem,.nexus-stage-sticker,.nexus-stage-card:before,.nexus-pass:before,.nexus-tier-pass:before,.nexus-preview-card:before,.nexus-tier-pass-icon,.nexus-pass,.nexus-member-aura,.nexus-studio-orb{animation:none!important}.nexus-tier,.nexus-tier-pass{transform:none!important;transition:none!important}}
+body.calm .nexus-landing:after,body.calm .nexus-landing h1 em,body.calm .nexus-stage-halo,body.calm .nexus-stage-rings,body.calm .nexus-stage-card,body.calm .nexus-stage-emblem,body.calm .nexus-stage-sticker,body.calm .nexus-stage-card:before,body.calm .nexus-pass:before,body.calm .nexus-tier-pass:before,body.calm .nexus-preview-card:before,body.calm .nexus-tier-pass-icon,body.calm .nexus-pass,body.calm .nexus-member-aura,body.calm .nexus-studio-orb{animation:none!important}
+body.calm .nexus-tier,body.calm .nexus-tier:hover,body.calm .nexus-tier-pass,body.calm .nexus-tier:hover .nexus-tier-pass{transform:none!important}
+
 </style>
 </head>
 <body>
@@ -390,6 +487,9 @@ body.calm .home-vip-beacon:after{animation:none!important}
 const ICON={
 crown:'<path d="M2 8l5 4 5-8 5 8 5-4-2 12H4z"/><path d="M4 20h16"/>',
 sparkles:'<path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/><path d="M19 2v5M16.5 4.5h5"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+palette:'<path d="M12 3a9 9 0 100 18h2a2 2 0 001-4c-1-1-1-2 1-2h2c2 0 3-2 3-4a9 9 0 00-9-8z"/><circle cx="7.5" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16.5" cy="10" r="1"/>',
+'mouse-pointer':'<path d="M5 3l14 9-7 1-3 7z"/>',
 home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',
 gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zm0 0c2-4 6-4 6-1.5S14 8 12 8z"/>',
 cube:'<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>',
@@ -673,7 +773,7 @@ function mpCard(m,i=0){
     <p class="mute">${esc(L(m.desc))}</p>
     <div class="specs"><span>${m.mods} ${t("mods")}</span><span>${m.sizeMb} MB</span><span>${fmt(m.downloads)} ${t("dls")}</span></div>
     <div class="row">${m.keyMods.map(k=>`<span class="tag">${esc(k)}</span>`).join("")}</div>
-    <div style="margin-top:auto">${m.file?`<a class="btn wide" href="${esc(m.file)}" target="_blank" rel="noopener">${ic("dl")} ${t("dload")}</a>`:`<button class="btn ghost wide" data-nofile="1">${ic("clock")} ${t("nofile")}</button>`}</div>
+    <div class="row" style="margin-top:auto">${libBtn("modpack",m.id)}</div><div>${m.file?`<a class="btn wide" href="${esc(m.file)}" target="_blank" rel="noopener">${ic("dl")} ${t("dload")}</a>`:`<button class="btn ghost wide" data-nofile="1">${ic("clock")} ${t("nofile")}</button>`}</div>
   </article>`;
 }
 function prodCard(p,i=0){
@@ -681,7 +781,7 @@ function prodCard(p,i=0){
     <div class="between row"><span class="tag">${esc(catName(p.cat))}</span><b style="color:var(--acc);font:700 20px var(--fh)">${money(p.price)}</b></div>
     <h3 style="font-size:18px;margin:0">${esc(L(p.name))}</h3>
     <p class="mute" style="flex:1">${esc(L(p.desc))}</p>
-    <button class="btn ghost sm" data-add="${esc(p.id)}" ${inCart(p.id)?"disabled":""}>${ic("cart")} ${inCart(p.id)?t("inc"):t("add")}</button>
+    <div class="row"><button class="btn ghost sm" data-add="${esc(p.id)}" ${inCart(p.id)?"disabled":""}>${ic("cart")} ${inCart(p.id)?t("inc"):t("add")}</button>${libBtn("product",p.id)}</div>
   </article>`;
 }
 function mrHTML(){
@@ -691,7 +791,7 @@ function mrHTML(){
   if(!MC.hits.length) return `<div class="empty">${t("nores")}</div>`;
   return `<div class="mr-list">${MC.hits.map((h,i)=>`<article class="glass mr rv" style="--d:${i*40}ms" data-pid="${esc(h.id)}" data-title="${esc(h.title)}">
     <img src="${esc(h.icon||"")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
-    <div class="mr-i"><b>${esc(h.title)}</b><p>${t("by")} ${esc(h.author)} · ${fmt(h.downloads)} · ${esc(h.license||"")}</p></div></article>`).join("")}</div>`;
+    <div class="mr-i"><b>${esc(h.title)}</b><p>${t("by")} ${esc(h.author)} · ${fmt(h.downloads)} · ${esc(h.license||"")}</p></div><span class="mr-save">${libBtn('modrinth',h.id,{title:h.title})}</span></article>`).join("")}</div>`;
 }
 const winsHTML=()=>ME&&ME.wins.length?ME.wins.map(w=>`<div class="glass ex" style="margin:0"><div><b>${esc(L(w.title))}</b><small class="mute" style="display:block">${esc(w.date)}</small></div>${w.code?`<span class="tag">${esc(w.code)}</span>`:""}</div>`).join(""):`<p class="mute">${t("nowins")}</p>`;
 function ordersTable(list){
@@ -714,6 +814,7 @@ function pHome(){
     </div>
   </section>
   ${ME?.vip?`<a class="home-vip-beacon rv" href="#me"><div class="home-vip-emblem">${ic('crown')}</div><div><b class="home-vip-title">${esc(ME.vip.tier==='VIP-FREE'?'ULTRA TRIAL':ME.vip.name)} ✦</b><span class="home-vip-sub">${tri('VIP профилің іске қосылған • Толық көру','VIP-профиль активен • Открыть','VIP profile active • View now')}</span></div><span class="home-vip-arr">${ic('arrow')}</span></a>`:""}
+  ${homeVipDesk()}
   <a class="glass rv" href="#streams" style="display:flex;align-items:center;gap:14px;margin-top:26px"><span class="dot ${D.stream.live?"on":""}"></span>
     <div style="flex:1;min-width:0"><b>${esc(L(D.stream.title))}</b><small class="mute" style="display:block">${D.stream.live?t("live"):t("next")}</small>
       <div class="cd" id="cd" style="margin-top:10px"></div></div><span style="margin-left:auto;color:var(--acc)">${ic("arrow")}</span></a>
@@ -779,39 +880,38 @@ function pStore(){
   return `<header class="ph rv"><p class="eyebrow">${ic("bag")} ${t("store")}</p><h1>${t("stitle")}</h1><p class="lead">${t("slead")}</p></header>
   <div class="pills rv">${[["all","cat0"],["pack","cat1"],["over","cat2"],["design","cat3"],["guide","cat4"]].map(([k,l])=>`<button class="pill ${STORE===k?"on":""}" data-scat="${k}">${t(l)}</button>`).join("")}</div>
   <div class="grid">${list.map(prodCard).join("")||`<div class="empty">${t("nores")}</div>`}</div>
-  <div class="glass rv bl"><h3>✦ VIP A782</h3><p class="mute">${LANG==="ru"?"Особые VIP-статусы и оформление через Telegram":LANG==="en"?"VIP plans and ordering via Telegram":"VIP мәртебесі және Telegram арқылы тапсырыс"}</p><a class="btn" href="#vip" style="margin-top:12px">VIP ✦</a></div>
+  <div class="glass rv bl"><h3>✦ VIP A782</h3><p class="mute">${LANG==="ru"?"VIP Studio: избранное, темы и быстрые переходы":LANG==="en"?"VIP Studio: saved collections, themes and quick links":"VIP Studio: таңдаулылар, жеке түс пен жылдам бөлімдер"}</p><a class="btn" href="#vip" style="margin-top:12px">VIP ✦</a></div>
   ${n?`<div class="cart-bar"><span>${t("cart")}: ${n}</span><b>${money(cartTotal())}</b><button class="btn sm" id="openCart">${t("checkout")}</button></div>`:""}
   <h2 class="bl rv">${t("orders")}</h2><div id="ordersBox">${ME?"":`<p class="notice">${t("login")}</p>`}</div>
   ${footer()}`;
 }
 // Tier-specific, server-authorized visual membership experience.
 function membershipHero(u){
-  const v=u.vip;if(!v)return "";
-  const tier=v.visualTier||v.tier||"VIP-PLUS";
-  const ultra=tier==="VIP-ULTRA";
-  const isTrial=v.tier==="VIP-FREE";
-  const label=ultra?"ULTRA":tier==="VIP-PRO"?"PRO":"PLUS";
-  const title=isTrial?"VIP-FREE · ULTRA TRIAL":v.name||tier;
-  const perks=tier==="VIP-PLUS"
-     ?[tri("NEON CYAN","НЕОНОВЫЙ CYAN","NEON CYAN"),tri("Аватар жақтауы","Рамка аватара","Avatar frame"),tri("VIP белгі","Значок VIP","VIP badge")]
-     :tier==="VIP-PRO"
-     ?[tri("Голографиялық дизайн","Голографический дизайн","Holographic design"),tri("Анимациялық рамка","Анимированная рамка","Animated frame"),tri("VIP белгі","Значок VIP","VIP badge")]
-     :[tri("Алтын голограмма","Золотая голограмма","Golden hologram"),tri("Анимациялық ULTRA профиль","Анимированный ULTRA профиль","Animated ULTRA profile"),tri("Эксклюзивті тәж","Эксклюзивная корона","Exclusive crown")];
-  const until=v.expiresAt?`<span data-vip-countdown="${esc(v.expiresAt)}">${vipEndText(v)}</span>`:tri("Мерзімсіз","Бессрочно","Lifetime");
-  return `<section class="membership-hero rv" data-tier="${esc(tier)}">
-    <div class="membership-grid" aria-hidden="true"></div><div class="membership-sheen" aria-hidden="true"></div>
-    <div class="membership-topline"><span class="member-live"><i></i> A782 PREMIUM • ${tri("БЕЛСЕНДІ","АКТИВЕН","ACTIVE")}</span><span class="member-serial">ID / ${esc(String(u.id).slice(0,14))}</span></div>
-    <div class="membership-layout"><div class="membership-copy">
-      <p class="membership-pretitle">${ic('sparkles')} ${ultra?"THE ULTIMATE EXPERIENCE":"EXCLUSIVE DIGITAL IDENTITY"}</p>
-      <h2 class="membership-title">${esc(title)}</h2>
-      <p class="membership-name">@${esc(u.nick)} <span class="member-verified">${ic('check')} VERIFIED</span></p>
-      <p class="membership-intro">${ultra?tri("Бұл жай белгі емес — сенің профилің енді A782 ULTRA стилінде.","Это не просто значок — твой профиль оформлен в стиле A782 ULTRA.","More than a badge — your profile now has the full A782 ULTRA look."):tri("VIP профиліңнің ерекше дизайны іске қосылды.","Твой особый VIP-стиль активирован.","Your distinctive VIP profile style is now active.")}</p>
-      <div class="membership-pills">${perks.map(q=>`<span>${ic('check')}${esc(q)}</span>`).join('')}</div>
-      <div class="membership-expiry">${ic('clock')} ${until}${isTrial?`<small>${tri("7 күндік сынақ","Пробный доступ на 7 дней","7-day trial")}</small>`:""}</div>
-    </div>
-    <div class="membership-orbit" aria-hidden="true"><div class="membership-orbit-a"></div><div class="membership-orbit-b"></div><div class="membership-orbit-c"></div><div class="membership-core">${ic(ultra?'crown':tier==='VIP-PRO'?'gem':'star')}<span>${label}</span></div><i class="orbit-star orbit-star-1"></i><i class="orbit-star orbit-star-2"></i><i class="orbit-star orbit-star-3"></i></div></div>
-    <div class="membership-bottomline"><span>${isTrial?"ULTRA TRIAL • 7D":"A782 • ELITE MEMBERSHIP"}</span><span>✦ &nbsp; GAMING IDENTITY UNLOCKED &nbsp; ✦</span></div>
-  </section>`;
+ const v=u.vip;if(!v)return '';
+ const tier=v.visualTier||v.tier||'VIP-PLUS', trial=v.tier==='VIP-FREE';
+ const name=tier.replace('VIP-',''), trialName=trial?'ULTRA TRIAL':name;
+ const cap=vipCapsClient(), saves=Array.isArray(u.library)?u.library.length:0;
+ const expiry=v.expiresAt?`<span data-vip-countdown="${esc(v.expiresAt)}">${vipEndText(v)}</span>`:tri('Мерзімсіз','Бессрочно','Lifetime');
+ return `<section class="nexus-member rv" data-tier="${esc(tier)}" aria-label="${esc(trial?'ULTRA TRIAL':v.name||tier)}">
+   <div class="nexus-member-noise" aria-hidden="true"></div>
+   <div class="nexus-member-header"><span class="nexus-live">${ic('shield')} ${tri('VIP МӘРТЕБЕСІ БЕЛСЕНДІ','VIP-СТАТУС АКТИВЕН','VIP MEMBERSHIP ACTIVE')}</span><span class="nexus-serial">A782 / ${esc(String(u.id).slice(0,12))}</span></div>
+   <div class="nexus-member-body">
+     <div class="nexus-member-info"><p class="nexus-micro">A782 <b>PREMIUM UNIVERSE</b> · 2026</p>
+       <h2 class="nexus-member-title">${trial?'ULTRA':esc(name)}<span>${trial?'FREE ACCESS':tri('ӨЗІҢНІҢ ЖАҢА ДЕҢГЕЙІҢ','ТВОЙ НОВЫЙ УРОВЕНЬ','YOUR NEXT LEVEL')}</span></h2>
+       <p class="nexus-member-user">${ic('check')} @${esc(u.nick)} <span class="nexus-verified">VERIFIED</span></p>
+       <p class="nexus-member-description">${tri('Сенің жеке тақырыптарың, статусың және таңдаулыларың — енді барлығы бір Premium кеңістікте.','Твои темы, статус и избранное — всё в одном Premium-пространстве.','Your themes, status and saved items — all inside one Premium space.')}</p>
+       <div class="nexus-member-stats"><span><strong>${cap.themes.length}</strong><small>${tri('Тақырып','Тем','Themes')}</small></span><span><strong>${cap.count}</strong><small>${tri('Жылдам сілтеме','Быстрых ссылок','Shortcuts')}</small></span><span><strong>${saves}</strong><small>${tri('Сақталған','Сохранено','Saved')}</small></span></div>
+       <div class="nexus-member-expiry">${ic('clock')} ${expiry}</div>
+       <a href="#me" class="nexus-member-open">${ic('palette')} ${tri('Premium Studio ашу','Открыть Premium Studio','Open Premium Studio')} ${ic('arrow')}</a>
+     </div>
+     <div class="nexus-member-art" aria-hidden="true"><div class="nexus-member-aura"></div>
+       <div class="nexus-pass tilt-card"><div class="nexus-pass-top"><span>A782 <b>·</b> DIGITAL</span>${ic('star')}</div>
+         <div class="nexus-pass-symbol"><div class="nexus-pass-symbol-inner">${ic(tier==='VIP-PLUS'?'bolt':tier==='VIP-PRO'?'gem':'crown')}</div></div>
+         <div class="nexus-pass-bottom"><span>MEMBER ACCESS<br><b>${esc(trialName)}</b></span><small>✦ ELITE<br>${esc(String(u.id).slice(-6).toUpperCase())}</small></div>
+       </div><div class="nexus-pass-shadow"></div>
+     </div>
+   </div><div class="nexus-member-footer"><span>✦ A782 ORIGINAL MEMBERSHIP</span><span>${trial?'7-DAY TRIAL':tri('VIP РАСТАЛҒАН','VIP ПОДТВЕРЖДЁН','VIP VERIFIED')}</span></div>
+ </section>`;
 }
 function maybeVipReveal(){
   if(!ME?.vip||!S.motion||!['me','vip'].includes(ROUTE))return;
@@ -839,7 +939,7 @@ function pMe(){
     <p class="mute sm" style="margin-top:12px">${t("authnote")}</p></section>
   ${footer()}`;
   const u=ME;
-  return `<header class="ph rv profile-heading"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1>${u.vip?`<span class="profile-rank" style="--rank:${vipColor(u.vip)}">${ic('crown')} ${esc(u.vip.tier==='VIP-FREE'?'ULTRA TRIAL':u.vip.name)}</span>`:''}</header>
+  return `<header class="ph rv profile-heading"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1>${u.vip&&u.vipPrefs?.status?`<span class="tag profile-custom-status">${esc(u.vipPrefs?.statusEmoji||"✦")} ${esc(u.vipPrefs.status)}</span>`:""}${u.vip?`<span class="profile-rank" style="--rank:${vipColor(u.vip)}">${ic('crown')} ${esc(u.vip.tier==='VIP-FREE'?'ULTRA TRIAL':u.vip.name)}</span>`:''}</header>
   ${u.vip?membershipHero(u):`<div class="glass rv" style="margin-bottom:16px"><div class="row between"><span class="mute">${tri("VIP әлі қосылмаған","VIP пока не активирован","VIP not active yet")}</span><a class="btn sm" href="#vip">VIP CLUB ✨</a></div></div>`}
   <section class="glass rv ${u.vip?'vip-identity':''}" ${u.vip?`data-vip="${esc(u.vip.visualTier||u.vip.tier||'VIP-PLUS')}" style="--vip-accent:${vipColor(u.vip)};padding:0;overflow:hidden"`:'style="padding:0;overflow:hidden"'}>
     <div class="prof-banner ${u.vip?'prof-banner-vip':''}" style="${u.banner?`--profile-art:url('${esc(u.banner)}')`:""}">${u.vip?`<div class="prof-banner-vip-top"><span>${ic('sparkles')} PREMIUM PLAYER</span><span>${ic('crown')} ${esc(u.vip.visualTier||u.vip.tier)}</span></div><div class="prof-banner-huge">${esc((u.vip.visualTier||u.vip.tier).replace('VIP-',''))}</div>`:""}</div>
@@ -862,6 +962,8 @@ function pMe(){
       <label class="field">${t("bio")}<textarea name="bio" rows="3">${esc(u.bio)}</textarea></label>
       <div class="row"><button class="btn" type="submit">${t("save")}</button><button class="btn ghost" type="button" id="logout">${t("logout")}</button></div>
     </form></section>
+  ${vipStudioUI()}
+  ${myLibraryUI()}
   <section class="glass bl rv"><h3>${t("mywins")}</h3>${winsHTML()}</section>
   <section class="glass bl rv"><h3>${t("orders")}</h3><div id="ordersBox"></div></section>
   <div class="row bl"><a class="btn ghost sm" href="#settings">${ic("gear")} ${t("setl")}</a></div>
@@ -869,17 +971,102 @@ function pMe(){
 }
 const tri=(kk,ru,en)=>LANG==="ru"?ru:LANG==="en"?en:kk;
 const vipColor=v=>({"VIP-FREE":"#ffc76d","VIP-PLUS":"#48d5ff","VIP-PRO":"#b18cff","VIP-ULTRA":"#ffc76d"})[v.visualTier||v.tier||v.name]||"#ffc76d";
+const LIB_KIND={product:'store',modpack:'mc',game:'home',modrinth:'mc'};
+const VIP_PRESETS={
+ cyan:['#51dfff','#81c5ff','#568aff'],ocean:['#5caaff','#76e4ff','#5b8af4'],mint:['#5df0bd','#a8ffe1','#61bcb0'],
+ violet:['#b991ff','#efbaff','#8675ff'],rose:['#ff89ca','#efbaff','#ed7d98'],ember:['#ff9d74','#ffd28a','#e88070'],
+ gold:['#ffce70','#e1b0ff','#f7a76a'],aurora:['#76e5d2','#e18fff','#ffc7a1'],obsidian:['#b1b8f6','#bec9ed','#7780c9']
+};
+const LIB_LABELS=()=>({product:tri('Дүкен','Товары','Store'),modpack:'Minecraft',game:tri('Ойындар','Игры','Games'),modrinth:'Modrinth'});
+const libSaved=(kind,id)=>!!ME?.library?.some(x=>x.kind===kind&&x.id===id);
+const libBtn=(kind,id,meta={})=>`<button type="button" class="btn ghost sm lib-toggle ${libSaved(kind,id)?'is-saved':''}" data-library="${kind}:${esc(id)}" ${meta.title?`data-title="${esc(meta.title)}"`:''} aria-label="${libSaved(kind,id)?tri('Таңдаулыдан алу','Убрать из избранного','Remove saved'):tri('Таңдаулыға қосу','Сохранить','Save item')}">${ic(libSaved(kind,id)?'check':'star')} ${libSaved(kind,id)?tri('Сақталған','Сохранено','Saved'):tri('Сақтау','Сохранить','Save')}</button>`;
+const libraryEntry=x=>{
+ const item=x.kind==='modrinth'?null:(D[{product:'products',modpack:'modpacks',game:'games'}[x.kind]]||[]).find(p=>p.id===x.id);
+ if(!item&&x.kind!=='modrinth')return '';
+ const title=x.kind==='modrinth'?x.title:x.kind==='product'?L(item.name):x.kind==='modpack'?item.title:item.name;
+ const url=x.kind==='modrinth'?`https://modrinth.com/project/${encodeURIComponent(x.id)}`:`#${LIB_KIND[x.kind]}`;
+ return `<div class="library-item"><div class="library-icon">${ic(['modpack','modrinth'].includes(x.kind)?'cube':x.kind==='game'?'gamepad':'bag')}</div><div><b>${esc(title)}</b><small>${LIB_LABELS()[x.kind]}</small></div><a class="btn ghost sm" href="${esc(url)}" ${x.kind==='modrinth'?'target="_blank" rel="noopener noreferrer"':''}>${ic('arrow')}</a>${libBtn(x.kind,x.id,{title})}</div>`;
+};
+const vipCapsClient=()=>{
+ const v=ME?.vip?.visualTier||ME?.vip?.tier||'';
+ return {count:v==='VIP-ULTRA'?5:v==='VIP-PRO'?3:v==='VIP-PLUS'?1:0,
+ themes:v==='VIP-ULTRA'?Object.keys(VIP_PRESETS):v==='VIP-PRO'?Object.keys(VIP_PRESETS).slice(0,6):Object.keys(VIP_PRESETS).slice(0,3)};
+};
+function vipStudioUI(){
+ if(!ME?.vip)return '';
+ const v=ME.vipPrefs||{},caps=vipCapsClient(),defaultPreset=ME.vip.visualTier==='VIP-ULTRA'?'gold':ME.vip.visualTier==='VIP-PRO'?'violet':'cyan',preset=caps.themes.includes(v.preset)?v.preset:defaultPreset,emoji=v.statusEmoji||'✦';
+ const links=[['home',tri('Басты бет','Главная','Home')],['mc','Minecraft'],['store',tri('Дүкен','Магазин','Store')],['streams',tri('Стримдер','Стримы','Streams')],['vip','VIP'],['me',tri('Профиль','Профиль','Profile')]];
+ return `<section class="rv nexus-studio" id="premiumStudio" style="--preview-color:${VIP_PRESETS[preset][0]};--preview-color-2:${VIP_PRESETS[preset][1]}">
+ <div class="nexus-studio-intro"><span class="nexus-kicker">${ic('sparkles')} PREMIUM CONTROL ROOM</span><h2>${tri('Өз әлеміңді бапта.','Создай свой стиль.','Make it yours.')}</h2><p>${tri('Түсті таңда, өз статусыңды жаз, жиі қолданатын бөлімдеріңді ретте. Өзгерістер бірден preview-де көрінеді.','Выбирай цвет, добавляй статус и быстрые ссылки. Предпросмотр меняется сразу.','Pick a color, set your status, and choose shortcuts. Your preview updates instantly.')}</p></div>
+ <div class="nexus-studio-grid">
+  <div class="nexus-studio-preview"><div class="nexus-studio-orb" aria-hidden="true"></div><div class="nexus-preview-label">${ic('eye')} LIVE PREVIEW <i></i></div>
+    <div class="nexus-preview-card" id="nexusPreviewCard"><div class="nexus-preview-top">A782 <span>✦ PREMIUM ID</span></div><div class="nexus-preview-avatar">${ME.avatar?`<img src="${esc(ME.avatar)}" alt="">`:ic(ME.icon||'user')}</div><b>${esc(ME.nick)}</b><span class="nexus-preview-status" id="nexusPreviewStatus">${esc(emoji)} ${esc(v.status||'PREMIUM')}</span><p id="nexusPreviewHeadline">${esc(v.headline||'A782 DIGITAL MEMBER')}</p><div class="nexus-preview-bottom"><span>AUTHENTIC MEMBER</span><span>${esc((ME.vip.visualTier||ME.vip.tier).replace('VIP-',''))} ✦</span></div></div>
+    <div class="nexus-preview-tip">${ic('mouse-pointer')} ${tri('Сақтамай тұрып нәтижесін көр','Посмотри результат до сохранения','See the result before saving')}</div></div>
+  <form id="vipStudioForm" class="nexus-studio-form form">
+   <div class="nexus-field-title"><span>01</span><strong>${tri('Түс палитрасы','Цветовая палитра','Color palette')}</strong></div>
+   <div class="studio-colors">${caps.themes.map(k=>`<label title="${k}"><input type="radio" name="preset" value="${k}" ${k===preset?'checked':''}><span class="color-dot" style="--c1:${VIP_PRESETS[k][0]};--c2:${VIP_PRESETS[k][1]}"></span><small>${k}</small></label>`).join('')}</div>
+   <div class="nexus-field-title"><span>02</span><strong>${tri('Жеке статус','Личный статус','Your status')}</strong></div>
+   <div class="g2"><label class="field">${tri('Белгі','Значок','Icon')}<select name="statusEmoji">${['✦','⚡','🎮','🚀','💎','👑','🌌','🛡️','🎨','✨'].map(x=>`<option ${emoji===x?'selected':''} value="${x}">${x}</option>`).join('')}</select></label><label class="field">${tri('Мәтін','Текст','Text')}<input name="status" maxlength="32" value="${esc(v.status||'')}" placeholder="Building my world..."></label></div>
+   ${caps.count>1?`<label class="field">${tri('Профиль ұраны','Подпись профиля','Profile headline')}<input name="headline" maxlength="70" value="${esc(v.headline||'')}" placeholder="My Minecraft world ✦"></label>`:''}
+   <div class="nexus-field-title"><span>03</span><strong>${tri('Жылдам бөлімдер','Быстрые разделы','Quick access')}</strong><small>${caps.count} MAX</small></div>
+   <fieldset class="studio-links"><legend>${tri('Таңдаулы бөлімдер','Избранные разделы','Favorite sections')}</legend>${links.map(([id,label])=>`<label><input type="checkbox" name="shortcuts" value="${id}" ${(v.shortcuts||[]).includes(id)?'checked':''}><span>${label}</span></label>`).join('')}</fieldset>
+   <button class="btn nexus-save" type="submit">${ic('check')} ${tri('Өзгерістерді сақтау','Сохранить изменения','Save changes')} ${ic('arrow')}</button>
+   <p class="nexus-studio-note">${ic('shield')} ${tri('Баптаулар аккаунтыңда бұлтқа сақталады.','Настройки сохраняются в облаке аккаунта.','Settings are saved to your cloud account.')}</p>
+  </form></div></section>`;
+}
+function myLibraryUI(){
+ if(!ME)return '';
+ const entries=(ME.library||[]).map(libraryEntry).filter(Boolean);
+ return `<section class="glass bl rv my-library"><div class="row between"><div><p class="eyebrow">${ic('star')} A782 LIBRARY</p><h3>${tri('Менің таңдаулыларым','Моё избранное','My saved collection')}</h3></div><span class="tag">${entries.length} / ${ME.libraryLimit||12}</span></div>
+ <p class="mute sm" style="margin:4px 0 15px">${tri('Minecraft жинақтары мен тауарларың осы аккаунтта сақталады. VIP аяқталса да таңдаулылар өшпейді.','Сохранения привязаны к аккаунту и не исчезают после VIP.','Saved items stay in your account after VIP expires.')}</p>
+ <div class="library-list">${entries.length?entries.join(''):`<p class="mute sm">${tri('Әзірше бос. Дүкенде немесе Minecraft-та «Сақтау» бас.','Пока пусто. Нажми «Сохранить» в магазине или Minecraft.','Nothing saved yet. Use Save in Store or Minecraft.')}</p>`}</div></section>`;
+}
+function homeVipDesk(){
+ if(!ME?.vip)return '';
+ const shortcuts=Array.isArray(ME.vipPrefs?.shortcuts)?ME.vipPrefs.shortcuts:[];
+ const names={home:tri('Басты бет','Главная','Home'),mc:'Minecraft',store:tri('Дүкен','Магазин','Store'),streams:tri('Стрим','Стрим','Streams'),vip:'VIP',me:tri('Профиль','Профиль','Profile')};
+ const list=shortcuts.length?shortcuts:['mc','store','me'];
+ const count=Array.isArray(ME.library)?ME.library.length:0;
+ return `<section class="nexus-desk rv"><div class="nexus-desk-head"><div><span class="nexus-kicker">${ic('bolt')} PREMIUM COMMAND CENTER</span><h2>${esc(ME.vipPrefs?.statusEmoji||'✦')} ${esc(ME.vipPrefs?.status||tri('Менің A782 әлемім','Мой мир A782','My A782 world'))}</h2><p>${esc(ME.vipPrefs?.headline||tri('Таңдаулыларың мен керек бөлімдерің бір жерде.','Избранное и быстрые переходы в одном месте.','Your saved items and favorite places, in one spot.'))}</p></div><a href="#me" class="nexus-desk-edit">${ic('palette')} ${tri('Баптау','Настроить','Customize')}</a></div>
+ <div class="nexus-desk-grid"><div class="nexus-desk-saved"><span>${ic('star')} A782 LIBRARY</span><strong>${count}<small> / ${ME.libraryLimit||12}</small></strong><a href="#me">${tri('Таңдаулыларды ашу','Открыть избранное','View saved items')} ${ic('arrow')}</a></div><div class="nexus-desk-links">${list.map((k,i)=>`<a href="#${k}" style="--i:${i}">${ic(k==='mc'?'cube':k==='store'?'bag':k==='streams'?'radio':k==='vip'?'crown':k==='me'?'user':'home')}<span>${esc(names[k]||k)}</span>${ic('arrow')}</a>`).join('')}</div></div></section>`;
+}
+async function toggleLibrary(spec,btn){
+ if(!ME){toast(t('login'),true);location.hash='#me';return}
+ const [kind,id]=spec.split(':');btn.disabled=true;
+ try{
+  const r=await api('POST','/api/library',{kind,id,title:btn.dataset.title||'',save:!libSaved(kind,id)});
+  ME=r.user;render(true);toast(tri('Таңдаулылар жаңартылды','Избранное обновлено','Saved collection updated'));
+ }catch(e){btn.disabled=false;toast(e.code==='library_limit'?tri('Таңдаулы лимиті толық','Достигнут лимит избранного','Saved limit reached'):errMsg(e),true)}
+}
 const vipEndText=v=>v.expiresAt?tri("Аяқталады: ","Истекает: ","Expires: ")+new Date(v.expiresAt).toLocaleString(LANG==="kk"?"kk-KZ":LANG==="ru"?"ru-RU":"en-US"):"∞";
 function pVip(){
- const plans=D.vipPlans||[];
- return `<header class="ph rv"><p class="eyebrow">${ic("crown")} A782 DIGITAL ACCESS</p><h1 class="grad">VIP LEVELS</h1><p class="lead">${tri("FREE — 7 күн ULTRA дизайны. PLUS / PRO / ULTRA бағаларын админ белгілейді. Төлемді админ тексеріп, растаған соң VIP қосылады.","FREE — 7 дней дизайна ULTRA. Цены PLUS / PRO / ULTRA задаёт админ. Платные уровни активируются после подтверждения.","FREE gives 7 days of ULTRA visuals. Admin sets PLUS / PRO / ULTRA prices, and confirms paid orders.")}</p></header>
- ${ME&&ME.vip?membershipHero(ME):""}
- <div class="vip-cards">${plans.map(p=>{
- const isFree=p.tier==="VIP-FREE", perks=(p.perks?.[LANG]||"").split("|").filter(Boolean);
- const priceReady=isFree||p.price>0;
- const trialUsed=!!(ME&&ME.vipTrialUsed);
- const locked=isFree&&(trialUsed||!!ME?.vip);
- return `<article class="glass tilt-card vip-card rv" data-tier="${esc(p.tier)}" style="--tier:${esc(p.color)}"><div class="vip-crest">${ic(p.icon||'crown')}</div><div class="vip-mini-preview"><div class="vip-mini-ring">${ic(p.icon||'crown')}</div><div><small>YOUR PROFILE</small><b>${isFree?'ULTRA TRIAL':p.tier.replace('VIP-','')}</b></div><span>✦</span></div><span class="tag" style="color:var(--tier);border-color:var(--tier)">${isFree?tri("7 КҮН ТЕГІН","7 ДНЕЙ БЕСПЛАТНО","7 DAYS FREE"):p.tier==="VIP-ULTRA"?"ULTIMATE":"EXCLUSIVE"}</span><h3>${esc(p.name)}</h3><div class="vip-price">${isFree?tri("ТЕГІН","БЕСПЛАТНО","FREE"):priceReady?money(p.price):"— ₸"}</div><p class="mute sm">${p.durationDays} ${tri("күн","дней","days")}${isFree?" · ULTRA ACCESS":""}</p><ul class="vip-perks">${perks.map(f=>`<li>${ic('check')}<span>${esc(f)}</span></li>`).join("")}</ul><button class="btn" ${!priceReady||locked?'disabled':''} ${isFree?'data-viptrial="1"':`data-vipbuy="${esc(p.id)}"`}>${locked?tri("Сынақ қолданылған","Пробный период использован","Trial already used"):!priceReady?tri("Бағаны админ орнатады","Цена ещё не установлена","Price not set yet"):isFree?tri("7 күнге қосу","Активировать на 7 дней","Activate 7-day trial"):tri("Telegram арқылы алу","Оформить через Telegram","Order via Telegram")}</button></article>`}).join("")}</div><p class="mute sm" style="margin:18px 0">${tri("VIP-FREE бір аккаунтқа бір-ақ рет беріледі. 7 күн біткенде сервер оны автоматты тоқтатады.","VIP-FREE доступен один раз на аккаунт. После 7 дней сервер автоматически отключит доступ.","VIP-FREE is once per account. Access automatically expires after seven days.")}</p>${footer()}`;
+ const plans=(D.vipPlans||[]).slice().sort((a,b)=>['VIP-FREE','VIP-PLUS','VIP-PRO','VIP-ULTRA'].indexOf(a.tier)-['VIP-FREE','VIP-PLUS','VIP-PRO','VIP-ULTRA'].indexOf(b.tier));
+ const lineup={
+  'VIP-FREE':{num:'00',kind:'ULTRA TRIAL',face:'FREE',desc:tri('ULTRA әлемін 7 күн тегін сезін.','Попробуй мир ULTRA бесплатно 7 дней.','Discover the ULTRA experience free for seven days.'),color:'#c9e1ff',count:'500',themes:'9',links:'5'},
+  'VIP-PLUS':{num:'01',kind:'YOUR FIRST UPGRADE',face:'PLUS',desc:tri('Күнделікті ыңғайлы Premium мүмкіндіктер.','Полезные Premium-функции на каждый день.','Everyday premium tools with a fresh neon identity.'),color:'#56dfff',count:'60',themes:'3',links:'1'},
+  'VIP-PRO':{num:'02',kind:'GO BEYOND',face:'PRO',desc:tri('Көбірек бақылау, жеке стиль, еркіндік.','Больше настроек, стиля и возможностей.','More room for your style and shortcuts.'),color:'#c29aff',count:'160',themes:'6',links:'3'},
+  'VIP-ULTRA':{num:'03',kind:'THE COMPLETE EXPERIENCE',face:'ULTRA',desc:tri('Барлық мүмкіндіктің толық жиынтығы.','Все Premium-возможности без компромиссов.','Everything A782 Premium can offer, unlocked.'),color:'#ffd281',count:'500',themes:'9',links:'5'}
+ };
+ return `<section class="nexus-landing rv"><div class="nexus-landing-lines" aria-hidden="true"></div>
+   <div class="nexus-landing-copy"><span class="nexus-kicker">${ic('sparkles')} A782 / EXCLUSIVE ACCESS</span><h1>MORE THAN<br><em>A BADGE.</em></h1><p>${tri('Премиум — жай алтын белгі емес. Жеке стиль, сүйікті жинақтар, жылдам басқару және ерекше ойыншы профилі.','Премиум — это не просто золотой значок. Свой стиль, избранное, удобное управление и особый игровой профиль.','Premium is more than a golden badge. Your style, saved items, quick access and a unique gaming identity.')}</p>
+     <div class="nexus-landing-actions"><a href="#vip-levels" class="btn">${tri('Деңгейлерді қарау','Смотреть уровни','Explore levels')} ${ic('arrow')}</a><a href="#me" class="nexus-simple-link">${ic('user')} ${tri('Менің профилім','Мой профиль','My profile')}</a></div><div class="nexus-landing-foot"><span>FOUR LEVELS</span><i></i><span>ONE UNIVERSE</span><i></i><span>YOUR WAY</span></div>
+   </div>
+   <div class="nexus-landing-stage" aria-hidden="true"><div class="nexus-stage-halo"></div><div class="nexus-stage-rings"></div><div class="nexus-stage-card tilt-card"><div class="nexus-stage-head"><span>A782</span><span>✦ NEXUS</span></div><div class="nexus-stage-emblem">${ic('crown')}</div><div class="nexus-stage-caption"><span>PREMIUM ACCESS</span><strong>ULTRA</strong></div></div><span class="nexus-stage-sticker">✦ UNLOCK YOUR STYLE</span></div>
+ </section>
+ ${ME?.vip?membershipHero(ME):''}
+ <section id="vip-levels" class="nexus-levels"><div class="nexus-section-heading rv"><div><span class="nexus-kicker">${ic('gem')} A782 MEMBERSHIP</span><h2>${tri('Өзіңнің деңгейіңді таңда','Выбери свой уровень','Choose your level')}</h2></div><p>${tri('Әр деңгей өз мүмкіндігімен келеді. Бағаны админ белгілейді, ақылы VIP тек төлемді растаған соң қосылады.','У каждого уровня свои функции. Цены устанавливает админ; платный VIP включается после подтверждения.','Each tier has its own tools. Admin sets prices and approves paid VIP before activation.')}</p></div>
+ <div class="nexus-tier-grid">${plans.map(p=>{
+   const data=lineup[p.tier]||lineup['VIP-PLUS'];const free=p.tier==='VIP-FREE',ultra=p.tier==='VIP-ULTRA',ready=free||Number(p.price)>0,locked=free&&(!!ME?.vip||!!ME?.vipTrialUsed);
+   const features=[`${data.count} ${tri('таңдаулы','избранных','saved items')}`,`${data.themes} ${tri('түс тақырыбы','цветовых тем','color themes')}`,`${data.links} ${tri('жылдам сілтеме','быстрых ссылок','shortcuts')}`];
+   return `<article class="nexus-tier rv tilt-card" data-tier="${esc(p.tier)}" style="--nexus-tier:${esc(data.color)}"><div class="nexus-tier-top"><span>EDITION ${data.num}</span>${ultra?'<span class="nexus-tier-best">✦ TOP LEVEL</span>':`<span>${data.kind}</span>`}</div>
+   <div class="nexus-tier-pass"><span class="nexus-tier-pass-a">A782 <b>✦</b></span><span class="nexus-tier-pass-icon">${ic(free?'sparkles':p.tier==='VIP-PLUS'?'bolt':p.tier==='VIP-PRO'?'gem':'crown')}</span><span class="nexus-tier-pass-name">${esc(data.face)}</span><span class="nexus-tier-pass-bottom">DIGITAL MEMBERSHIP <b>✦ ${data.num}</b></span></div>
+   <div class="nexus-tier-body"><div class="nexus-tier-name"><div><small>VIP / ${data.num}</small><h3>${esc(p.name)}</h3></div><span>${ic('arrow')}</span></div><p class="nexus-tier-description">${data.desc}</p>
+   <div class="nexus-tier-price">${free?tri('ТЕГІН','БЕСПЛАТНО','FREE'):ready?money(p.price):tri('Баға қойылмаған','Цена не установлена','Price not set')}<small> / ${free?'7':Number(p.durationDays)||0} ${tri('күн','дней','days')}</small></div>
+   <div class="nexus-tier-features">${features.map(x=>`<span>${ic('check')} ${esc(x)}</span>`).join('')}</div>
+   <div class="nexus-tier-buttons"><button class="btn nexus-tier-buy" type="button" ${locked||!ready||p.active===false?'disabled':''} ${free?'data-viptrial="1"':`data-vipbuy="${esc(p.id)}"`}>${locked?tri('Сынақ қолданылған','Пробный период использован','Trial used'):p.active===false?tri('Қолжетімсіз','Недоступно','Unavailable'):!ready?tri('Бағаны күту','Ожидание цены','Price pending'):free?tri('7 күнге қосу','Активировать на 7 дней','Activate 7 days'):tri('VIP-ке тапсырыс беру','Заказать VIP','Order VIP')} ${ic('arrow')}</button><button class="nexus-tier-preview" type="button" data-premiumpreview="${esc(p.tier)}">${ic('eye')} ${tri('Дизайнды көру','Предпросмотр','Preview look')}</button></div></div></article>`}).join('')}</div>
+ <div class="nexus-levels-footnote">${ic('shield')} ${tri('VIP-FREE әр аккаунтқа бір рет, 7 күн ULTRA мүмкіндіктерімен беріледі. Мерзім біткен соң автоматты тоқтайды.','VIP-FREE предоставляется один раз на аккаунт: 7 дней функций ULTRA, после чего доступ заканчивается.','VIP-FREE is a one-time 7-day ULTRA trial per account. Access expires automatically.')}</div></section>
+ <section class="nexus-why rv"><div><span class="nexus-kicker">✦ BUILT FOR PLAYERS</span><h2>${tri('Тек көрініс емес. Мүмкіндік.','Не только оформление. Возможности.','Not just the look. The tools.')}</h2></div><div class="nexus-why-items"><div>${ic('star')}<b>A782 LIBRARY</b><small>${tri('Модтар мен тауарларды сақта','Сохраняй моды и товары','Keep mods and store items saved')}</small></div><div>${ic('palette')}<b>PREMIUM STUDIO</b><small>${tri('Жеке түс, статус, профиль стилі','Темы, статус и профиль','Themes, status and profile style')}</small></div><div>${ic('bolt')}<b>COMMAND CENTER</b><small>${tri('Қажетті бөлімдерің бір басуда','Любимые разделы в один клик','Your favorite links in one tap')}</small></div></div></section>
+ ${footer()}`;
 }
 async function claimVipTrial(){
  if(!ME){toast(t("login"),true);location.hash="#me";return}
@@ -947,38 +1134,39 @@ function pAdmin(){
 
   <section class="glass rv bl"><h3>${t("sec_g")} (${D.games.length})</h3>
     ${D.games.map(g=>`<div class="ex-row"><span>${esc(g.name)} · ${g.status==="live"?t("live2"):t("soon2")}</span><span class="row"><button class="btn ghost sm" data-edit="games:${g.id}">${t("edit")}</button><button class="btn red sm" data-del="games:${g.id}">${t("del")}</button></span></div>`).join("")}
-    <form id="fGame" class="form" style="margin-top:14px"><input type="hidden" name="id">
+    <form id="fGame" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
       <div class="g2"><label class="field">${t("gname")}<input name="name" required></label>
         <label class="field">${t("gstatus")}${sel("status",[["soon",t("soon2")],["live",t("live2")]])}</label>
         <label class="field">${t("glink")}<input name="link" placeholder="https://t.me/..."></label>
         <label class="field">${t("gicon")}${sel("icon",[["gamepad","gamepad"],["cube","cube"],["swords","swords"],["flame","flame"],["star","star"],["shield","shield"]])}</label></div>
       <div class="g3">${ml("desc",t("gdesc"),{})}</div>
-      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGame">${t("cancel")}</button></div></form></section>
+      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fGame">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGame">${t("cancel")}</button></div></form></section>
 
   <section class="glass rv bl"><h3>${t("sec_gw")} (${D.giveaways.length})</h3>
     ${D.giveaways.map(g=>`<div class="ex-row"><span>${esc(L(g.title))} · ${g.participants.length}${g.winner?` · ${t("winner")}: ${esc(g.winner.name)}`:""}</span>
       <span class="row"><button class="btn sm" data-draw="${g.id}">${t("draw")}</button><button class="btn ghost sm" data-edit="giveaways:${g.id}">${t("edit")}</button><button class="btn red sm" data-del="giveaways:${g.id}">${t("del")}</button></span></div>`).join("")}
-    <form id="fGw" class="form" style="margin-top:14px"><input type="hidden" name="id">
+    <form id="fGw" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
       <div class="g3">${ml("title",t("title"),{})}</div>
       <div class="g3">${ml("desc",t("desc"),{})}</div>
       <div class="g3">${ml("prize",t("gprize"),{})}</div>
       <div class="g2"><label class="field">${t("gcost")}<input name="cost" type="number" value="1" min="1"></label>
         <label class="field">${t("gicon")}${sel("icon",[["gift","gift"],["users","users"],["gem","gem"],["bolt","bolt"],["trophy","trophy"],["star","star"],["swords","swords"]])}</label></div>
-      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGw">${t("cancel")}</button></div></form></section>
+      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fGw">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGw">${t("cancel")}</button></div></form></section>
 
   <section class="glass rv bl"><h3>${t("sec_pr")} (${D.products.length})</h3>
     ${D.products.map(p=>`<div class="ex-row"><span>${esc(L(p.name))} · ${money(p.price)}</span><span class="row"><button class="btn ghost sm" data-edit="products:${p.id}">${t("edit")}</button><button class="btn red sm" data-del="products:${p.id}">${t("del")}</button></span></div>`).join("")}
-    <form id="fPr" class="form" style="margin-top:14px"><input type="hidden" name="id">
+    <form id="fPr" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
       <div class="g3">${ml("name",t("title"),{})}</div>
+      <p class="mute sm">${tri("Атауын кемінде бір тілде жаз (KK / RU / EN).", "Заполни название хотя бы на одном языке (KK / RU / EN).", "Enter a name in at least one language (KK / RU / EN).")}</p>
       <div class="g3">${ml("desc",t("desc"),{})}</div>
       <div class="g2"><label class="field">${t("price")}<input name="price" type="number" required></label>
         <label class="field">${t("cat")}${sel("cat",[["pack","pack"],["over","over"],["design","design"],["guide","guide"]])}</label></div>
       <label class="field">${t("img")}<input name="img" placeholder="https://"></label>
-      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fPr">${t("cancel")}</button></div></form></section>
+      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fPr">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fPr">${t("cancel")}</button></div></form></section>
 
   <section class="glass rv bl"><h3>${t("sec_mp")} (${D.modpacks.length})</h3>
     ${D.modpacks.map(m=>`<div class="ex-row"><span>${esc(m.title)} · ${esc(m.version)} ${esc(m.loader)}</span><span class="row"><button class="btn ghost sm" data-edit="modpacks:${m.id}">${t("edit")}</button><button class="btn red sm" data-del="modpacks:${m.id}">${t("del")}</button></span></div>`).join("")}
-    <form id="fMp" class="form" style="margin-top:14px"><input type="hidden" name="id">
+    <form id="fMp" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
       <label class="field">${t("mtitle")}<input name="title" required></label>
       <div class="g3"><label class="field">${t("mver")}<input name="version" value="1.20.1"></label>
         <label class="field">${t("mload")}${sel("loader",[["Fabric","Fabric"],["Forge","Forge"],["NeoForge","NeoForge"],["Quilt","Quilt"]])}</label>
@@ -989,7 +1177,7 @@ function pAdmin(){
       <label class="field">${t("mfile")}<input name="file" placeholder="https://"></label>
       <div class="g3">${ml("desc",t("desc"),{})}</div>
       <p class="mute sm">${t("pidh")}</p>
-      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div></form></section>
+      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fMp">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div></form></section>
 
   <section class="glass rv bl"><h3>✦ VIP тарифтері</h3><div id="vipAdminPlans"></div>
     <p class="mute sm">${tri("Деңгейді «Өңдеу» арқылы таңдаңыз. VIP-FREE әрқашан 7 күн және тегін.","Нажмите «Изменить» для нужного уровня. FREE всегда бесплатен на 7 дней.","Select a tier via Edit. FREE is always a 7-day free trial.")}</p>
@@ -1034,7 +1222,12 @@ function render(keep){
   document.body.classList.toggle("vip-view",!!ME?.vip);
   document.body.dataset.activeTier=ME?.vip?(ME.vip.visualTier||ME.vip.tier||''):'';
   document.documentElement.style.setProperty("--vip-accent",ME?.vip?vipColor(ME.vip):"#ffc76d");
-  applySettings(); chrome();
+  applySettings();
+  const customPreset=ME?.vip&&ME.vipPrefs?.preset&&VIP_PRESETS[ME.vipPrefs.preset];
+  const canUsePreset=ME?.vip&&vipCapsClient().themes.includes(ME.vipPrefs?.preset);
+  if(customPreset&&canUsePreset){const [a,b,c]=customPreset;document.documentElement.style.setProperty('--acc',a);document.documentElement.style.setProperty('--acc2',b);document.documentElement.style.setProperty('--acc3',c)}
+  else{['--acc','--acc2','--acc3'].forEach(k=>document.documentElement.style.removeProperty(k))}
+  chrome();
   $$("[data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r===(key==="gw"?"giveaways":key==="mc"?"minecraft":key==="streams"?"streams":key)));
   const ti=TABS.indexOf(key); if(ti>=0) $("#tabbar").style.setProperty("--i",ti);
   $("#main").innerHTML=`<section class="pg" style="--dir:${dir}">${fn()}</section>`;
@@ -1231,14 +1424,69 @@ async function loadAdmin(){
 }
 const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
 
+// Explicit, mobile-friendly admin add/edit handler.
+// Never lets browser-native required-field validation swallow the Save/Add click.
+const ADMIN_FORM_KINDS={fGame:"games",fGw:"giveaways",fPr:"products",fMp:"modpacks"};
+function adminFormError(form,message,focusName){
+  let box=form.querySelector('[data-admin-error]');
+  if(!box){box=document.createElement('p');box.dataset.adminError='1';box.setAttribute('role','alert');box.style.cssText='color:var(--bad);font-size:13px;margin-top:6px;white-space:pre-wrap';form.appendChild(box)}
+  box.textContent=message;
+  toast(message,true);
+  const field=focusName && form.elements.namedItem(focusName);
+  if(field&&typeof field.focus==='function')field.focus({preventScroll:false});
+}
+function clearAdminFormError(form){const box=form.querySelector('[data-admin-error]');if(box)box.remove()}
+async function submitAdminForm(form){
+  if(!form||!ADMIN_FORM_KINDS[form.id]||form.dataset.submitting==='1')return;
+  clearAdminFormError(form);
+  const fields=formObj(form), kind=ADMIN_FORM_KINDS[form.id];
+  const hasText=prefix=>['kk','ru','en'].some(lang=>String(fields[prefix+'_'+lang]||'').trim());
+  const titleError=tri('Атауын толтыр (KK, RU немесе EN).','Укажи название (KK, RU или EN).','Enter a title in KK, RU or EN.');
+  if(kind==='products'){
+    if(!hasText('name'))return adminFormError(form,titleError,'name_kk');
+    const price=String(fields.price||'').trim();
+    if(price===''||!/^\d+$/.test(price)||Number(price)>10000000){
+      return adminFormError(form,tri('Бағаны дұрыс жаз: 0 ₸ немесе одан жоғары бүтін сан.','Укажи цену: целое число от 0 ₸.','Enter a valid whole-number price from 0 ₸.'),'price');
+    }
+  }else if(kind==='games'){
+    if(!String(fields.name||'').trim())return adminFormError(form,titleError,'name');
+  }else if(kind==='giveaways'){
+    if(!hasText('title'))return adminFormError(form,titleError,'title_kk');
+  }else if(kind==='modpacks'){
+    if(!String(fields.title||'').trim())return adminFormError(form,titleError,'title');
+  }
+  const button=form.querySelector('[data-adminsubmit],button[type="submit"]');
+  form.dataset.submitting='1';
+  if(button)button.disabled=true;
+  const originalText=button?button.innerHTML:'';
+  if(button)button.textContent=tri('Сақталып жатыр…','Сохраняется…','Saving…');
+  try{
+    await api('POST',ADMIN_ENDPOINT[kind],fields,true);
+    await loadData();
+    render(true);
+    toast(tri('Сәтті қосылды / сақталды ✓','Добавлено / сохранено ✓','Added / saved ✓'));
+  }catch(err){
+    const reason=err.code==='title_required'?titleError:
+      err.code==='admin_required'?tri('Админ сессиясы аяқталған. Қайта кір.','Сессия администратора истекла. Войди снова.','Admin session expired. Sign in again.'):
+      err.code==='too_large'?tri('Дерек көлемі тым үлкен.','Слишком большой объём данных.','Payload is too large.'):
+      tri('Сақталмады. Сервер жауабы: ','Не сохранено. Ответ сервера: ','Not saved. Server response: ')+(err.code||err.message||'generic');
+    adminFormError(form,reason);
+  }finally{
+    delete form.dataset.submitting;
+    if(form.isConnected&&button){button.disabled=false;button.innerHTML=originalText}
+  }
+}
+
 /* ===================== ОҚИҒАЛАР ===================== */
 document.addEventListener("click",async e=>{
   const go=e.target.closest("[data-go]");if(go){location.hash="#"+go.dataset.go;return}
   const lg=e.target.closest("[data-lang]");if(lg){LANG=lg.dataset.lang;localStorage.setItem("a782-lang",LANG);render(true);return}
   if(e.target.closest("[data-close]")){closeSheet();return}
+  const libraryButton=e.target.closest("button[data-library]");if(libraryButton){e.preventDefault();e.stopPropagation();toggleLibrary(libraryButton.dataset.library,libraryButton);return}
   const pid=e.target.closest("[data-pid]");if(pid){openVersions(pid.dataset.pid,pid.dataset.title);return}
   const btn=e.target.closest("button");if(!btn)return;
   const d=btn.dataset;
+  if(d.adminsubmit){e.preventDefault();await submitAdminForm(document.getElementById(d.adminsubmit));return}
   if(d.add){addToCart(d.add);return}
   if(d.enter){enterGw(d.enter);return}
   if(d.nofile){toast(t("nofile"),true);return}
@@ -1269,6 +1517,14 @@ document.addEventListener("click",async e=>{
     try{ await api("POST","/api/admin/vip-plans",b,true);await loadData();render(true);toast(t("saved"))}
     catch(x){toast(x.code==="storage_failed"?"JSONBin сақтау қатесі: Render logs тексеріңіз":errMsg(x),true)}
     finally{btn.disabled=false}
+    return;
+  }
+  if(d.premiumpreview){
+    const tier=d.premiumpreview;
+    const names={'VIP-FREE':'ULTRA TRIAL','VIP-PLUS':'PLUS','VIP-PRO':'PRO','VIP-ULTRA':'ULTRA'};
+    if(!names[tier])return;
+    const accent=({'VIP-FREE':'#c9e1ff','VIP-PLUS':'#56dfff','VIP-PRO':'#c29aff','VIP-ULTRA':'#ffd281'})[tier];
+    openSheet(`<div class="nexus-modal-preview" style="--nexus-tier:${accent}"><span class="nexus-kicker">✦ A782 DESIGN PREVIEW</span><h2>${names[tier]}</h2><p>${tri('Бұл дизайн үлгісі. VIP мүмкіндіктері тек белсенді аккаунтта жұмыс істейді.','Это пример оформления. VIP-функции работают только при активной подписке.','This is a design preview. VIP tools only work with active membership.')}</p><div class="nexus-tier-pass"><span class="nexus-tier-pass-a">A782 <b>✦</b></span><span class="nexus-tier-pass-icon">${ic('crown')}</span><span class="nexus-tier-pass-name">${names[tier]}</span><span class="nexus-tier-pass-bottom">DIGITAL MEMBERSHIP <b>✦ A782</b></span></div><button class="btn ghost" data-close="1">${t('close')}</button></div>`);
     return;
   }
   if(d.viptrial){claimVipTrial();return}
@@ -1310,7 +1566,27 @@ document.addEventListener("change",e=>{
     img.src=url;
   }
 });
-document.addEventListener("input",e=>{if(e.target.id==="mcQ")MC.q=e.target.value.trim()});
+function syncNexusPreview(form){
+ const preview=document.getElementById('nexusPreviewCard');
+ if(!preview||!form)return;
+ const preset=form.elements.preset?.value;
+ if(VIP_PRESETS[preset]){
+  const [a,b]=VIP_PRESETS[preset];
+  const section=form.closest('.nexus-studio');
+  if(section){section.style.setProperty('--preview-color',a);section.style.setProperty('--preview-color-2',b)}
+ }
+ const status=document.getElementById('nexusPreviewStatus');
+ if(status)status.textContent=(form.elements.statusEmoji?.value||'✦')+' '+(form.elements.status?.value||'PREMIUM');
+ const headline=document.getElementById('nexusPreviewHeadline');
+ if(headline)headline.textContent=form.elements.headline?.value||'A782 DIGITAL MEMBER';
+}
+document.addEventListener('input',e=>{const form=e.target.closest('#vipStudioForm');if(form)syncNexusPreview(form)});
+document.addEventListener('change',e=>{const form=e.target.closest('#vipStudioForm');if(form)syncNexusPreview(form)});
+document.addEventListener("input",e=>{
+  if(e.target.id==="mcQ")MC.q=e.target.value.trim();
+  const form=e.target.closest('form');
+  if(form && ADMIN_FORM_KINDS[form.id])clearAdminFormError(form);
+});
 if(matchMedia("(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)").matches){
  document.addEventListener("pointermove",e=>{
   if(!S.motion)return;
@@ -1338,6 +1614,13 @@ document.addEventListener("submit",async e=>{
         TOKEN=r.token;localStorage.setItem("a782-token",TOKEN);ME=r.user;
         await loadData();render(true);return;
       }
+      case "vipStudioForm":{
+        const shortcuts=[...f.querySelectorAll('input[name="shortcuts"]:checked')].map(x=>x.value);
+        const caps=vipCapsClient();
+        if(shortcuts.length>caps.count){toast(tri('Жылдам сілтемелер шегінен асты','Слишком много быстрых ссылок','Too many shortcuts'),true);return}
+        const r=await api('POST','/api/vip/preferences',{preset:o.preset,statusEmoji:o.statusEmoji,status:o.status||'',headline:o.headline||'',shortcuts});
+        ME=r.user;toast(tri('Studio сақталды ✦','Studio сохранена ✦','Studio saved ✦'));render(true);return;
+      }
       case "profForm":{
         const r=await api("PUT","/api/me",{nick:o.nick,mc:o.mc,ff:o.ff,so2:o.so2,tg:o.tg,bio:o.bio,avatar:o.avatar,banner:o.banner,icon:pendingIcon||ME.icon});
         ME=r.user;pendingIcon=null;toast(t("saved"));render(true);return;
@@ -1357,9 +1640,7 @@ document.addEventListener("submit",async e=>{
       }
       case "fSite":{await api("PUT","/api/admin/site",o,true);await loadData();toast(t("saved"));render(true);return}
       case "fGame":case "fGw":case "fPr":case "fMp":{
-        const ep=ADMIN_ENDPOINT[{fGame:"games",fGw:"giveaways",fPr:"products",fMp:"modpacks"}[f.id]];
-        await api("POST",ep,o,true);
-        await loadData();toast(t("saved"));render(true);return;
+        await submitAdminForm(f);return;
       }
     }
   }catch(err){ toast(errMsg(err),true) }
