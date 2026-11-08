@@ -805,7 +805,17 @@ function bindPage(key){
   if(key==="streams"||key==="home") startCd();
   if(key==="mc"&&MC.hits===null) searchMC();
   if(key==="store"||(key==="me"&&ME)) loadOrders();
+  if(key==="me"&&ME) refreshVipProfile();
   if(key==="admin"&&ADMIN) loadAdmin();
+}
+async function refreshVipProfile(){
+  try {
+    const latest=(await api("GET","/api/me")).user;
+    if(!latest || !ME || latest.id!==ME.id)return;
+    const before=JSON.stringify(ME.vip||null), after=JSON.stringify(latest.vip||null);
+    ME=latest;
+    if(before!==after && location.hash==="#me")render(true);
+  }catch(e){console.warn("VIP profile refresh:",e.code||e.message)}
 }
 async function loadOrders(){
   const box=$("#ordersBox"); if(!box||!TOKEN) return;
@@ -971,7 +981,7 @@ async function loadAdmin(){
     if(ob) ob.innerHTML=orders.length?`<div class="table"><table><tr><th>#</th><th>${t("nick")||"Nick"}</th><th>${t("total")}</th><th>${t("pend")}</th><th></th></tr>
       ${orders.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${esc(o.nick)}</td><td>${money(o.total)}</td>
         <td>${o.type==="vip"?"✦ VIP "+esc(o.planName):esc(o.method)} · ${o.status==="paid"?t("paid"):t("pend")}</td>
-        <td>${o.type==="vip"?(o.status==="paid"?"✓ VIP":`<button class="btn sm" data-vipapprove="${esc(o.id)}">VIP растау</button>`):`<button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button>`}</td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
+        <td>${o.type==="vip"?`<button class="btn sm" data-vipapprove="${esc(o.id)}">${o.status==="paid"?"VIP іске қосу / тексеру":"VIP растау"}</button>`:`<button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button>`}</td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
   }catch(e){ toast(errMsg(e),true) }
 }
 const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
@@ -1016,7 +1026,7 @@ document.addEventListener("click",async e=>{
     return;
   }
   if(d.vipbuy){buyVip(d.vipbuy);return}
-  if(d.vipapprove){if(confirm("Төлемді тексердіңіз бе? VIP берілсін бе?"))api("POST",`/api/admin/vip-orders/${d.vipapprove}/approve`,{},true).then(()=>{toast(t("saved"));loadAdmin()}).catch(e=>toast(errMsg(e),true));return}
+  if(d.vipapprove){if(confirm("Төлемді тексердіңіз бе? VIP берілсін бе?"))api("POST",`/api/admin/vip-orders/${d.vipapprove}/approve`,{},true).then(r=>{if(ME&&r.user&&ME.id===r.user.id)ME=r.user;toast("VIP тексерілді / іске қосылды");loadAdmin()}).catch(e=>toast(errMsg(e),true));return}
   if(d.vipedit){const p=(window.vipAdminPlans||[]).find(x=>x.id===d.vipedit),f=$("#vipPlanForm");if(p&&f){fillForm(f,p);f.elements.active.checked=p.active;f.scrollIntoView({behavior:"smooth"})}return}
   if(d.vipdel){if(confirm("Тарифті өшіру керек пе?"))api("DELETE",`/api/admin/vip-plans/${d.vipdel}`,null,true).then(async()=>{await loadData();render(true)}).catch(e=>toast(errMsg(e),true));return}
   switch(btn.id){
