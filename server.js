@@ -223,3 +223,366 @@ async function cached(key, load) {
   mcCache.set(key, { t: Date.now(), v });
   return v;
 }
+async function upstream(url) {
+  let r;
+  try { r = await fetch(url, { headers: { "User-Agent": UA } }); } catch { fail(502, "upstream"); }
+  if (!r.ok) fail(502, "upstream");
+  return r.json();
+}
+async function mcSearch(sp) {
+  const q = str(sp.get("q"), 80);
+  const type = ["mod", "modpack", "resourcepack", "shader"].includes(sp.get("type")) ? sp.get("type") : "mod";
+  const loader = ["fabric", "forge", "neoforge", "quilt"].includes(sp.get("loader")) ? sp.get("loader") : "";
+  const version = /^[\d.]{3,10}$/.test(sp.get("version") || "") ? sp.get("version") : "";
+  const sort = ["downloads", "follows", "newest", "updated"].includes(sp.get("sort")) ? sp.get("sort") : "downloads";
+  const facets = [[`project_type:${type}`]];
+  if (loader && (type === "mod" || type === "modpack")) facets.push([`categories:${loader}`]);
+  if (version) facets.push([`versions:${version}`]);
+  const url = `https://api.modrinth.com/v2/search?query=${encodeURIComponent(q)}&facets=${encodeURIComponent(JSON.stringify(facets))}&index=${q ? "relevance" : sort}&limit=20`;
+  return cached(url, async () => {
+    const d = await upstream(url);
+    return { hits: d.hits.map(h => ({ id: h.project_id, title: h.title, author: h.author, desc: h.description, icon: h.icon_url, downloads: h.downloads, license: h.license })) };
+  });
+}
+async function mcVersions(id) {
+  if (!/^[\w-]{1,64}$/.test(id || "")) fail(400, "invalid");
+  const url = `https://api.modrinth.com/v2/project/${id}/version`;
+  return cached(url, async () => {
+    const vs = await upstream(url);
+    return { versions: vs.slice(0, 12).map(v => ({
+      name: v.name, games: (v.game_versions || []).slice(0, 4), loaders: v.loaders || [],
+      file: ((v.files || []).find(f => f.primary) || (v.files || [])[0] || {}).url || ""
+    })) };
+  });
+}
+
+async function route(req, url, user) {
+  const p = url.pathname, m = req.method;
+  const need = () => user || fail(401, "login_required");
+
+  if (m === "GET" && p === "/api/data") return [200, pubData()];
+  if (m === "GET" && p === "/api/mc/search") return [200, await mcSearch(url.searchParams)];
+  if (m === "GET" && p === "/api/mc/versions") return [200, await mcVersions(url.searchParams.get("id"))];
+
+  if (m === "POST" && p === "/api/register") {
+    const b = await readBody(req);
+    const email = str(b.email, 120).toLowerCase(), pw = String(b.password || ""), nick = str(b.nick, 24);
+    if (!/^\S+@\S+\.\S+$/.test(email) || pw.length < 6 || !nick) fail(400, "invalid");
+    if (db.users.some(x => x.email === email)) fail(409, "exists");
+    const salt = crypto.randomBytes(16).toString("hex");
+    const u = { id: uid(), email, salt, pass: hashPw(pw, salt), nick, mc: "", ff: "", so2: "", tg: "", bio: "",
+      avatar: "", banner: "", icon: "user", tickets: 3, tokens: 0, diamonds: 0, wins: [], codes: {}, lastDaily: 0 };
+    db.users.push(u);
+    const token = crypto.randomBytes(32).toString("hex");
+    db.sessions[token] = u.id;
+    saveDB();
+    return [200, { token, user: pubUser(u) }];
+  }
+  if (m === "POST" && p === "/api/login") {
+    const b = await readBody(req);
+    const u = db.users.find(x => x.email === str(b.email, 120).toLowerCase());
+    if (!u) fail(401, "bad_login");
+    const ok = crypto.timingSafeEqual(Buffer.from(hashPw(String(b.password || ""), u.salt), "hex"), Buffer.from(u.pass, "hex"));
+    if (!ok) fail(401, "bad_login");
+    const token = crypto.randomBytes(32).toString("hex");
+    db.sessions[token] = u.id;
+    saveDB();
+    return [200, { token, user: pubUser(u) }];
+  }
+  if (m === "POST" && p === "/api/logout") {
+    delete db.sessions[(req.headers.authorization || "").slice(7)];
+    saveDB();
+    return [200, { ok: true }];
+  }
+  if (m === "GET" && p === "/api/me") return [200, { user: pubUser(need()) }];
+  if (m === "PUT" && p === "/api/me") {
+    const u = need();
+    const b = await readBody(req, 80 * 1024);
+    u.nick = str(b.nick, 24) || u.nick;
+    u.mc = str(b.mc, 32); u.ff = str(b.ff, 32); u.so2 = str(b.so2, 32); u.tg = str(b.tg, 40); u.bio = str(b.bio, 200);
+    if (b.avatar !== undefined) u.avatar = b.avatar === "" ? "" : (safeImg(b.avatar) || u.avatar);
+    if (b.banner !== undefined) u.banner = b.banner === "" ? "" : (safeImg(b.banner) || u.banner);
+    if (AVATARS.includes(b.icon)) u.icon = b.icon;
+    saveDB();
+    return [200, { user: pubUser(u) }];
+  }
+  if (m === "POST" && p === "/api/me/daily") {
+    const u = need();
+    if (Date.now() - u.lastDaily < 864e5) fail(429, "daily_done");
+    u.lastDaily = Date.now(); u.tickets++;
+    saveDB();
+    return [200, { user: pubUser(u) }];
+  }
+  if (m === "POST" && p === "/api/me/exchange") {
+    const u = need();
+    const b = await readBody(req);
+    if (b.kind === "ticket") {
+      if (u.tokens < 50) fail(400, "not_enough");
+      u.tokens -= 50; u.tickets++;
+    } else if (b.kind === "coupon") {
+      if (u.tokens < 100) fail(400, "not_enough");
+      u.tokens -= 100;
+      const code = "EX-" + randCode();
+      u.codes[code] = 10;
+      u.wins.unshift({ id: uid(), title: L3("Купон 10%", "Купон 10%", "10% coupon"), code, date: new Date().toLocaleDateString("en-GB") });
+    } else fail(400, "invalid");
+    saveDB();
+    return [200, { user: pubUser(u) }];
+  }
+  if (m === "POST" && p === "/api/wheel/spin") {
+    const u = need();
+    if (u.tickets < db.wheelCost) fail(400, "no_tickets");
+    u.tickets -= db.wheelCost;
+    const total = db.prizes.reduce((s, x) => s + x.weight, 0);
+    let r = crypto.randomInt(total), idx = 0;
+    for (let i = 0; i < db.prizes.length; i++) { r -= db.prizes[i].weight; if (r < 0) { idx = i; break; } }
+    const pz = db.prizes[idx];
+    let code = null;
+    if (pz.kind === "tokens") u.tokens += pz.val;
+    else if (pz.kind === "tickets") u.tickets += pz.val;
+    else if (pz.kind === "diamonds") u.diamonds += pz.val;
+    else if (pz.kind === "coupon") { code = "CP-" + randCode(); u.codes[code] = pz.val; }
+    u.wins.unshift({ id: uid(), title: pz.label, code: code || "", date: new Date().toLocaleDateString("en-GB") });
+    saveDB();
+    return [200, { index: idx, prize: pz, code, user: pubUser(u) }];
+  }
+
+  const en = p.match(/^\/api\/giveaways\/([\w-]+)\/enter$/);
+  if (m === "POST" && en) {
+    const u = need();
+    const g = db.giveaways.find(x => x.id === en[1]) || fail(404, "not_found");
+    if (g.winner) fail(400, "ended");
+    if (g.participants.some(x => x.uid === u.id)) fail(409, "already");
+    if (u.tickets < g.cost) fail(400, "no_tickets");
+    u.tickets -= g.cost;
+    g.participants.push({ uid: u.id, nick: u.nick });
+    saveDB();
+    return [200, { user: pubUser(u) }];
+  }
+
+  if (m === "GET" && p === "/api/orders") {
+    const u = need();
+    return [200, { orders: db.orders.filter(o => o.userId === u.id) }];
+  }
+  if (m === "POST" && p === "/api/orders") {
+    const u = need();
+    const b = await readBody(req);
+    const lines = []; let sub = 0;
+    for (const it of (Array.isArray(b.items) ? b.items : []).slice(0, 30)) {
+      const pr = db.products.find(x => x.id === it.id);
+      if (!pr) continue;
+      const q = Math.min(20, Math.max(1, parseInt(it.qty) || 1));
+      lines.push({ id: pr.id, name: pr.name, qty: q, price: pr.price });
+      sub += pr.price * q;
+    }
+    if (!lines.length) fail(400, "empty_cart");
+    const code = str(b.coupon, 30).toUpperCase();
+    let pct = 0, used = null;
+    if (db.coupons[code]) pct = db.coupons[code];
+    else if (u.codes[code]) { pct = u.codes[code]; used = code; }
+    const disc = Math.round(sub * pct / 100);
+    const method = ["kaspi", "telegram", "demo"].includes(b.method) ? b.method : "telegram";
+    if (method === "demo" && !DEMO_PAY) fail(400, "invalid");
+    const receipt = str(b.receipt, 80);
+    if (method === "kaspi" && receipt.length < 3) fail(400, "receipt_required");
+    const order = {
+      id: "A782-" + randCode(), userId: u.id, nick: u.nick, date: new Date().toISOString(),
+      items: lines, subtotal: sub, discount: disc, total: sub - disc,
+      method, receipt, status: method === "demo" ? "paid" : "pending"
+    };
+    if (used) delete u.codes[used];
+    db.orders.unshift(order);
+    saveDB();
+    return [201, order];
+  }
+
+  if (m === "POST" && p === "/api/admin/login") {
+    const ip = req.socket.remoteAddress;
+    const hit = pinHits.get(ip) || { n: 0, t: Date.now() };
+    if (Date.now() - hit.t > 15 * 60e3) { hit.n = 0; hit.t = Date.now(); }
+    if (hit.n >= 10) fail(429, "too_many");
+    const b = await readBody(req);
+    const pin = String(b.pin || "");
+    const ok = pin.length === ADMIN_PIN.length && crypto.timingSafeEqual(Buffer.from(pin), Buffer.from(ADMIN_PIN));
+    if (!ok) { hit.n++; pinHits.set(ip, hit); fail(403, "bad_pin"); }
+    const tok = crypto.randomBytes(24).toString("hex");
+    adminTokens.set(tok, Date.now() + 12 * 3600e3);
+    return [200, { token: tok }];
+  }
+  if (p.startsWith("/api/admin/")) {
+    if (!isAdmin(req)) fail(403, "admin_required");
+    return adminRoute(req, m, p);
+  }
+  return [404, { error: "not_found" }];
+}
+
+async function adminRoute(req, m, p) {
+  if (m === "PUT" && p === "/api/admin/site") {
+    const b = await readBody(req);
+    const o = db.owner, s = db.stream;
+    db.owner = {
+      ...o,
+      name: str(b.name, 60) || o.name,
+      handle: str(b.handle, 40) || o.handle,
+      tiktok: safeUrl(b.tiktok) || o.tiktok,
+      telegram: safeUrl(b.telegram) || o.telegram,
+      kaspi: str(b.kaspi, 40),
+      avatar: b.avatar === undefined ? o.avatar : safeImg(b.avatar),
+      banner: b.banner === undefined ? o.banner : safeImg(b.banner),
+      bio: tr(b, "bio", 200)
+    };
+    db.stream = {
+      ...s,
+      live: !!b.live,
+      title: tr(b, "stitle", 120),
+      nextAt: str(b.nextAt, 40) || s.nextAt,
+      schedule: parseSchedule(b.sched)
+    };
+    db.server = { ip: str(b.ip, 80), version: str(b.version, 20) };
+    db.wheelCost = Math.max(1, parseInt(b.wheelCost) || 1);
+    saveDB();
+    return [200, { ok: true }];
+  }
+  if (m === "POST" && p === "/api/admin/giveaways") {
+    const b = await readBody(req);
+    const title = tr(b, "title", 120);
+    if (!title.kk && !title.ru && !title.en) fail(400, "title_required");
+    const old = db.giveaways.find(x => x.id === str(b.id, 40));
+    upsert(db.giveaways, {
+      id: old ? old.id : uid(),
+      icon: ICONS.includes(b.icon) ? b.icon : "gift",
+      title, desc: tr(b, "desc", 300), prize: tr(b, "prize", 120),
+      cost: Math.max(1, parseInt(b.cost) || 1),
+      participants: old ? old.participants : [], winner: old ? old.winner : null
+    });
+    saveDB();
+    return [200, { ok: true }];
+  }
+  if (m === "POST" && p === "/api/admin/products") {
+    const b = await readBody(req);
+    const name = tr(b, "name", 120);
+    if (!name.kk && !name.ru && !name.en) fail(400, "title_required");
+    const old = db.products.find(x => x.id === str(b.id, 40));
+    upsert(db.products, {
+      id: old ? old.id : uid(),
+      cat: P_CATS.includes(b.cat) ? b.cat : "pack",
+      name, desc: tr(b, "desc", 300),
+      price: Math.max(0, parseInt(b.price) || 0),
+      img: safeImg(b.img) || (old ? old.img : "")
+    });
+    saveDB();
+    return [200, { ok: true }];
+  }
+  if (m === "POST" && p === "/api/admin/modpacks") {
+    const b = await readBody(req);
+    const title = str(b.title, 120);
+    if (!title) fail(400, "title_required");
+    const old = db.modpacks.find(x => x.id === str(b.id, 40));
+    upsert(db.modpacks, {
+      id: old ? old.id : uid(),
+      cat: M_CATS.includes(b.cat) ? b.cat : "rpg",
+      title,
+      version: str(b.version, 20) || "1.20.1",
+      loader: str(b.loader, 20) || "Fabric",
+      mods: parseInt(b.mods) || 0,
+      sizeMb: parseInt(b.sizeMb) || 0,
+      downloads: old ? old.downloads : 0,
+      rating: old ? old.rating : 5,
+      file: safeUrl(b.file),
+      keyMods: str(b.keys, 400).split(",").map(x => x.trim()).filter(Boolean).slice(0, 12),
+      desc: tr(b, "desc", 300)
+    });
+    saveDB();
+    return [200, { ok: true }];
+  }
+  if (m === "POST" && p === "/api/admin/games") {
+    const b = await readBody(req);
+    const name = str(b.name, 40);
+    if (!name) fail(400, "title_required");
+    const old = db.games.find(x => x.id === str(b.id, 40));
+    upsert(db.games, {
+      id: old ? old.id : uid(),
+      name,
+      icon: ICONS.includes(b.icon) ? b.icon : "gamepad",
+      status: b.status === "live" ? "live" : "soon",
+      link: safeUrl(b.link),
+      desc: tr(b, "desc", 200)
+    });
+    saveDB();
+    return [200, { ok: true }];
+  }
+  const del = p.match(/^\/api\/admin\/(giveaways|products|modpacks|games)\/([\w-]+)$/);
+  if (m === "DELETE" && del) {
+    db[del[1]] = db[del[1]].filter(x => x.id !== del[2]);
+    saveDB();
+    return [200, { ok: true }];
+  }
+  const dr = p.match(/^\/api\/admin\/giveaways\/([\w-]+)\/draw$/);
+  if (m === "POST" && dr) {
+    const g = db.giveaways.find(x => x.id === dr[1]) || fail(404, "not_found");
+    if (!g.participants.length) fail(400, "no_participants");
+    const w = g.participants[crypto.randomInt(g.participants.length)];
+    g.winner = { name: w.nick, at: new Date().toISOString() };
+    const wu = db.users.find(u => u.id === w.uid);
+    if (wu) wu.wins.unshift({ id: uid(), title: g.title, code: "G-" + randCode(), date: new Date().toLocaleDateString("en-GB") });
+    saveDB();
+    return [200, { winner: g.winner }];
+  }
+  const bal = p.match(/^\/api\/admin\/users\/([\w-]+)\/balance$/);
+  if (m === "POST" && bal) {
+    const b = await readBody(req);
+    const u = db.users.find(x => x.id === bal[1]) || fail(404, "not_found");
+    if (!["tickets", "tokens", "diamonds"].includes(b.field)) fail(400, "invalid");
+    u[b.field] = Math.max(0, u[b.field] + (parseInt(b.delta) || 0));
+    saveDB();
+    return [200, { ok: true }];
+  }
+  const ost = p.match(/^\/api\/admin\/orders\/([\w-]+)\/status$/);
+  if (m === "POST" && ost) {
+    const b = await readBody(req);
+    const o = db.orders.find(x => x.id === ost[1]) || fail(404, "not_found");
+    if (!["paid", "pending"].includes(b.status)) fail(400, "invalid");
+    o.status = b.status;
+    saveDB();
+    return [200, { ok: true }];
+  }
+  if (m === "GET" && p === "/api/admin/users") {
+    return [200, { users: db.users.map(u => ({ id: u.id, email: u.email, nick: u.nick, tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds })) }];
+  }
+  if (m === "GET" && p === "/api/admin/orders") return [200, { orders: db.orders }];
+  fail(404, "not_found");
+}
+
+const MIME = {
+  ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+  ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".ico": "image/x-icon"
+};
+function serveStatic(pathname, res) {
+  const rel = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
+  const full = path.resolve(PUBLIC_DIR, "." + rel);
+  const relative = path.relative(PUBLIC_DIR, full);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) { res.writeHead(403); return res.end(); }
+  fs.readFile(full, (err, buf) => {
+    if (err) { res.writeHead(404); return res.end("Not found"); }
+    res.writeHead(200, { "Content-Type": MIME[path.extname(full)] || "application/octet-stream", "Cache-Control": "no-cache" });
+    res.end(buf);
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  const url = new URL(req.url, "http://localhost");
+  if (!url.pathname.startsWith("/api/")) return serveStatic(url.pathname, res);
+  try {
+    const [status, out] = await route(req, url, userFrom(req));
+    send(res, status, out);
+  } catch (e) {
+    const status = e.status || 500;
+    if (status === 500) console.error(e);
+    send(res, status, { error: status === 500 ? "generic" : (e.code || e.message) });
+  }
+});
+
+loadDB()
+  .catch(e => { console.error("Жүктеу қатесі:", e.message); migrate(); })
+  .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: порт ${PORT}`)));
