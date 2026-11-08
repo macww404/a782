@@ -1,5 +1,4 @@
 // A782 DIGITAL — backend. Node.js 18+ керек, басқа ешқандай пакет қажет емес.
-// Іске қосу: ADMIN_PIN=1234 node server.js
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -13,8 +12,11 @@ const DEMO_PAY = process.env.DEMO_PAY !== "0";
 const UA = "A782DIGITAL/2.0 (+https://t.me/Asxm_A782)";
 const ICONS = ["gift", "users", "gem", "bolt", "trophy", "shield", "star", "user"];
 const AVATAR_ICONS = ["user", "gem", "bolt", "cube", "trophy", "shield", "star"];
+const JB_ID = process.env.JSONBIN_ID, JB_KEY = process.env.JSONBIN_KEY;
+const REMOTE = !!(JB_ID && JB_KEY);
 
-console.log("Admin PIN:", ADMIN_PIN, process.env.ADMIN_PIN ? "(ADMIN_PIN арқылы)" : "(кездейсоқ — ADMIN_PIN орнатыңыз)");
+console.log("Admin PIN:", ADMIN_PIN, process.env.ADMIN_PIN ? "(ADMIN_PIN арқылы)" : "(кездейсоқ)");
+console.log("Деректер сақтау:", REMOTE ? "JSONBin" : "жергілікті data.json");
 
 const L3 = (kk, ru, en) => ({ kk, ru, en });
 
@@ -70,13 +72,43 @@ function seed() {
   };
 }
 
-let db = fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, "utf8")) : seed();
-function saveDB() {
-  const tmp = DATA_FILE + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
-  fs.renameSync(tmp, DATA_FILE);
+/* ---------- Деректерді сақтау: JSONBin немесе жергілікті файл ---------- */
+let db = seed();
+let remoteReady = !REMOTE;
+let saveTimer = null;
+
+async function loadDB() {
+  if (!REMOTE) {
+    if (fs.existsSync(DATA_FILE)) db = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
+    else fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
+    return;
+  }
+  const r = await fetch(`https://api.jsonbin.io/v3/b/${JB_ID}/latest`, { headers: { "X-Master-Key": JB_KEY } });
+  if (!r.ok) throw new Error("JSONBin " + r.status);
+  const j = await r.json();
+  if (j.record && j.record.owner) db = j.record;
+  remoteReady = true;
+  console.log("JSONBin-нен деректер жүктелді");
 }
-if (!fs.existsSync(DATA_FILE)) saveDB();
+
+function saveDB() {
+  if (!REMOTE) {
+    const tmp = DATA_FILE + ".tmp";
+    fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+    fs.renameSync(tmp, DATA_FILE);
+    return;
+  }
+  if (!remoteReady) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    fetch(`https://api.jsonbin.io/v3/b/${JB_ID}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-Master-Key": JB_KEY },
+      body: JSON.stringify(db)
+    }).then(r => { if (!r.ok) console.error("JSONBin сақтау қатесі:", r.status); })
+      .catch(e => console.error("JSONBin сақтау қатесі:", e.message));
+  }, 500);
+}
 
 const uid = () => crypto.randomBytes(8).toString("hex");
 const randCode = () => crypto.randomBytes(3).toString("hex").toUpperCase();
@@ -496,7 +528,7 @@ function serveStatic(pathname, res) {
   });
 }
 
-http.createServer(async (req, res) => {
+const server = http.createServer(async (req, res) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   const url = new URL(req.url, "http://localhost");
   if (!url.pathname.startsWith("/api/")) return serveStatic(url.pathname, res);
@@ -508,4 +540,8 @@ http.createServer(async (req, res) => {
     if (status === 500) console.error(e);
     send(res, status, { error: status === 500 ? "generic" : (e.code || e.message) });
   }
-}).listen(PORT, () => console.log(`A782 DIGITAL: http://localhost:${PORT}`));
+});
+
+loadDB()
+  .catch(e => console.error("Жүктеу қатесі:", e.message))
+  .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: порт ${PORT}`)));
