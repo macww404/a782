@@ -594,14 +594,16 @@ async function adminRoute(req, m, p) {
   if (m === "POST" && vipGrant) {
     const o = db.orders.find(x => x.id === vipGrant[1] && x.type === "vip") || fail(404, "not_found");
     const u = db.users.find(x => x.id === o.userId) || fail(404, "not_found");
-    if (o.status === "paid") return [200, { ok: true, user: pubUser(u) }];
+    // A legacy VIP order may already be marked paid without a VIP grant.
+    // Reconcile it exactly once. Do not re-grant already approved or expired orders.
+    if (o.approvedAt) return [200, { ok: true, user: pubUser(u), alreadyApproved: true }];
     const days = o.durationDays;
     if (!Number.isSafeInteger(days) || days < 0 || days > 36500) fail(400, "invalid");
     const now = Date.now(), prev = activeVip(u);
     const start = prev && prev.expiresAt === null ? null : Math.max(now, prev ? Date.parse(prev.expiresAt) || now : now);
     u.vip = { planId: o.planId, name: o.planName, expiresAt: days === 0 || start === null ? null : new Date(start + days * 86400000).toISOString() };
     o.status = "paid"; o.approvedAt = new Date().toISOString();
-    saveDB(); return [200, { ok: true, user: pubUser(u) }];
+    await saveVipNow(); return [200, { ok: true, user: pubUser(u) }];
   }
   const ost = p.match(/^\/api\/admin\/orders\/([\w-]+)\/status$/);
   if (m === "POST" && ost) {
