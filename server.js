@@ -20,6 +20,16 @@ const M_CATS = ["rpg", "pvp", "tech", "anime", "surv"];
 console.log("Деректер:", REMOTE ? "JSONBin" : "data.json");
 
 const L3 = (kk, ru, en) => ({ kk, ru, en });
+const VIP_TIERS = ["VIP-FREE", "VIP-PLUS", "VIP-PRO", "VIP-ULTRA"];
+const VIP_META = {
+ "VIP-FREE": { icon:"sparkles", color:"#8be9fd", perks: L3("ULTRA-ның 7 күндік толық дизайны|ULTRA рамкасы мен жарқылы|Бір аккаунтқа бір рет", "7 дней полного дизайна ULTRA|Рамка и сияние ULTRA|Один раз на аккаунт", "7 days of full ULTRA visuals|ULTRA frame and effects|Once per account") },
+ "VIP-PLUS": { icon:"star", color:"#48d5ff", perks: L3("Көгілдір VIP белгі|Жарқыраған аватар жақтауы|Профильдің ерекше түсі", "Голубой VIP-значок|Светящаяся рамка|Цветной профиль", "Cyan VIP badge|Glowing avatar frame|Custom profile color") },
+ "VIP-PRO": { icon:"gem", color:"#b18cff", perks: L3("PLUS мүмкіндіктері|Күлгін голографиялық жақтау|Қозғалатын профиль фоны", "Возможности PLUS|Фиолетовая голографическая рамка|Анимированный фон", "Everything in PLUS|Purple holographic frame|Animated profile background") },
+ "VIP-ULTRA": { icon:"crown", color:"#ffc76d", perks: L3("PRO мүмкіндіктері|Алтын ULTRA аурасы|Профильдегі ерекше бөлшектер", "Возможности PRO|Золотая аура ULTRA|Особые частицы профиля", "Everything in PRO|Golden ULTRA aura|Premium profile particles") }
+};
+const tierOf = (plan) => VIP_TIERS.includes(plan?.tier) ? plan.tier : VIP_TIERS.includes(plan?.name?.toUpperCase()) ? plan.name.toUpperCase() : "VIP-PLUS";
+const vipPublicPlan = p => ({...p, tier:tierOf(p), ...VIP_META[tierOf(p)]});
+
 
 function seed() {
   return {
@@ -88,7 +98,12 @@ function seed() {
       { id: "mc", name: "Minecraft", icon: "cube", status: "live", link: "",
         desc: L3("Minecraft ойыншыларының жеке чаты.", "Отдельный чат игроков Minecraft.", "A dedicated Minecraft players chat.") }
     ],
-    vipPlans: [], users: [], orders: [], sessions: {}
+    vipPlans: [
+      {id:"vip-free",tier:"VIP-FREE",name:"VIP-FREE",price:0,durationDays:7,active:true},
+      {id:"vip-plus",tier:"VIP-PLUS",name:"VIP-PLUS",price:0,durationDays:30,active:true},
+      {id:"vip-pro",tier:"VIP-PRO",name:"VIP-PRO",price:0,durationDays:30,active:true},
+      {id:"vip-ultra",tier:"VIP-ULTRA",name:"VIP-ULTRA",price:0,durationDays:30,active:true}
+    ], users: [], orders: [], sessions: {}
   };
 }
 
@@ -102,6 +117,13 @@ function migrate() {
   if (!db.owner.bio || typeof db.owner.bio !== "object") db.owner.bio = s.owner.bio;
   if (!db.stream.title || typeof db.stream.title !== "object") db.stream.title = s.stream.title;
   if (!Array.isArray(db.stream.schedule) || db.stream.schedule.some(x => typeof x.day !== "number")) db.stream.schedule = s.stream.schedule;
+  if (!Array.isArray(db.vipPlans)) db.vipPlans = [];
+  // Existing VIP plans and orders are retained; only missing fixed tiers are added.
+  for (const template of s.vipPlans) {
+    let current = db.vipPlans.find(p => p.id === template.id || p.tier === template.tier || String(p.name||"").toUpperCase() === template.tier);
+    if (!current) db.vipPlans.push({...template});
+    else { current.tier = template.tier; current.name = template.name; if(template.tier === "VIP-FREE") {current.price=0;current.durationDays=7;} }
+  }
   if (!Array.isArray(db.games)) db.games = [];
   for (const game of s.games) {
     const existing = db.games.find(x => x.id === game.id || x.name === game.name);
@@ -182,15 +204,19 @@ const upsert = (arr, item) => {
   if (i >= 0) arr[i] = { ...arr[i], ...item }; else arr.unshift(item);
 };
 function fail(status, code) { const e = new Error(code); e.status = status; e.code = code; throw e; }
-const activeVip = u => u.vip && (u.vip.expiresAt === null || Date.parse(u.vip.expiresAt) > Date.now()) ? u.vip : null;
+const activeVip = u => {
+ if (!u.vip || (u.vip.expiresAt !== null && !(Date.parse(u.vip.expiresAt) > Date.now()))) return null;
+ const tier = u.vip.tier || tierOf(db.vipPlans.find(p=>p.id===u.vip.planId)||{name:u.vip.name});
+ return {...u.vip,tier,visualTier:tier==="VIP-FREE"?"VIP-ULTRA":tier};
+};
 const pubUser = u => ({
-  id: u.id, vip: activeVip(u), nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
+  id: u.id, vip: activeVip(u), vipTrialUsed:!!u.vipTrialUsed || db.orders.some(o=>o.type==="vip-trial"&&o.userId===u.id), nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
   avatar: u.avatar, banner: u.banner, icon: u.icon,
   tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds, wins: u.wins
 });
 const pubGw = g => ({ ...g, participants: g.participants.map(p => p.nick), winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null });
 const pubData = () => ({
-  vipPlans: db.vipPlans.filter(p => p.active), owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
+  vipPlans: db.vipPlans.filter(p => p.active && VIP_TIERS.includes(tierOf(p)) && p.tier).map(vipPublicPlan).sort((a,b)=>VIP_TIERS.indexOf(a.tier)-VIP_TIERS.indexOf(b.tier)), owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
   prizes: db.prizes, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
   giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
 });
@@ -383,13 +409,28 @@ async function route(req, url, user) {
     return [200, { user: pubUser(u) }];
   }
 
+  if (m === "POST" && p === "/api/vip/trial") {
+    const u = need();
+    const free = db.vipPlans.find(x => tierOf(x)==="VIP-FREE" && x.active);
+    if (!free) fail(400,"not_found");
+    // Both the flag and historical grant are checked against old accounts.
+    if (u.vipTrialUsed || db.orders.some(o => o.type === "vip-trial" && o.userId === u.id)) fail(409,"trial_used");
+    if (activeVip(u)) fail(409,"vip_active");
+    const now = Date.now();
+    u.vipTrialUsed = true;
+    u.vip = { planId: free.id, name:"VIP-FREE", tier:"VIP-FREE", startedAt:new Date(now).toISOString(), expiresAt:new Date(now+7*86400000).toISOString(), trial:true };
+    db.orders.unshift({id:"TRIAL-"+randCode(),type:"vip-trial",userId:u.id,planId:free.id,planName:"VIP-FREE",nick:u.nick,date:new Date(now).toISOString(),total:0,status:"paid",approvedAt:new Date(now).toISOString()});
+    await saveVipNow();
+    return [200,{user:pubUser(u)}];
+  }
   if (m === "POST" && p === "/api/vip/orders") {
     const u = need();
     const b = await readBody(req);
     const plan = db.vipPlans.find(x => x.id === b.planId && x.active);
-    if (!plan) fail(404, "not_found");
+    if (!plan || tierOf(plan)==="VIP-FREE") fail(404, "not_found");
+    if (!(plan.price > 0)) fail(400,"price_not_set");
     const order = { id: "VIP-" + randCode(), type: "vip", planId: plan.id,
-      planName: plan.name, durationDays: plan.durationDays, userId: u.id,
+      planName: plan.name, tier:tierOf(plan), durationDays: plan.durationDays, userId: u.id,
       nick: u.nick, date: new Date().toISOString(), items: [],
       subtotal: plan.price, discount: 0, total: plan.price,
       method: "telegram", receipt: "", status: "pending" };
@@ -577,18 +618,23 @@ async function adminRoute(req, m, p) {
   if (m === "GET" && p === "/api/admin/vip-plans") return [200, { plans: db.vipPlans }];
   if (m === "POST" && p === "/api/admin/vip-plans") {
     const b = await readBody(req);
-    const name = str(b.name, 70), price = Number(b.price), durationDays = Number(b.durationDays);
-    if (!name || !Number.isSafeInteger(price) || price < 0 || price > 10000000 ||
-        !Number.isSafeInteger(durationDays) || durationDays < 0 || durationDays > 36500) fail(400, "invalid");
-    const old = b.id && db.vipPlans.find(x => x.id === b.id);
-    const plan = { id: old ? old.id : "vp-" + uid(), name, price, durationDays, active: b.active !== false };
-    if (old) Object.assign(old, plan); else db.vipPlans.push(plan);
-    await saveVipNow(); return [200, { plan }];
+    const old = db.vipPlans.find(x => x.id === b.id);
+    if (!old) fail(404,"not_found");
+    const tier = tierOf(old);
+    if (!VIP_TIERS.includes(tier)) fail(400,"invalid");
+    const price = Number(b.price), durationDays = Number(b.durationDays);
+    if (!Number.isSafeInteger(price) || price<0 || price>10000000 || !Number.isSafeInteger(durationDays) || durationDays<1 || durationDays>36500) fail(400,"invalid");
+    // FREE is always seven days, free, and one-time. The admin cannot accidentally alter that.
+    old.name=tier; old.tier=tier; old.price=tier==="VIP-FREE"?0:price;
+    old.durationDays=tier==="VIP-FREE"?7:durationDays;
+    old.active=b.active!==false;
+    await saveVipNow();
+    return [200,{plan:vipPublicPlan(old)}];
   }
   const vpDel = p.match(/^\/api\/admin\/vip-plans\/([\w-]+)$/);
   if (m === "DELETE" && vpDel) {
-    const plan = db.vipPlans.find(x => x.id === vpDel[1]) || fail(404, "not_found");
-    plan.active = false; await saveVipNow(); return [200, { ok: true }];
+    const plan = db.vipPlans.find(x=>x.id===vpDel[1]) || fail(404,"not_found");
+    plan.active=false; await saveVipNow(); return [200,{ok:true}];
   }
   const vipGrant = p.match(/^\/api\/admin\/vip-orders\/([\w-]+)\/approve$/);
   if (m === "POST" && vipGrant) {
@@ -601,7 +647,7 @@ async function adminRoute(req, m, p) {
     if (!Number.isSafeInteger(days) || days < 0 || days > 36500) fail(400, "invalid");
     const now = Date.now(), prev = activeVip(u);
     const start = prev && prev.expiresAt === null ? null : Math.max(now, prev ? Date.parse(prev.expiresAt) || now : now);
-    u.vip = { planId: o.planId, name: o.planName, expiresAt: days === 0 || start === null ? null : new Date(start + days * 86400000).toISOString() };
+    u.vip = { planId:o.planId, name:o.planName, tier:o.tier||tierOf(db.vipPlans.find(p=>p.id===o.planId)||{name:o.planName}), startedAt:new Date(now).toISOString(), expiresAt: days === 0 || start === null ? null : new Date(start + days * 86400000).toISOString() };
     o.status = "paid"; o.approvedAt = new Date().toISOString();
     await saveVipNow(); return [200, { ok: true, user: pubUser(u) }];
   }
