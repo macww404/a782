@@ -143,6 +143,28 @@ function saveDB() {
   }, 500);
 }
 
+// VIP changes must be confirmed by persistent storage before reporting success.
+async function saveVipNow() {
+  if (!REMOTE) { saveDB(); return; }
+  if (!remoteReady) fail(503, "storage_failed");
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  try {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${JB_ID}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-Master-Key": JB_KEY },
+      body: JSON.stringify(db)
+    });
+    if (!response.ok) {
+      console.error("VIP JSONBin сақтау қатесі:", response.status);
+      fail(503, "storage_failed");
+    }
+  } catch (error) {
+    console.error("VIP сақтау қатесі:", error.message);
+    fail(503, "storage_failed");
+  }
+}
+
 const uid = () => crypto.randomBytes(8).toString("hex");
 const randCode = () => crypto.randomBytes(3).toString("hex").toUpperCase();
 const hashPw = (pw, salt) => crypto.scryptSync(pw, salt, 64).toString("hex");
@@ -561,12 +583,12 @@ async function adminRoute(req, m, p) {
     const old = b.id && db.vipPlans.find(x => x.id === b.id);
     const plan = { id: old ? old.id : "vp-" + uid(), name, price, durationDays, active: b.active !== false };
     if (old) Object.assign(old, plan); else db.vipPlans.push(plan);
-    saveDB(); return [200, { plan }];
+    await saveVipNow(); return [200, { plan }];
   }
   const vpDel = p.match(/^\/api\/admin\/vip-plans\/([\w-]+)$/);
   if (m === "DELETE" && vpDel) {
     const plan = db.vipPlans.find(x => x.id === vpDel[1]) || fail(404, "not_found");
-    plan.active = false; saveDB(); return [200, { ok: true }];
+    plan.active = false; await saveVipNow(); return [200, { ok: true }];
   }
   const vipGrant = p.match(/^\/api\/admin\/vip-orders\/([\w-]+)\/approve$/);
   if (m === "POST" && vipGrant) {
