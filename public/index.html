@@ -420,7 +420,7 @@ let cart=JSON.parse(localStorage.getItem("a782-cart")||"[]");
 let ROUTE="", STORE="all", MPC="all", MC={type:"mod",q:"",loader:"",version:"",sort:"downloads",hits:null};
 let AUTH="login", WHEEL=0, SPIN=false, cdT=null, toastT=null, sParts=[];
 const TABS=["home","gw","mc","store","me"];
-const PAGES={home:pHome,gw:pGw,mc:pMc,streams:pStreams,store:pStore,me:pMe,settings:pSettings,admin:pAdmin};
+const PAGES={home:pHome,gw:pGw,mc:pMc,streams:pStreams,store:pStore,vip:pVip,me:pMe,settings:pSettings,admin:pAdmin};
 const saveCart=()=>localStorage.setItem("a782-cart",JSON.stringify(cart));
 const cartCount=()=>cart.reduce((s,i)=>s+i.qty,0);
 const inCart=id=>cart.some(i=>i.id===id);
@@ -599,6 +599,7 @@ function pStore(){
   return `<header class="ph rv"><p class="eyebrow">${ic("bag")} ${t("store")}</p><h1>${t("stitle")}</h1><p class="lead">${t("slead")}</p></header>
   <div class="pills rv">${[["all","cat0"],["pack","cat1"],["over","cat2"],["design","cat3"],["guide","cat4"]].map(([k,l])=>`<button class="pill ${STORE===k?"on":""}" data-scat="${k}">${t(l)}</button>`).join("")}</div>
   <div class="grid">${list.map(prodCard).join("")||`<div class="empty">${t("nores")}</div>`}</div>
+  <div class="glass rv bl"><h3>✦ VIP A782</h3><p class="mute">${LANG==="ru"?"Особые VIP-статусы и оформление через Telegram":LANG==="en"?"VIP plans and ordering via Telegram":"VIP мәртебесі және Telegram арқылы тапсырыс"}</p><a class="btn" href="#vip" style="margin-top:12px">VIP ✦</a></div>
   ${n?`<div class="cart-bar"><span>${t("cart")}: ${n}</span><b>${money(cartTotal())}</b><button class="btn sm" id="openCart">${t("checkout")}</button></div>`:""}
   <h2 class="bl rv">${t("orders")}</h2><div id="ordersBox">${ME?"":`<p class="notice">${t("login")}</p>`}</div>
   ${footer()}`;
@@ -617,6 +618,7 @@ function pMe(){
   ${footer()}`;
   const u=ME;
   return `<header class="ph rv"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1></header>
+  ${u.vip?`<div class="glass glow rv" style="margin-bottom:14px"><span class="tag a">✦ VIP ${esc(u.vip.name)}</span><p class="mute sm">${u.vip.expiresAt?esc(new Date(u.vip.expiresAt).toLocaleDateString()):"Lifetime ∞"}</p></div>`:""}
   <section class="glass rv" style="padding:0;overflow:hidden">
     <div class="prof-banner" style="${u.banner?`background-image:url('${esc(u.banner)}')`:""}"></div>
     <div class="prof-top"><div class="avatar">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:ic(u.icon||"user")}</div>
@@ -641,6 +643,22 @@ function pMe(){
   <section class="glass bl rv"><h3>${t("orders")}</h3><div id="ordersBox"></div></section>
   <div class="row bl"><a class="btn ghost sm" href="#settings">${ic("gear")} ${t("setl")}</a></div>
   ${footer()}`;
+}
+function pVip(){
+ const plans=D.vipPlans||[];
+ return `<header class="ph rv"><p class="eyebrow">✦ A782 VIP</p><h1 class="grad">VIP CLUB</h1><p class="lead">${LANG==="ru"?"Выберите план. Оплата согласуется в Telegram и подтверждается администратором.":LANG==="en"?"Choose a plan. Payment is arranged in Telegram and verified by an admin.":"Тариф таңдаңыз. Төлем Telegram-да келісіліп, админ растаған соң VIP қосылады."}</p></header>
+ <div class="grid">${plans.map(p=>`<article class="glass glow card rv"><span class="tag a">✦ VIP</span><h3>${esc(p.name)}</h3><div style="font:700 32px var(--fh)">${money(p.price)}</div><p class="mute">${p.durationDays===0?"∞ Lifetime":p.durationDays+" күн / дней / days"}</p><button class="btn wide" data-vipbuy="${esc(p.id)}">${LANG==="ru"?"Оформить":LANG==="en"?"Order":"Тапсырыс беру"}</button></article>`).join("")||`<div class="empty">${LANG==="kk"?"Тарифтерді админ панелінен қосыңыз":"Add plans from the admin panel"}</div>`}</div>${footer()}`;
+}
+async function buyVip(id){
+ if(!ME){toast(t("login"),true);location.hash="#me";return}
+ try{
+  const r=await api("POST","/api/vip/orders",{planId:id});
+  const o=r.order;
+  const msg=`A782 VIP\nOrder: ${o.id}\nUser ID: ${o.userId}\nNick: ${o.nick}\nPlan: ${o.planName}\nPrice: ${o.total} KZT\nPlease confirm payment manually.`;
+  const ok=await copyText(msg);
+  openSheet(`<h3>✦ VIP ${esc(o.planName)}</h3><p class="mute">${esc(o.id)} · ${money(o.total)}</p><p style="margin:12px 0">${LANG==="kk"?"Тапсырыс мәтінін Telegram-ға жіберіңіз. Админ төлемді тексеріп, VIP береді.":"Send the order details on Telegram. Admin verifies payment before activating VIP."}</p><textarea id="vipMsg" rows="7" readonly>${esc(msg)}</textarea><div class="row" style="margin-top:12px"><button class="btn ghost" id="vipCopy">${t("copy")}</button><a class="btn" href="${esc(r.telegram)}" target="_blank" rel="noopener">Telegram ↗</a></div>`);
+  if(ok)toast(t("copied"));
+ }catch(e){toast(errMsg(e),true)}
 }
 function pSettings(){
   const sw=(k,l,d)=>`<div class="set"><div><b>${l}</b><small class="mute" style="display:block">${d}</small></div><label class="switch"><input type="checkbox" id="mo" ${S.motion?"checked":""}><span></span></label></div>`;
@@ -734,6 +752,13 @@ function pAdmin(){
       <p class="mute sm">${t("pidh")}</p>
       <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div></form></section>
 
+  <section class="glass rv bl"><h3>✦ VIP тарифтері</h3><div id="vipAdminPlans"></div>
+    <form id="vipPlanForm" class="form"><input type="hidden" name="id"><div class="g3">
+    <label class="field">Атауы / Name<input name="name" required maxlength="70" placeholder="VIP GOLD"></label>
+    <label class="field">Бағасы ₸<input name="price" type="number" min="0" max="10000000" required></label>
+    <label class="field">Күн (0 = мәңгі)<input name="durationDays" type="number" min="0" max="36500" required value="30"></label></div>
+    <label class="row"><input type="checkbox" name="active" checked> Белсенді / Active</label>
+    <div class="row"><button class="btn sm" type="submit">${t("save")}</button><button class="btn ghost sm" type="reset">${t("cancel")}</button></div></form></section>
   <section class="glass rv bl"><h3>${t("sec_b")}</h3><div id="usersBox"></div></section>
   <section class="glass rv bl"><h3>${t("sec_o")}</h3><div id="ordersAdm"></div></section>
   ${footer()}`;
@@ -934,17 +959,19 @@ async function copyText(txt){
 async function loadAdmin(){
   if(!ADMIN) return;
   try{
-    const [{users},{orders}]=await Promise.all([api("GET","/api/admin/users",null,true),api("GET","/api/admin/orders",null,true)]);
+    const [{users},{orders},{plans}]=await Promise.all([api("GET","/api/admin/users",null,true),api("GET","/api/admin/orders",null,true),api("GET","/api/admin/vip-plans",null,true)]);
+    window.vipAdminPlans=plans;
+    const vp=$("#vipAdminPlans");if(vp)vp.innerHTML=plans.map(p=>`<div class="ex-row"><span>${esc(p.name)} · ${money(p.price)} · ${p.durationDays||"∞"} ${p.active?"✓":"(off)"}</span><span class="row"><button class="btn ghost sm" data-vipedit="${esc(p.id)}">${t("edit")}</button><button class="btn red sm" data-vipdel="${esc(p.id)}">${t("del")}</button></span></div>`).join("");
     const ub=$("#usersBox"),ob=$("#ordersAdm");
     if(ub) ub.innerHTML=users.length?`<div class="table"><table><tr><th>${t("nick")||"Nick"}</th><th>${t("email")}</th><th>${t("tickets")}</th><th>${t("tokens")}</th><th>${t("diamonds")}</th></tr>
-      ${users.map(u=>`<tr><td>${esc(u.nick)}</td><td>${esc(u.email)}</td>
+      ${users.map(u=>`<tr><td>${esc(u.nick)} ${u.vip?"✦ VIP":""}<small class="mute" style="display:block">${esc(u.id)}</small></td><td>${esc(u.email)}</td>
         <td>${u.tickets} <button class="btn ghost sm" data-bal="${u.id}|tickets|1">+1</button></td>
         <td>${u.tokens} <button class="btn ghost sm" data-bal="${u.id}|tokens|100">+100</button></td>
         <td>${u.diamonds} <button class="btn ghost sm" data-bal="${u.id}|diamonds|100">+100</button></td></tr>`).join("")}</table></div>`:`<p class="mute">${t("nousers")}</p>`;
     if(ob) ob.innerHTML=orders.length?`<div class="table"><table><tr><th>#</th><th>${t("nick")||"Nick"}</th><th>${t("total")}</th><th>${t("pend")}</th><th></th></tr>
       ${orders.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${esc(o.nick)}</td><td>${money(o.total)}</td>
-        <td>${esc(o.method)} · ${o.status==="paid"?t("paid"):t("pend")}</td>
-        <td><button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button></td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
+        <td>${o.type==="vip"?"✦ VIP "+esc(o.planName):esc(o.method)} · ${o.status==="paid"?t("paid"):t("pend")}</td>
+        <td>${o.type==="vip"?(o.status==="paid"?"✓ VIP":`<button class="btn sm" data-vipapprove="${esc(o.id)}">VIP растау</button>`):`<button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button>`}</td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
   }catch(e){ toast(errMsg(e),true) }
 }
 const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
@@ -976,7 +1003,12 @@ document.addEventListener("click",e=>{
   if(d.reset){const f=document.getElementById(d.reset);if(f){f.reset();if(f.elements.id)f.elements.id.value=""}return}
   if(d.bal){adminBal(d.bal);return}
   if(d.ost){adminOrder(d.ost);return}
+  if(d.vipbuy){buyVip(d.vipbuy);return}
+  if(d.vipapprove){if(confirm("Төлемді тексердіңіз бе? VIP берілсін бе?"))api("POST",`/api/admin/vip-orders/${d.vipapprove}/approve`,{},true).then(()=>{toast(t("saved"));loadAdmin()}).catch(e=>toast(errMsg(e),true));return}
+  if(d.vipedit){const p=(window.vipAdminPlans||[]).find(x=>x.id===d.vipedit),f=$("#vipPlanForm");if(p&&f){fillForm(f,p);f.elements.active.checked=p.active;f.scrollIntoView({behavior:"smooth"})}return}
+  if(d.vipdel){if(confirm("Тарифті өшіру керек пе?"))api("DELETE",`/api/admin/vip-plans/${d.vipdel}`,null,true).then(async()=>{await loadData();render(true)}).catch(e=>toast(errMsg(e),true));return}
   switch(btn.id){
+    case "vipCopy":copyText($("#vipMsg").value).then(ok=>toast(ok?t("copied"):"Copy failed",!ok));return;
     case "spinBtn":case "hub":spin();return;
     case "daily":claimDaily();return;
     case "openCart":openCart();return;
@@ -1081,6 +1113,12 @@ async function adminOrder(spec){
   catch(e){ toast(errMsg(e),true) }
 }
 
+document.addEventListener("submit",async e=>{
+ if(e.target.id!=="vipPlanForm")return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const f=e.target,b=Object.fromEntries(new FormData(f));b.active=f.elements.active.checked;
+ try{await api("POST","/api/admin/vip-plans",b,true);await loadData();render(true);toast(t("saved"))}catch(x){toast(errMsg(x),true)}
+},true);
 addEventListener("hashchange",()=>render());
 (async function init(){
   initFx();
