@@ -977,7 +977,7 @@ async function loadAdmin(){
 const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
 
 /* ===================== ОҚИҒАЛАР ===================== */
-document.addEventListener("click",e=>{
+document.addEventListener("click",async e=>{
   const go=e.target.closest("[data-go]");if(go){location.hash="#"+go.dataset.go;return}
   const lg=e.target.closest("[data-lang]");if(lg){LANG=lg.dataset.lang;localStorage.setItem("a782-lang",LANG);render(true);return}
   if(e.target.closest("[data-close]")){closeSheet();return}
@@ -1010,7 +1010,7 @@ document.addEventListener("click",e=>{
     const btn=e.target.closest("#vipSaveBtn");
     const b=Object.fromEntries(new FormData(f));b.active=f.elements.active.checked;
     btn.disabled=true;
-    try{await api("POST","/api/admin/vip-plans",b,true);await loadData();render(true);toast(t("saved"))}
+    try{ await api("POST","/api/admin/vip-plans",b,true);await loadData();render(true);toast(t("saved"))}
     catch(x){toast(x.code==="storage_failed"?"JSONBin сақтау қатесі: Render logs тексеріңіз":errMsg(x),true)}
     finally{btn.disabled=false}
     return;
