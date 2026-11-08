@@ -1117,7 +1117,7 @@ document.addEventListener("submit",async e=>{
  if(e.target.id!=="vipPlanForm")return;
  e.preventDefault();e.stopImmediatePropagation();
  const f=e.target,b=Object.fromEntries(new FormData(f));b.active=f.elements.active.checked;
- try{await api("POST","/api/admin/vip-plans",b,true);await loadData();render(true);toast(t("saved"))}catch(x){toast(errMsg(x),true)}
+ try{await api("POST","/api/admin/vip-plans",b,true);await loadData();render(true);toast(t("saved"))}catch(x){toast(x.code==="storage_failed"?"VIP сақталмады: JSONBin байланысын және Render логтарын тексеріңіз":errMsg(x),true)}
 },true);
 addEventListener("hashchange",()=>render());
 (async function init(){
