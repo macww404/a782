@@ -88,7 +88,7 @@ function seed() {
       { id: "mc", name: "Minecraft", icon: "cube", status: "live", link: "",
         desc: L3("Minecraft ойыншыларының жеке чаты.", "Отдельный чат игроков Minecraft.", "A dedicated Minecraft players chat.") }
     ],
-    users: [], orders: [], sessions: {}
+    vipPlans: [], users: [], orders: [], sessions: {}
   };
 }
 
@@ -160,14 +160,15 @@ const upsert = (arr, item) => {
   if (i >= 0) arr[i] = { ...arr[i], ...item }; else arr.unshift(item);
 };
 function fail(status, code) { const e = new Error(code); e.status = status; e.code = code; throw e; }
+const activeVip = u => u.vip && (u.vip.expiresAt === null || Date.parse(u.vip.expiresAt) > Date.now()) ? u.vip : null;
 const pubUser = u => ({
-  id: u.id, nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
+  id: u.id, vip: activeVip(u), nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
   avatar: u.avatar, banner: u.banner, icon: u.icon,
   tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds, wins: u.wins
 });
 const pubGw = g => ({ ...g, participants: g.participants.map(p => p.nick), winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null });
 const pubData = () => ({
-  owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
+  vipPlans: db.vipPlans.filter(p => p.active), owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
   prizes: db.prizes, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
   giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
 });
@@ -360,6 +361,20 @@ async function route(req, url, user) {
     return [200, { user: pubUser(u) }];
   }
 
+  if (m === "POST" && p === "/api/vip/orders") {
+    const u = need();
+    const b = await readBody(req);
+    const plan = db.vipPlans.find(x => x.id === b.planId && x.active);
+    if (!plan) fail(404, "not_found");
+    const order = { id: "VIP-" + randCode(), type: "vip", planId: plan.id,
+      planName: plan.name, durationDays: plan.durationDays, userId: u.id,
+      nick: u.nick, date: new Date().toISOString(), items: [],
+      subtotal: plan.price, discount: 0, total: plan.price,
+      method: "telegram", receipt: "", status: "pending" };
+    db.orders.unshift(order); saveDB();
+    return [201, { order, telegram: db.owner.telegram || "https://t.me/Asxm_A782" }];
+  }
+
   if (m === "GET" && p === "/api/orders") {
     const u = need();
     return [200, { orders: db.orders.filter(o => o.userId === u.id) }];
@@ -537,17 +552,47 @@ async function adminRoute(req, m, p) {
     saveDB();
     return [200, { ok: true }];
   }
+  if (m === "GET" && p === "/api/admin/vip-plans") return [200, { plans: db.vipPlans }];
+  if (m === "POST" && p === "/api/admin/vip-plans") {
+    const b = await readBody(req);
+    const name = str(b.name, 70), price = Number(b.price), durationDays = Number(b.durationDays);
+    if (!name || !Number.isSafeInteger(price) || price < 0 || price > 10000000 ||
+        !Number.isSafeInteger(durationDays) || durationDays < 0 || durationDays > 36500) fail(400, "invalid");
+    const old = b.id && db.vipPlans.find(x => x.id === b.id);
+    const plan = { id: old ? old.id : "vp-" + uid(), name, price, durationDays, active: b.active !== false };
+    if (old) Object.assign(old, plan); else db.vipPlans.push(plan);
+    saveDB(); return [200, { plan }];
+  }
+  const vpDel = p.match(/^\/api\/admin\/vip-plans\/([\w-]+)$/);
+  if (m === "DELETE" && vpDel) {
+    const plan = db.vipPlans.find(x => x.id === vpDel[1]) || fail(404, "not_found");
+    plan.active = false; saveDB(); return [200, { ok: true }];
+  }
+  const vipGrant = p.match(/^\/api\/admin\/vip-orders\/([\w-]+)\/approve$/);
+  if (m === "POST" && vipGrant) {
+    const o = db.orders.find(x => x.id === vipGrant[1] && x.type === "vip") || fail(404, "not_found");
+    const u = db.users.find(x => x.id === o.userId) || fail(404, "not_found");
+    if (o.status === "paid") return [200, { ok: true, user: pubUser(u) }];
+    const days = o.durationDays;
+    if (!Number.isSafeInteger(days) || days < 0 || days > 36500) fail(400, "invalid");
+    const now = Date.now(), prev = activeVip(u);
+    const start = prev && prev.expiresAt === null ? null : Math.max(now, prev ? Date.parse(prev.expiresAt) || now : now);
+    u.vip = { planId: o.planId, name: o.planName, expiresAt: days === 0 || start === null ? null : new Date(start + days * 86400000).toISOString() };
+    o.status = "paid"; o.approvedAt = new Date().toISOString();
+    saveDB(); return [200, { ok: true, user: pubUser(u) }];
+  }
   const ost = p.match(/^\/api\/admin\/orders\/([\w-]+)\/status$/);
   if (m === "POST" && ost) {
     const b = await readBody(req);
     const o = db.orders.find(x => x.id === ost[1]) || fail(404, "not_found");
     if (!["paid", "pending"].includes(b.status)) fail(400, "invalid");
+    if (o.type === "vip") fail(400, "invalid");
     o.status = b.status;
     saveDB();
     return [200, { ok: true }];
   }
   if (m === "GET" && p === "/api/admin/users") {
-    return [200, { users: db.users.map(u => ({ id: u.id, email: u.email, nick: u.nick, tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds })) }];
+    return [200, { users: db.users.map(u => ({ id: u.id, email: u.email, nick: u.nick, vip: activeVip(u), tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds })) }];
   }
   if (m === "GET" && p === "/api/admin/orders") return [200, { orders: db.orders }];
   fail(404, "not_found");
