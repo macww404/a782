@@ -707,6 +707,8 @@ const fmt=n=>Number(n||0).toLocaleString("en-US");
 const words=s=>String(s).split(" ").map((w,i)=>`<span class="w"><span style="--i:${i}">${esc(w)}</span></span>`).join(" ");
 
 let D=null, ME=null, TOKEN=localStorage.getItem("a782-token")||"", ADMIN=sessionStorage.getItem("a782-admin")||"";
+const ownerView=()=>!!ME?.isOwner;
+function clearAdminSession(){ADMIN="";sessionStorage.removeItem("a782-admin")}
 let S={theme:localStorage.getItem("a782-theme")||"dark", motion:localStorage.getItem("a782-motion")!=="0"};
 let cart=JSON.parse(localStorage.getItem("a782-cart")||"[]");
 let ROUTE="", STORE="all", MPC="all", MC={type:"mod",q:"",loader:"",version:"",sort:"downloads",hits:null};
@@ -1106,7 +1108,7 @@ function pSettings(){
   <section class="glass rv"><h3>${t("lang")}</h3><div class="seg">${[["kk","Қазақша"],["ru","Русский"],["en","English"]].map(([k,l])=>`<button class="${LANG===k?"on":""}" data-lang="${k}">${l}</button>`).join("")}</div></section>
   <section class="glass rv bl"><h3>${t("theme")}</h3><div class="seg">${[["dark",t("dark")],["light",t("light")]].map(([k,l])=>`<button class="${S.theme===k?"on":""}" data-theme="${k}">${l}</button>`).join("")}</div></section>
   <section class="glass rv bl">${sw("mo",t("motion"),t("motiond"))}</section>
-  <section class="glass rv bl" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><b>${t("admt")}</b><a class="btn ghost sm" href="#admin">${ic("lock")} ${t("admgo")}</a></section>
+  ${ownerView()?`<section class="glass rv bl" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><b>${t("admt")}</b><a class="btn ghost sm" href="#admin">${ic("lock")} ${t("admgo")}</a></section>`:""}
   ${footer()}`;
 }
 
@@ -1116,6 +1118,7 @@ function ml(base,label,val){
   return ["kk","ru","en"].map(k=>`<label class="field">${label} · ${k.toUpperCase()}<input name="${base}_${k}" value="${esc(val&&typeof val==="object"?val[k]:"")}"></label>`).join("");
 }
 function pAdmin(){
+  if(!ownerView()) return `<header class="ph"><h1>404</h1></header><p class="mute">${tri('Бет табылмады','Страница не найдена','Page not found')}</p>${footer()}`;
   if(!ADMIN) return `<header class="ph rv"><p class="eyebrow">${ic("lock")} ${t("adm")}</p><h1>${t("admt")}</h1></header>
     <form id="pinForm" class="glass auth rv"><input name="pin" type="password" inputmode="numeric" placeholder="${esc(t("pinph"))}" required>
     <button class="btn wide" type="submit" style="margin-top:12px">${t("open")}</button><p class="mute sm" style="margin-top:10px">${t("pinnote")}</p></form>${footer()}`;
@@ -1258,7 +1261,7 @@ function bindPage(key){
   if(key==="mc"&&MC.hits===null) searchMC();
   if(key==="store"||(key==="me"&&ME)) loadOrders();
   if(key==="me"&&ME) refreshVipProfile();
-  if(key==="admin"&&ADMIN) loadAdmin();
+  if(key==="admin"&&ADMIN&&ownerView()) loadAdmin();
 }
 async function refreshVipProfile(){
   try {
@@ -1351,7 +1354,7 @@ async function claimDaily(){
 }
 async function logout(){
   try{ await api("POST","/api/logout") }catch(e){}
-  TOKEN="";ME=null;localStorage.removeItem("a782-token");
+  TOKEN="";ME=null;clearAdminSession();localStorage.removeItem("a782-token");
   toast(t("logout")); render(true);
 }
 async function openVersions(pid,title){
@@ -1657,13 +1660,14 @@ document.addEventListener("submit",async e=>{
   try{
     switch(f.id){
       case "pinForm":{
+        if(!ownerView()){toast(tri('Қолжетімсіз','Нет доступа','Access denied'),true);return}
         const r=await api("POST","/api/admin/login",{pin:o.pin});
         ADMIN=r.token;sessionStorage.setItem("a782-admin",ADMIN);render(true);return;
       }
       case "authForm":{
         const reg=AUTH==="reg";
         const r=await api("POST",reg?"/api/register":"/api/login",reg?{email:o.email,password:o.password,nick:o.nick}:{email:o.email,password:o.password});
-        TOKEN=r.token;localStorage.setItem("a782-token",TOKEN);ME=r.user;
+        clearAdminSession();TOKEN=r.token;localStorage.setItem("a782-token",TOKEN);ME=r.user;
         await loadData();render(true);return;
       }
       case "vipStudioForm":{
