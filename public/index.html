@@ -10,54 +10,59 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#07080c;--bg2:#0f1119;--ink:#eef0f6;--mute:#8b92a5;--line:rgba(255,255,255,.09);--glass:rgba(255,255,255,.045);--acc:#f5b041;--acc2:#7dd3fc;--acc3:#a78bfa;--ok:#34d399;--bad:#f87171;--e:cubic-bezier(.2,.8,.2,1);--fh:"Space Grotesk",Inter,sans-serif}
-[data-theme=light]{--bg:#f5f2ec;--bg2:#ffffff;--ink:#14161e;--mute:#646b7a;--line:rgba(20,22,30,.1);--glass:rgba(255,255,255,.8)}
+[data-theme=light]{--bg:#f5f2ec;--bg2:#fff;--ink:#14161e;--mute:#646b7a;--line:rgba(20,22,30,.1);--glass:rgba(255,255,255,.78)}
 @property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
-body{font:15px/1.6 Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;transition:background .5s var(--e),color .5s}
-a{color:inherit;text-decoration:none}
-button,input,select,textarea{font:inherit;color:inherit}
+body{font:15px/1.6 Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;transition:background .6s var(--e),color .6s}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit;color:inherit}
 .ic{width:20px;height:20px;flex:0 0 auto}
-#splash{position:fixed;inset:0;z-index:300;display:grid;place-items:center;align-content:center;gap:16px;background:var(--bg);transition:opacity .7s var(--e),visibility .7s}
+#splash{position:fixed;inset:0;z-index:300;display:grid;place-content:center;justify-items:center;gap:16px;background:var(--bg);transition:opacity .7s var(--e),visibility .7s}
 #splash.off{opacity:0;visibility:hidden}
-.logo-ring{width:70px;height:70px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:spin 1s linear infinite;margin:0 auto}
-#splash b{font:700 20px var(--fh);letter-spacing:.2em}
+.ring{width:70px;height:70px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:spin 1s linear infinite}
+#splash b{font:700 20px var(--fh);letter-spacing:.25em}
 @keyframes spin{to{transform:rotate(360deg)}}
-.orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;filter:blur(70px);opacity:.5}
-.orbs i{position:absolute;width:45vmax;height:45vmax;border-radius:50%;background:var(--acc);opacity:.18;animation:float 20s ease-in-out infinite alternate}
-.orbs i:nth-child(2){background:var(--acc2);left:50%;top:20%;animation-duration:26s}
-.orbs i:nth-child(3){background:var(--acc3);left:-10%;top:55%;animation-duration:30s}
-@keyframes float{to{transform:translate(12vw,8vh) scale(1.15)}}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+.aurora{position:fixed;inset:-20%;z-index:0;pointer-events:none;filter:blur(90px);opacity:.4}
+.aurora i{position:absolute;width:44vw;height:44vw;border-radius:50%;background:var(--acc);opacity:.22;animation:drift 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){background:var(--acc2);left:55%;top:30%;animation-duration:28s}
+.aurora i:nth-child(3){background:var(--acc3);left:8%;top:60%;animation-duration:30s}
+@keyframes drift{to{transform:translate(8vw,6vh) scale(1.2)}}
 .top{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;font:700 18px var(--fh)}
-.mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--acc),var(--acc3));color:#0a0b10;font-weight:700}
+.mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--acc),var(--acc3));color:#0a0b10;font-weight:700;transition:transform .5s var(--e)}
+.brand:hover .mark{transform:rotate(-12deg) scale(1.08)}
 .dnav{display:flex;gap:4px}
 .dnav a{padding:8px 12px;border-radius:999px;color:var(--mute);font-weight:500;font-size:14px;transition:.3s}
 .dnav a:hover,.dnav a.on{color:var(--ink);background:var(--glass)}
 .tools{display:flex;gap:8px;align-items:center}
-.lang{display:flex;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:3px}
-.lang button,.seg button,.pill{border:0;background:transparent;color:var(--mute);padding:7px 12px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px;transition:.3s}
-.lang button.on,.seg button.on,.pill.on{background:var(--ink);color:var(--bg)}
-.icon-btn{width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer}
+.seg{display:inline-flex;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button,.pill{border:0;background:transparent;color:var(--mute);padding:7px 12px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px;transition:.3s}
+.seg button.on,.pill.on{background:var(--ink);color:var(--bg)}
+.pill{border:1px solid var(--line)}
+.icon-btn{width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer;transition:transform .3s var(--e)}
+.icon-btn:hover{transform:rotate(45deg)}
 main{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:18px 18px 40px}
-.pg.anim{animation:pgIn .55s var(--e) both}
-@keyframes pgIn{from{opacity:0;transform:translateX(calc(var(--dir)*28px))}to{opacity:1;transform:none}}
+.pg{animation:pgIn .6s var(--e) both}
+@keyframes pgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 .rv{opacity:0;transform:translateY(22px);filter:blur(4px);transition:opacity .8s var(--e),transform .8s var(--e),filter .8s var(--e);transition-delay:var(--d,0ms)}
 .rv.in{opacity:1;transform:none;filter:none}
 .ph{margin:14px 0 24px}
 .eyebrow{color:var(--acc);font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;display:inline-flex;gap:8px;align-items:center}
 .ph h1,.hero h1{font:700 clamp(40px,9vw,84px)/.98 var(--fh);letter-spacing:-.04em;margin:10px 0 12px}
-.lead{color:var(--mute);font-size:clamp(16px,2vw,19px);max-width:620px}
+.lead{color:var(--mute);font-size:clamp(16px,2vw,19px);max-width:640px}
 .mute{color:var(--mute)}
 .sm{font-size:13px}
-.hero{padding:30px 0 10px}
 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-right:.2em}
-.w>span{display:inline-block;transform:translateY(105%);animation:up .9s var(--e) forwards;animation-delay:calc(var(--i)*90ms + 150ms)}
+.w>span{display:inline-block;transform:translateY(105%);animation:up .9s var(--e) forwards;animation-delay:calc(var(--i)*90ms + 120ms)}
 @keyframes up{to{transform:none}}
+.grad{background:linear-gradient(100deg,var(--acc),var(--acc3),var(--acc2),var(--acc));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s linear infinite}
+@keyframes sheen{to{background-position:300% 0}}
+.hero{padding:30px 0 10px}
 .glass{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:24px;padding:22px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:hidden;transition:transform .45s var(--e),border-color .3s,box-shadow .45s}
 .glass::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--acc) 18%,transparent),transparent 60%)}
 .glass:hover::before{opacity:1}
 .glass>*{position:relative}
 .glass:hover{border-color:color-mix(in srgb,var(--acc) 35%,var(--line));box-shadow:0 20px 50px -25px rgba(0,0,0,.6)}
-.glow::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;background:conic-gradient(from var(--ang),var(--acc),var(--acc2),var(--acc3),var(--acc));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:ang 5s linear infinite;opacity:.8}
+.glow::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;background:conic-gradient(from var(--ang),var(--acc),var(--acc2),var(--acc3),var(--acc));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:ang 5s linear infinite;opacity:.75}
 @keyframes ang{to{--ang:360deg}}
 .btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border:0;border-radius:16px;background:linear-gradient(120deg,var(--acc),var(--acc3));color:#0a0b10;font-weight:600;cursor:pointer;text-decoration:none;transition:transform .3s var(--e),box-shadow .3s,opacity .2s}
 .btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -12px color-mix(in srgb,var(--acc) 70%,transparent)}
@@ -71,44 +76,36 @@ main{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:18px 18p
 .rip{position:absolute;width:10px;height:10px;margin:-5px;border-radius:50%;background:rgba(255,255,255,.55);pointer-events:none;animation:rip .6s var(--e) forwards}
 @keyframes rip{to{transform:scale(28);opacity:0}}
 .tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--mute);background:var(--glass)}
-.tag.a{color:var(--acc)}
-.tag.g{color:var(--ok)}
+.tag.a{color:var(--acc)}.tag.g{color:var(--ok)}
 .tag .ic{width:14px;height:14px}
-.live-dot{width:10px;height:10px;border-radius:50%;background:var(--mute);flex:0 0 auto}
-.live-dot.on{background:var(--ok);animation:ping 2s infinite}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--mute);flex:0 0 auto}
+.dot.on{background:var(--ok);animation:ping 2s infinite}
 @keyframes ping{70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:16px;margin-top:14px}
-.gw,.mp{display:flex;flex-direction:column;gap:12px}
-.gw-head{display:flex;gap:12px;align-items:center}
-.ibox{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc);flex:0 0 auto}
-.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--line);margin-top:auto;font-size:13px;color:var(--mute);flex-wrap:wrap}
-.win{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;border:1px solid var(--acc)}
-.win .ic{color:var(--acc)}
-.stats-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,265px),1fr));gap:16px;margin-top:14px}
+.card{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px}
 .stat b{display:block;font:700 clamp(24px,5vw,38px) var(--fh);font-variant-numeric:tabular-nums;line-height:1.1}
 .stat span{font-size:12px;color:var(--mute)}
-.stream-card{display:flex;align-items:center;gap:14px;margin-top:26px}
-.stream-card .arrow{margin-left:auto;color:var(--acc);font-size:20px}
-.block-s{margin-top:34px}
-h2.block-s,.block-s h3,h3{font:700 22px var(--fh);margin-bottom:12px}
-.cd{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-.cd div{flex:1;min-width:64px;padding:12px 8px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);text-align:center}
-.cd b{display:block;font:700 28px var(--fh);font-variant-numeric:tabular-nums}
-.cd span{font-size:11px;color:var(--mute)}
+.bl{margin-top:34px}
+h2.bl,h3{font:700 22px var(--fh);margin-bottom:12px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--line);margin-top:auto;font-size:13px;color:var(--mute);flex-wrap:wrap}
+.win{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;border:1px solid var(--acc)}
+.win .ic{color:var(--acc)}
+.ibox{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc);flex:0 0 auto}
+.specs{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--mute);padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .wheel-wrap{display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:26px;align-items:center}
 .wheel-box{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:0 auto}
 #wheel{width:100%;height:100%;border-radius:50%;box-shadow:0 0 0 1px var(--line),0 40px 80px -30px rgba(0,0,0,.7)}
-.ptr{position:absolute;top:-12px;left:50%;translate:-50% 0;width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid var(--acc);z-index:3;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+.ptr{position:absolute;top:-12px;left:50%;translate:-50% 0;width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid var(--acc);z-index:3}
 .hub{position:absolute;left:50%;top:50%;translate:-50% -50%;width:64px;height:64px;border-radius:50%;border:1px solid var(--line);background:var(--bg2);color:var(--acc);display:grid;place-items:center;cursor:pointer;z-index:2;transition:scale .3s var(--e)}
 .hub:hover{scale:1.08}
-.hub .ic{width:24px;height:24px}
 .ex{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;margin-top:10px;flex-wrap:wrap}
 .search{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:20px;background:var(--glass);border:1px solid var(--line);margin-top:20px}
 .search input{border:0;background:transparent;flex:1;padding:10px 0;outline:none;min-width:0}
 .pills{display:flex;gap:8px;overflow-x:auto;padding:4px 0;margin:14px 0}
 .pills::-webkit-scrollbar{display:none}
-.pill{border:1px solid var(--line);white-space:nowrap}
 .filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 select,input,textarea{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);outline:none;transition:border-color .3s,box-shadow .3s}
 select{padding:10px}
@@ -124,15 +121,6 @@ input[type=file]{padding:9px}
 .mr img{width:56px;height:56px;border-radius:16px;object-fit:cover;background:var(--bg2);flex:0 0 auto}
 .mr-i{flex:1;min-width:0}
 .mr-i p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:var(--mute)}
-.ver{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;flex-wrap:wrap}
-.vlist{display:grid;gap:10px}
-.mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-.ipbox{font-family:"Courier New",monospace;font-size:clamp(18px,4vw,24px);font-weight:700;padding:14px 18px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);display:inline-block;margin:10px 0}
-.line{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.qty{display:flex;align-items:center;gap:10px}
-.qty button{width:34px;height:34px;border-radius:12px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer}
-.total{display:flex;justify-content:space-between;align-items:center;margin:14px 0;font-size:18px;font-weight:700}
-.cart-bar{position:sticky;bottom:100px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 18px;border-radius:20px;background:var(--ink);color:var(--bg);margin-top:20px;box-shadow:0 20px 40px -18px rgba(0,0,0,.6)}
 .prof-banner{height:150px;border-radius:24px 24px 0 0;background:linear-gradient(120deg,var(--acc),var(--acc3));background-size:cover;background-position:center}
 .prof-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:-46px 22px 14px;position:relative}
 .avatar{width:92px;height:92px;border-radius:28px;border:4px solid var(--bg);background:var(--bg2);display:grid;place-items:center;overflow:hidden;color:var(--acc)}
@@ -142,7 +130,6 @@ input[type=file]{padding:9px}
 .ibtn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer}
 .ibtn.on{border-color:var(--acc);color:var(--acc)}
 .auth{max-width:460px}
-.seg{display:inline-flex;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
 .set{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;flex-wrap:wrap}
 .switch{position:relative;width:50px;height:28px;flex:0 0 auto}
 .switch input{opacity:0;width:0;height:0;position:absolute}
@@ -150,30 +137,46 @@ input[type=file]{padding:9px}
 .switch span::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .4s var(--e)}
 .switch input:checked+span{background:var(--acc)}
 .switch input:checked+span::after{transform:translateX(22px)}
-.ex-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.tw{overflow-x:auto}
+.line{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:34px;height:34px;border-radius:12px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer}
+.cart-bar{position:sticky;bottom:100px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 18px;border-radius:20px;background:var(--ink);color:var(--bg);margin-top:20px}
+.sumrow{display:flex;justify-content:space-between;color:var(--mute);margin:4px 0}
+.total{display:flex;justify-content:space-between;align-items:center;margin:14px 0;font-size:18px;font-weight:700}
+.cd{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.cd div{flex:1;min-width:64px;padding:12px 8px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);text-align:center}
+.cd b{display:block;font:700 28px var(--fh);font-variant-numeric:tabular-nums}
+.cd span{font-size:11px;color:var(--mute)}
+.ipbox{font-family:"Courier New",monospace;font-size:clamp(18px,4vw,24px);font-weight:700;padding:14px 18px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);display:inline-block;margin:10px 0}
+.table{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{padding:10px;text-align:left;border-bottom:1px solid var(--line)}
 th{color:var(--mute);font-weight:500;font-size:12px}
+.ex-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .empty,.notice{padding:26px;border-radius:20px;border:1px dashed var(--line);text-align:center;color:var(--mute)}
 .notice{border-style:solid;border-color:color-mix(in srgb,var(--bad) 50%,transparent)}
 .spin{width:34px;height:34px;margin:30px auto;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:spin .9s linear infinite}
-footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:13px}
-.links{display:flex;gap:16px;flex-wrap:wrap}
-.links a{color:var(--acc);font-weight:600}
+.marquee{overflow:hidden;white-space:nowrap;margin-top:50px;padding:14px 0;border-block:1px solid var(--line);color:var(--mute)}
+.marquee div{display:inline-block;animation:marq 32s linear infinite;font:italic 20px var(--fh)}
+.marquee span{padding-right:44px}
+@keyframes marq{to{transform:translateX(-50%)}}
 .sheet-wrap{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;background:rgba(3,4,8,.55);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s}
 .sheet-wrap.on{opacity:1;pointer-events:all}
 .sheet{width:min(560px,100%);max-height:88vh;overflow:auto;background:var(--bg2);border:1px solid var(--line);border-radius:28px 28px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(40px);transition:transform .5s var(--e)}
 .sheet-wrap.on .sheet{transform:none}
-.toast{position:fixed;left:50%;bottom:110px;z-index:200;transform:translate(-50%,200%);padding:12px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;transition:transform .5s var(--e);max-width:92vw;text-align:center;box-shadow:0 20px 40px -18px rgba(0,0,0,.6)}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:110px;z-index:200;transform:translate(-50%,200%);padding:12px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;transition:transform .5s var(--e);max-width:92vw;text-align:center}
 .toast.on{transform:translate(-50%,0)}
 .toast.bad{background:var(--bad);color:#fff}
-.tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:60;display:grid;grid-template-columns:repeat(5,1fr);padding:6px;border-radius:24px;background:color-mix(in srgb,var(--bg2) 88%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:0 20px 50px -20px rgba(0,0,0,.7)}
+.tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:60;display:grid;grid-template-columns:repeat(5,1fr);padding:6px;border-radius:24px;background:color-mix(in srgb,var(--bg2) 88%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line)}
 .tabbar .ind{position:absolute;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/5);border-radius:18px;background:var(--glass);border:1px solid var(--line);transform:translateX(calc(var(--i,0)*100%));transition:transform .5s var(--e)}
 .tabbar a{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;color:var(--mute);font-size:11px;font-weight:600;transition:color .3s,transform .3s var(--e)}
 .tabbar a.on{color:var(--ink)}
 .tabbar a:active{transform:scale(.92)}
 .tabbar .ic{width:21px;height:21px}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:13px}
+.links{display:flex;gap:16px;flex-wrap:wrap}
+.links a{color:var(--acc);font-weight:600}
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition-duration:.01s!important}
 body.calm .rv{opacity:1;transform:none;filter:none}
 body.calm .w>span{transform:none}
@@ -193,12 +196,13 @@ body.calm .w>span{transform:none}
 </style>
 </head>
 <body>
-<div id="splash"><div class="logo-ring"></div><b>A782</b></div>
-<div class="orbs"><i></i><i></i><i></i></div>
+<div id="splash"><div class="ring"></div><b>A782</b></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <header class="top">
   <a class="brand" href="#home"><span class="mark">A</span><span id="brand">A782</span></a>
   <nav class="dnav" id="dnav"></nav>
-  <div class="tools"><div class="lang" id="lang"></div><span id="gear"></span></div>
+  <div class="tools"><div class="seg" id="lang"></div><span id="gear"></span></div>
 </header>
 <main id="main"></main>
 <nav class="tabbar" id="tabbar"></nav>
@@ -206,7 +210,6 @@ body.calm .w>span{transform:none}
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-/* ===================== ИКОНКАЛАР ===================== */
 const ICON={
 home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',
 gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zm0 0c2-4 6-4 6-1.5S14 8 12 8z"/>',
@@ -239,600 +242,598 @@ arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
 pin:'<path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
 receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
 shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
-coin:'<circle cx="12" cy="12" r="8"/><path d="M9 12h6M12 9v6"/>',
+coins:'<circle cx="12" cy="12" r="8"/><path d="M9 12h6M12 9v6"/>',
 percent:'<path d="M19 5L5 19"/><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/>',
-disc:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/>'
+flame:'<path d="M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>',
+swords:'<path d="M14 4l6 6-8 8-6-6zM4 20l4-4M6 14l-2 6 6-2"/>',
+gamepad:'<rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 12h4M9 10v4M15 11h.01M17 13h.01"/>',
+disc:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/>',
+ext:'<path d="M14 4h6v6M20 4l-9 9M10 6H5v13h13v-5"/>'
 };
-const ico=(n,c="")=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[n]||""}</svg>`;
+const ic=(n,c="")=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[n]||""}</svg>`;
 
-/* ===================== МӘТІНДЕР ===================== */
+/* ===================== ТІЛДЕР (әр тіл — тек өз мәтіні) ===================== */
 const T={
-eyebrow:["Ойыншылар порталы","Портал для игроков","Player portal"],
-h_title:["Модпактар, розыгрыштар және стрим бір жерде","Модпаки, розыгрыши и стримы в одном месте","Modpacks, giveaways and streams in one place"],
-h_lead:["Модпактарды жүктеңіз, Modrinth-тен модтарды табыңыз, билет жинап розыгрышқа қатысыңыз.","Скачивайте модпаки, находите моды на Modrinth, копите билеты и участвуйте в розыгрышах.","Download modpacks, find mods on Modrinth, collect tickets and join giveaways."],
-h_gw:["Розыгрыштарға өту","К розыгрышам","Open giveaways"],
-h_mc:["Minecraft Hub","Minecraft Hub","Minecraft Hub"],
-st_gw:["белсенді розыгрыш","розыгрышей","active giveaways"],
-st_mp:["модпак","модпаков","modpacks"],
-st_dl:["жүктеу","скачиваний","downloads"],
-next_stream:["Келесі стрим уақыты","Время следующего стрима","Next stream"],
-live:["Эфирде","В эфире","Live"],
-offline:["Эфирде емес","Не в эфире","Offline"],
-gw_sect:["Белсенді розыгрыштар","Активные розыгрыши","Active giveaways"],
-mp_sect:["Модпактар","Модпаки","Modpacks"],
-comm_h:["Сайт және стрим дизайны","Дизайн сайта и стрима","Website & stream design"],
-comm_p:["Қажетті нәрсені жазыңыз, бағасын Telegram-да келісеміз.","Напишите, что нужно, цену согласуем в Telegram.","Tell us what you need, we agree on price in Telegram."],
-order:["Тапсырыс беру","Заказать","Order"],
-tg:["Telegram","Telegram","Telegram"],
-follow:["TikTok-қа жазылу","Подписаться в TikTok","Follow on TikTok"],
-nav_home:["Басты бет","Главная","Home"],
-nav_gw:["Розыгрыш","Розыгрыши","Giveaways"],
-nav_mc:["Minecraft","Minecraft","Minecraft"],
-nav_st:["Стрим","Стримы","Streams"],
-nav_store:["Дүкен","Магазин","Store"],
-nav_me:["Профиль","Профиль","Profile"],
-nav_set:["Баптаулар","Настройки","Settings"],
-admin:["Админ","Админ","Admin"],
-open:["Ашу","Открыть","Open"],
-lock:["Құлыптау","Выйти","Lock"],
-pin:["PIN","PIN","PIN"],
-pin_note:["PIN серверде ADMIN_PIN арқылы тексеріледі.","PIN проверяется на сервере через ADMIN_PIN.","The PIN is checked on the server against ADMIN_PIN."],
-admin_h:["Басқару","Управление","Management"],
-sec_site:["Сайт, стрим, сервер","Сайт, стрим, сервер","Site, stream, server"],
-gw_h:["Розыгрыштар","Розыгрыши","Giveaways"],
-gw_p:["Билет жинаңыз, розыгрышқа қатысыңыз. Жеңімпазды админ жариялайды, сыйлық ойын ID-іңізге беріледі.","Копите билеты и участвуйте. Победителя объявляет админ, приз отправляется на игровой ID.","Collect tickets and enter. The admin announces the winner; the prize goes to your game ID."],
-tickets:["Билет","Билеты","Tickets"],
-tickets_s:["билет","билет","tickets"],
-tokens:["Токен","Токены","Tokens"],
-diamonds:["Алмаз","Алмазы","Diamonds"],
-daily:["Күнделікті билет","Билет за день","Daily ticket"],
-daily_ok:["+1 билет берілді","+1 билет начислен","+1 ticket added"],
-need_login:["Алдымен кіріңіз","Сначала войдите","Please log in first"],
-spin:["Айналдыру","Крутить","Spin"],
-wheel_h:["Сәттілік дөңгелегі","Колесо удачи","Lucky wheel"],
-wheel_p:["Билет жұмсап айналдырыңыз. Ұтыстар виртуалды, ақшалай құны жоқ.","Потратьте билет и крутите. Призы виртуальные, без денежной стоимости.","Spend a ticket to spin. Prizes are virtual with no cash value."],
-exch_h:["Айырбас","Обмен","Exchange"],
-ex_tkt:["50 токен → 1 билет","50 токенов → 1 билет","50 tokens → 1 ticket"],
-ex_cpn:["100 токен → 10% купон","100 токенов → купон 10%","100 tokens → 10% coupon"],
-ex_done:["Айырбас орындалды","Обмен выполнен","Exchange done"],
-my_wins:["Менің ұтыстарым","Мои призы","My prizes"],
-no_prizes:["Әзірге ұтыс жоқ","Призов пока нет","No prizes yet"],
-entered:["Қатыстыңыз","Вы участвуете","Entered"],
-enter:["Қатысу","Участвовать","Enter"],
-ended:["Аяқталды","Завершён","Ended"],
-winner:["Жеңімпаз","Победитель","Winner"],
-participants:["қатысушы","участников","participants"],
-cost:["Құны","Цена","Cost"],
-mc_h:["Minecraft Hub","Minecraft Hub","Minecraft Hub"],
-mc_p:["Модтарды Modrinth-тен іздеңіз, модпактарды жүктеңіз. Бәрі осы сайтта.","Ищите моды на Modrinth, скачивайте модпаки. Всё на этом сайте.","Search Modrinth mods and download modpacks, all on this site."],
-search:["Іздеу","Поиск","Search"],
-search_ph:["Мод немесе пак атауы","Название мода или пака","Mod or pack name"],
-type_mod:["Модтар","Моды","Mods"],
-type_modpack:["Модпактар","Модпаки","Modpacks"],
-type_resourcepack:["Ресурс-пактар","Ресурс-паки","Resource packs"],
-type_shader:["Шейдерлер","Шейдеры","Shaders"],
-any:["Барлығы","Все","Any"],
-s_dl:["Көп жүктелген","Популярные","Most downloaded"],
-s_fol:["Көп ұнаған","Любимые","Most followed"],
-s_new:["Жаңалары","Новые","Newest"],
-s_upd:["Жаңартылған","Обновлённые","Recently updated"],
-by:["авторы","автор","by"],
-download:["Жүктеу","Скачать","Download"],
-net_err:["Қызмет жауап бермеуде. Кейінірек қайталаңыз.","Сервис не отвечает. Попробуйте позже.","Service is not responding. Try again later."],
-mods:["модтар","модов","mods"],
-dls:["жүктелді","скачиваний","downloads"],
-nofile:["Файл әлі жүктелмеген","Файл ещё не загружен","File not uploaded yet"],
-srv_h:["A782 сервері","Сервер A782","A782 server"],
-srv_closed:["Сервер әлі ашылмаған. Жаңалықты Telegram-да күтіңіз.","Сервер ещё не открыт. Следите за Telegram.","Server is not open yet. Follow Telegram for news."],
-copy:["Көшіру","Копировать","Copy"],
-copied:["Көшірілді","Скопировано","Copied"],
-store_h:["Цифрлық дүкен","Цифровой магазин","Digital store"],
-store_p:["Заңды цифрлық өнімдер мен дизайн қызметтері. Демо-төлем және Kaspi аударымы.","Легальные цифровые товары и дизайн. Демо-оплата и перевод Kaspi.","Legal digital goods and design. Demo checkout and Kaspi transfer."],
-c_all:["Барлығы","Все","All"],
-c_pack:["Minecraft пакі","Паки Minecraft","Minecraft packs"],
-c_over:["Оверлейлер","Оверлеи","Overlays"],
-c_design:["Дизайн","Дизайн","Design"],
-c_rpg:["RPG & шейдер","RPG и шейдеры","RPG & shaders"],
-c_pvp:["PvP & FPS","PvP и FPS","PvP & FPS"],
-c_tech:["Технологиялық","Технологии","Tech"],
-c_anime:["Аниме","Аниме","Anime"],
-c_surv:["Выживание","Выживание","Survival"],
-add:["Себетке қосу","В корзину","Add to cart"],
-in_cart:["Себетте","В корзине","In cart"],
-added:["себетке қосылды","добавлено в корзину","added to cart"],
-cart:["Себет","Корзина","Cart"],
-checkout:["Рәсімдеу","Оформить","Checkout"],
-coupon:["Промокод","Промокод","Coupon"],
-m_kaspi:["Kaspi аударымы","Перевод Kaspi","Kaspi transfer"],
-m_demo:["Демо төлем","Демо-оплата","Demo payment"],
-kaspi_txt:["Төмендегі Kaspi нөміріне аударыңыз, чек кодын енгізіңіз. Админ растаған соң тапсырыс төленеді.","Переведите на Kaspi ниже и введите код чека. После подтверждения админом заказ оплачен.","Send to the Kaspi number below and enter the receipt code. Paid after admin confirmation."],
-kaspi_none:["Kaspi нөмірі көрсетілмеген","Номер Kaspi не указан","Kaspi number not set"],
-receipt:["Чек коды немесе нөмірі","Код или номер чека","Receipt code or number"],
-send_order:["Тапсырысты жіберу","Отправить заказ","Send order"],
-demo_txt:["Демо режим: ақша алынбайды.","Демо-режим: деньги не списываются.","Demo mode: no money is charged."],
-order_ok:["Тапсырыс қабылданды","Заказ принят","Order placed"],
-orders:["Тапсырыстар","Заказы","Orders"],
-total:["Барлығы","Итого","Total"],
-no_orders:["Тапсырыс жоқ","Заказов нет","No orders yet"],
-st_pending:["Күтуде","Ожидает","Pending"],
-st_paid:["Төленді","Оплачен","Paid"],
-cart_empty:["Себетіңіз бос","Корзина пуста","Your cart is empty"],
-me_h:["Кіру","Вход","Sign in"],
-login:["Кіру","Войти","Log in"],
-register:["Тіркелу","Регистрация","Sign up"],
-email:["Email","Email","Email"],
-password:["Құпиясөз (6+)","Пароль (6+)","Password (6+)"],
-nick:["Никнейм","Никнейм","Nickname"],
-continue:["Жалғастыру","Продолжить","Continue"],
-auth_note:["Құпиясөз хештеліп серверде сақталады.","Пароль хранится на сервере в виде хеша.","Passwords are stored hashed on the server."],
-logout:["Шығу","Выйти","Log out"],
-save:["Сақтау","Сохранить","Save"],
-avatar_url:["Аватар сілтемесі","Ссылка на аватар","Avatar URL"],
-banner_url:["Баннер сілтемесі","Ссылка на баннер","Banner URL"],
-upload:["Құрылғыдан жүктеу","Загрузить с устройства","Upload from device"],
-bio:["Өзі туралы","О себе","Bio"],
-mc_nick:["Minecraft ник","Ник в Minecraft","Minecraft IGN"],
-ff_id:["Free Fire ID","Free Fire ID","Free Fire ID"],
-so2_id:["Standoff 2 ID","Standoff 2 ID","Standoff 2 ID"],
-tg_nick:["Telegram","Telegram","Telegram"],
-welcome:["Қош келдіңіз!","Добро пожаловать!","Welcome!"],
-bye:["Шықтыңыз","Вы вышли","Logged out"],
-saved:["Сақталды","Сохранено","Saved"],
-uploaded:["Файл жүктелді","Файл загружен","File uploaded"],
-big:["Файл 1.5 MB-тан аспауы керек","Файл не больше 1.5 MB","File must be under 1.5 MB"],
-st_h:["Тікелей эфирлер","Прямые эфиры","Live sessions"],
-st_p:["Minecraft және ойын стримдері TikTok-та өтеді.","Стримы Minecraft и игр в TikTok.","Minecraft and game streams run on TikTok."],
-sched_h:["Апталық кесте","Расписание","Weekly schedule"],
-days:["күн","дн.","days"],hrs:["сағ","ч","hrs"],min:["мин","мин","min"],sec:["сек","сек","sec"],
-watch:["Эфирді көру","Смотреть эфир","Watch live"],
-set_h:["Баптаулар","Настройки","Settings"],
-lang:["Тіл","Язык","Language"],
-theme:["Тақырып","Тема","Theme"],
-dark:["Қараңғы","Тёмная","Dark"],
-light:["Ашық","Светлая","Light"],
-motion:["Анимация","Анимации","Animations"],
-motion_d:["Беттің өтуі және эффекттер","Переходы и эффекты","Transitions and effects"],
-title:["Атауы","Название","Title"],
-desc:["Сипаттама","Описание","Description"],
-price:["Бағасы (₸)","Цена (₸)","Price (₸)"],
-cat:["Санаты","Категория","Category"],
-type:["Түрі","Тип","Type"],
-img_url:["Сурет сілтемесі","Ссылка на фото","Image URL"],
-file_url:["Файл сілтемесі (.zip, https)","Ссылка на файл (.zip, https)","File link (.zip, https)"],
-keys:["Негізгі модтар (үтірмен)","Основные моды (через запятую)","Key mods (comma separated)"],
-version:["Нұсқа","Версия","Version"],
-wheel_cost:["Айналдыру құны (билет)","Цена спина (билеты)","Spin cost (tickets)"],
-kaspi_num:["Kaspi нөмірі","Номер Kaspi","Kaspi number"],
-s_title:["Стрим тақырыбы","Название стрима","Stream title"],
-s_next:["Келесі стрим уақыты","Время следующего стрима","Next stream time"],
-s_sched:["Кесте: күн | уақыт | тақырып (әр жолда)","Расписание: день | время | тема","Schedule: day | time | topic (one per line)"],
-s_live:["Қазір эфирде","Сейчас в эфире","Live now"],
-gw_adm:["Розыгрыштар","Розыгрыши","Giveaways"],
-prod_adm:["Дүкен тауарлары","Товары магазина","Store products"],
-mp_adm:["Модпактар","Модпаки","Modpacks"],
-users_h:["Қолданушылар","Пользователи","Users"],
-no_users:["Қолданушы жоқ","Пользователей нет","No users"],
-ord_adm:["Тапсырыстар","Заказы","Orders"],
-draw:["Жеребе","Разыграть","Draw"],
-winner_ok:["Жеңімпаз жарияланды","Победитель объявлен","Winner announced"],
-mark_paid:["Төленді деп бекіту","Подтвердить оплату","Mark as paid"],
-mark_pend:["Күтуге қайтару","Вернуть в ожидание","Mark pending"],
-name:["Аты","Имя","Name"],
-prize:["Сыйлық","Приз","Prize"],
-icon:["Белгі","Иконка","Icon"],
-err_generic:["Қате орын алды. Қайталап көріңіз.","Произошла ошибка. Попробуйте снова.","Something went wrong. Try again."],
-err_login_required:["Алдымен кіріңіз","Сначала войдите","Please log in first"],
-err_admin_required:["Админ кіруі керек","Нужен вход админа","Admin login required"],
-err_bad_login:["Email немесе құпиясөз қате","Неверный email или пароль","Wrong email or password"],
-err_exists:["Бұл email тіркелген","Этот email уже зарегистрирован","This email is already registered"],
-err_invalid:["Деректер дұрыс емес","Неверные данные","Invalid data"],
-err_no_tickets:["Билет жеткіліксіз","Недостаточно билетов","Not enough tickets"],
-err_daily_done:["Бүгін алынды","Уже получено сегодня","Already claimed today"],
-err_ended:["Розыгрыш аяқталған","Розыгрыш завершён","Giveaway ended"],
-err_already:["Сіз қатысып қойғансыз","Вы уже участвуете","You already joined"],
-err_not_enough:["Токен жеткіліксіз","Недостаточно токенов","Not enough tokens"],
-err_empty_cart:["Себет бос","Корзина пуста","Cart is empty"],
-err_receipt_required:["Чек коды керек","Нужен код чека","Receipt code is required"],
-err_not_found:["Табылмады","Не найдено","Not found"],
-err_title_required:["Атауы керек","Нужно название","Title is required"],
-err_no_participants:["Қатысушылар жоқ","Участников нет","No participants"],
-err_too_large:["Деректер тым үлкен","Данные слишком большие","Data is too large"],
-err_upstream:["Modrinth жауап бермеуде","Modrinth не отвечает","Modrinth is not responding"],
-err_bad_pin:["PIN қате","Неверный PIN","Wrong PIN"],
-err_too_many:["Тым көп әрекет. 15 минуттан кейін қайталаңыз.","Слишком много попыток. Попробуйте через 15 минут.","Too many attempts. Try again in 15 minutes."],
-err_admin_required2:["Админ кіруі керек","Нужен вход админа","Admin login required"]
+kk:{home:"Басты бет",gw:"Розыгрыштар",mc:"Minecraft",st:"Стрим",store:"Дүкен",me:"Профиль",set:"Баптаулар",adm:"Админ",
+tag:"Ойыншылар порталы",htitle:"Модпактар, розыгрыштар, стрим",hlead:"Модпактарды жүктеп алыңыз, билет жинап розыгрышқа қатысыңыз, ойын каналдарына өтіңіз.",
+bgw:"Розыгрыштарға өту",bmc:"Minecraft Hub",sgw:"белсенді розыгрыш",smp:"модпак",sdl:"жүктеу",
+live:"Эфирде",off:"Эфирде емес",next:"Келесі стрим",secgw:"Белсенді розыгрыштар",secmp:"Модпактар",secg:"Ойындар және каналдар",all:"Барлығы",
+ck:"Тапсырыс",ct:"Сайт және стрим дизайны",cp:"Қажетті нәрсені жазыңыз, бағасын Telegram-да келісеміз.",ctg:"Telegram-да жазу",
+follow:"TikTok-қа жазылу",tg:"Telegram",chan:"Каналға өту",soon:"Жақында",
+add:"Себетке қосу",inc:"Себетте",added:"себетке қосылды",cart:"Себет",sub:"Аралық сома",disc:"Жеңілдік",total:"Барлығы",
+coupon:"Промокод",apply:"Қолдану",cok:"Промокод қабылданды",cbad:"Промокод жарамсыз",chint:"A782 (10%) немесе WELCOME (5%) көріңіз.",
+checkout:"Тапсырыс беру",mkaspi:"Kaspi аударымы",mtg:"Telegram арқылы",mdemo:"Демо",
+kaspit:"Kaspi нөміріне аударып, чек кодын енгізіңіз. Админ растаған соң тапсырыс төленеді.",kaspin:"Kaspi нөмірі көрсетілмеген. Telegram арқылы тапсырыс беріңіз.",
+receipt:"Чек коды",send:"Жіберу",tgt:"Тапсырыс мәтіні көшіріледі, сосын Telegram ашылады. Мәтінді жіберіңіз.",
+demot:"Демо режим: ақша алынбайды.",demob:"Демо төлеу",ok:"Тапсырыс қабылданды",tgok:"Мәтін көшірілді, Telegram ашылды",
+orders:"Тапсырыстар",noorders:"Тапсырыс жоқ",pend:"Күтуде",paid:"Төленді",cempty:"Себет бос",browse:"Дүкенге өту",
+stitle:"Цифрлық дүкен",slead:"Заңды цифрлық өнімдер мен дизайн қызметтері.",
+cat0:"Барлығы",cat1:"Minecraft пакі",cat2:"Оверлейлер",cat3:"Дизайн",cat4:"Нұсқаулық",
+mctitle:"Minecraft Hub",mclead:"Модтарды Modrinth-тен іздеңіз, модпактарды жүктеңіз.",search:"Іздеу",sph:"Мод немесе пакет атауы",
+tmod:"Модтар",tpack:"Модпактар",tres:"Ресурс-пактар",tshd:"Шейдерлер",any:"Барлығы",
+sdn:"Көп жүктелген",sfol:"Көп ұнаған",snew:"Жаңалары",supd:"Жаңартылған",
+mods:"модтар",dls:"жүктелді",dload:"Жүктеу",nofile:"Файл әлі қосылмаған",by:"авторы",lic:"Лицензия",nores:"Нәтиже жоқ",neterr:"Қызмет жауап бермеуде",
+srv:"A782 сервері",srvc:"Сервер әлі ашылмаған",copy:"Көшіру",copied:"Көшірілді",
+steps:"Minecraft Java → Сетевая игра → Add Server → IP",
+sttitle:"Тікелей эфирлер",stlead:"Minecraft және ойын стримдері TikTok-та өтеді.",sched:"Апталық кесте",watch:"Эфирді көру",
+days:"күн",hrs:"сағ",min:"мин",sec:"сек",dn:["Дс","Сс","Ср","Бс","Жм","Сб","Жк"],
+gwtitle:"Розыгрыштар",gwlead:"Билет жинаңыз, розыгрышқа қатысыңыз. Жеңімпазды админ жариялайды.",
+tickets:"Билет",tokens:"Токен",diamonds:"Алмаз",daily:"Күнделікті билет",dailyok:"+1 билет берілді",dailydone:"Бүгін алынған",
+login:"Алдымен кіріңіз",spin:"Айналдыру",wtitle:"Сәттілік дөңгелегі",wlead:"Билет жұмсаңыз. Ұтыстар виртуалды, ақшалай құны жоқ.",
+exch:"Айырбас",ex1:"50 токен → 1 билет",ex2:"100 токен → 10% купон",exdone:"Айырбас орындалды",
+mywins:"Менің ұтыстарым",nowins:"Әзірге ұтыс жоқ",
+enter:"Қатысу",entered:"Қатыстыңыз",ended:"Аяқталды",winner:"Жеңімпаз",parts:"қатысушы",cost:"Құны",
+req:"Шарт: TikTok-қа жазылу және ойын ID-ін жазу",draw:"Жеребе тарту",again:"Қайта",close:"Жабу",
+notick:"Билет жеткіліксіз",joined:"Қатыстыңыз!",prizenote:"Жүлдені админ береді. Кодты Telegram-ға жіберіңіз.",
+me_t:"Профиль",login_b:"Кіру",reg_b:"Тіркелу",email:"Email",pass:"Құпиясөз (6+)",nick:"Никнейм",cont:"Жалғастыру",
+authnote:"Құпиясөз хештеліп серверде сақталады.",logout:"Шығу",save:"Сақтау",avurl:"Аватар сілтемесі (URL)",bgurl:"Баннер сілтемесі (URL)",
+upload:"Құрылғыдан жүктеу",bio:"Өзі туралы",mcn:"Minecraft ник",ffid:"Free Fire ID",so2:"Standoff 2 ID",tgn:"Telegram",
+setl:"Баптаулар",lang:"Тіл",theme:"Тақырып",dark:"Қараңғы",light:"Ашық",motion:"Анимация",motiond:"Беттің өтуі, жарқыл, бөлшектер",
+admgo:"Админ панеліне өту",admt:"Админ панелі",pinph:"PIN-кодты енгізіңіз",open:"Кіру",lock:"Құлыптау",pinnote:"PIN серверде тексеріледі",
+sec_site:"Сайт және стрим",sec_gw:"Розыгрыштар",sec_pr:"Дүкен тауарлары",sec_mp:"Модпактар",sec_g:"Ойындар және каналдар",sec_b:"Қолданушылар",sec_o:"Тапсырыстар",sec_d:"Деректер",
+name:"Атауы",handle:"Handle",tiktok:"TikTok сілтемесі",tgl:"Telegram сілтемесі",kaspin:"Kaspi нөмірі",ip:"Сервер IP",ver:"Нұсқа",wcost:"Айналдыру құны (билет)",
+snext:"Келесі стрим уақыты",ssched:"Кесте: күн(0-6) | уақыт | тақырып KK | RU | EN",slive:"Қазір эфирде",stitle2:"Стрим тақырыбы",
+title:"Атауы",desc:"Сипаттама",price:"Бағасы (₸)",cat:"Санаты",img:"Сурет сілтемесі",
+gicon:"Белгі",gprize:"Жүлде",gcost:"Билет құны",
+mtitle:"Модпак атауы",mver:"Minecraft нұсқасы",mload:"Жүктеуші",mmods:"Модтар саны",msize:"Көлемі (MB)",mfile:"Файл сілтемесі (.zip, тікелей)",mkeys:"Негізгі модтар (үтірмен)",
+gstatus:"Күйі",glink:"Telegram канал сілтемесі",gdesc:"Сипаттама",gname:"Ойын атауы",
+live2:"Тікелей (Live)",soon2:"Жақында",
+add2:"Қосу",edit:"Өңдеу",del:"Өшіру",saved:"Сақталды",deleted:"Өшірілді",bal:"Баланс",mpaid:"Төленді деп бекіту",mpend:"Күтуге қайту",
+noval:"Ескерту: бұл PIN тек интерфейсті қорғайды.",newf:"Жаңа қосу",cancel:"Бас тарту",
+export:"Экспорт (JSON)",imp:"Импорт (JSON)",rall:"Барлығын тазалау",confirm:"Барлық деректерді өшіру керек пе?",badj:"JSON қате",impok:"Импортталды",
+ordsmall:"Тапсырыс",nousers:"Қолданушы жоқ",pidh:"Файл сілтемесі GitHub Releases немесе Google Drive-тан болуы керек."},
+ru:{home:"Главная",gw:"Розыгрыши",mc:"Minecraft",st:"Стримы",store:"Магазин",me:"Профиль",set:"Настройки",adm:"Админ",
+tag:"Портал для игроков",htitle:"Модпаки, розыгрыши, стримы",hlead:"Скачивайте модпаки, копите билеты для розыгрышей, переходите в каналы игр.",
+bgw:"К розыгрышам",bmc:"Minecraft Hub",sgw:"активных розыгрышей",smp:"модпаков",sdl:"скачиваний",
+live:"В эфире",off:"Не в эфире",next:"Следующий стрим",secgw:"Активные розыгрыши",secmp:"Модпаки",secg:"Игры и каналы",all:"Все",
+ck:"Заказы",ct:"Дизайн сайта и стрима",cp:"Напишите, что нужно. Цену согласуем в Telegram.",ctg:"Написать в Telegram",
+follow:"Подписаться в TikTok",tg:"Telegram",chan:"Перейти в канал",soon:"Скоро",
+add:"В корзину",inc:"В корзине",added:"добавлено в корзину",cart:"Корзина",sub:"Подытог",disc:"Скидка",total:"Итого",
+coupon:"Промокод",apply:"Применить",cok:"Промокод принят",cbad:"Промокод не действует",chint:"Попробуйте A782 (10%) или WELCOME (5%).",
+checkout:"Оформить заказ",mkaspi:"Перевод Kaspi",mtg:"Через Telegram",mdemo:"Демо",
+kaspit:"Переведите на номер Kaspi и введите код чека. После подтверждения админом заказ будет оплачен.",kaspin:"Номер Kaspi не указан. Оформите заказ через Telegram.",
+receipt:"Код чека",send:"Отправить",tgt:"Текст заказа будет скопирован, затем откроется Telegram. Отправьте текст.",
+demot:"Демо-режим: деньги не списываются.",demob:"Демо-оплата",ok:"Заказ принят",tgok:"Текст скопирован, Telegram открыт",
+orders:"Заказы",noorders:"Заказов нет",pend:"Ожидает",paid:"Оплачен",cempty:"Корзина пуста",browse:"В магазин",
+stitle:"Цифровой магазин",slead:"Легальные цифровые товары и дизайн.",
+cat0:"Все",cat1:"Паки Minecraft",cat2:"Оверлеи",cat3:"Дизайн",cat4:"Гайды",
+mctitle:"Minecraft Hub",mclead:"Ищите моды на Modrinth, скачивайте модпаки.",search:"Поиск",sph:"Название мода или сборки",
+tmod:"Моды",tpack:"Модпаки",tres:"Ресурс-паки",tshd:"Шейдеры",any:"Все",
+sdn:"Популярные",sfol:"Любимые",snew:"Новые",supd:"Обновлённые",
+mods:"модов",dls:"скачиваний",dload:"Скачать",nofile:"Файл пока не добавлен",by:"автор",lic:"Лицензия",nores:"Ничего не найдено",neterr:"Сервис не отвечает",
+srv:"Сервер A782",srvc:"Сервер ещё не открыт",copy:"Копировать",copied:"Скопировано",
+steps:"Minecraft Java → Сетевая игра → Add Server → IP",
+sttitle:"Прямые эфиры",stlead:"Стримы Minecraft и игр проходят в TikTok.",sched:"Расписание на неделю",watch:"Смотреть эфир",
+days:"дн.",hrs:"ч",min:"мин",sec:"сек",dn:["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
+gwtitle:"Розыгрыши",gwlead:"Копите билеты и участвуйте. Победителя объявляет админ.",
+tickets:"Билеты",tokens:"Токены",diamonds:"Алмазы",daily:"Билет за день",dailyok:"+1 билет начислен",dailydone:"Уже получено сегодня",
+login:"Сначала войдите",spin:"Крутить",wtitle:"Колесо удачи",wlead:"Потратьте билет. Призы виртуальные, без денежной стоимости.",
+exch:"Обмен",ex1:"50 токенов → 1 билет",ex2:"100 токенов → купон 10%",exdone:"Обмен выполнен",
+mywins:"Мои призы",nowins:"Призов пока нет",
+enter:"Участвовать",entered:"Вы участвуете",ended:"Завершён",winner:"Победитель",parts:"участников",cost:"Цена",
+req:"Условие: подписка на TikTok и игровой ID",draw:"Разыграть",again:"Ещё раз",close:"Закрыть",
+notick:"Недостаточно билетов",joined:"Вы участвуете!",prizenote:"Приз выдаёт админ. Отправьте код в Telegram.",
+me_t:"Профиль",login_b:"Войти",reg_b:"Регистрация",email:"Email",pass:"Пароль (6+)",nick:"Никнейм",cont:"Продолжить",
+authnote:"Пароль хранится на сервере в виде хеша.",logout:"Выйти",save:"Сохранить",avurl:"Ссылка на аватар (URL)",bgurl:"Ссылка на баннер (URL)",
+upload:"Загрузить с устройства",bio:"О себе",mcn:"Ник в Minecraft",ffid:"Free Fire ID",so2:"Standoff 2 ID",tgn:"Telegram",
+setl:"Настройки",lang:"Язык",theme:"Тема",dark:"Тёмная",light:"Светлая",motion:"Анимации",motiond:"Переходы, блеск, частицы",
+admgo:"Открыть админ-панель",admt:"Админ-панель",pinph:"Введите PIN",open:"Войти",lock:"Выйти",pinnote:"PIN проверяется на сервере",
+sec_site:"Сайт и стрим",sec_gw:"Розыгрыши",sec_pr:"Товары магазина",sec_mp:"Модпаки",sec_g:"Игры и каналы",sec_b:"Пользователи",sec_o:"Заказы",sec_d:"Данные",
+name:"Название",handle:"Handle",tiktok:"Ссылка TikTok",tgl:"Ссылка Telegram",kaspin:"Номер Kaspi",ip:"IP сервера",ver:"Версия",wcost:"Цена спина (билеты)",
+snext:"Время следующего стрима",ssched:"Расписание: день(0-6) | время | тема KK | RU | EN",slive:"Сейчас в эфире",stitle2:"Название стрима",
+title:"Название",desc:"Описание",price:"Цена (₸)",cat:"Категория",img:"Ссылка на фото",
+gicon:"Иконка",gprize:"Приз",gcost:"Цена в билетах",
+mtitle:"Название модпака",mver:"Версия Minecraft",mload:"Загрузчик",mmods:"Количество модов",msize:"Размер (MB)",mfile:"Ссылка на файл (.zip, прямая)",mkeys:"Основные моды (через запятую)",
+gstatus:"Статус",glink:"Ссылка на Telegram-канал",gdesc:"Описание",gname:"Название игры",
+live2:"Прямой (Live)",soon2:"Скоро",
+add2:"Добавить",edit:"Изменить",del:"Удалить",saved:"Сохранено",deleted:"Удалено",bal:"Баланс",mpaid:"Подтвердить оплату",mpend:"Вернуть в ожидание",
+noval:"Внимание: PIN защищает только интерфейс.",newf:"Новая запись",cancel:"Отмена",
+export:"Экспорт (JSON)",imp:"Импорт (JSON)",rall:"Сбросить всё",confirm:"Удалить все данные?",badj:"Неверный JSON",impok:"Импортировано",
+ordsmall:"Заказ",nousers:"Пользователей нет",pidh:"Ссылка на файл — из GitHub Releases или Google Drive."},
+en:{home:"Home",gw:"Giveaways",mc:"Minecraft",st:"Streams",store:"Store",me:"Profile",set:"Settings",adm:"Admin",
+tag:"Player portal",htitle:"Modpacks, giveaways, streams",hlead:"Download modpacks, collect tickets for giveaways and join game channels.",
+bgw:"Open giveaways",bmc:"Minecraft Hub",sgw:"active giveaways",smp:"modpacks",sdl:"downloads",
+live:"Live",off:"Offline",next:"Next stream",secgw:"Active giveaways",secmp:"Modpacks",secg:"Games and channels",all:"View all",
+ck:"Commissions",ct:"Website and stream design",cp:"Tell us what you need. We agree on price in Telegram.",ctg:"Message on Telegram",
+follow:"Follow on TikTok",tg:"Telegram",chan:"Open channel",soon:"Soon",
+add:"Add to cart",inc:"In cart",added:"added to cart",cart:"Cart",sub:"Subtotal",disc:"Discount",total:"Total",
+coupon:"Coupon code",apply:"Apply",cok:"Coupon applied",cbad:"Invalid coupon",chint:"Try A782 (10%) or WELCOME (5%).",
+checkout:"Place order",mkaspi:"Kaspi transfer",mtg:"Via Telegram",mdemo:"Demo",
+kaspit:"Send the amount to the Kaspi number and enter the receipt code. Paid after admin confirmation.",kaspin:"Kaspi number is not set. Order via Telegram.",
+receipt:"Receipt code",send:"Send",tgt:"The order text will be copied, then Telegram opens. Send the text.",
+demot:"Demo mode: no money is charged.",demob:"Pay (demo)",ok:"Order placed",tgok:"Text copied, Telegram opened",
+orders:"Orders",noorders:"No orders",pend:"Pending",paid:"Paid",cempty:"Your cart is empty",browse:"Browse store",
+stitle:"Digital store",slead:"Legal digital goods and design services.",
+cat0:"All",cat1:"Minecraft packs",cat2:"Overlays",cat3:"Design",cat4:"Guides",
+mctitle:"Minecraft Hub",mclead:"Search mods on Modrinth, download modpacks.",search:"Search",sph:"Mod or pack name",
+tmod:"Mods",tpack:"Modpacks",tres:"Resource packs",tshd:"Shaders",any:"Any",
+sdn:"Most downloaded",sfol:"Most followed",snew:"Newest",supd:"Recently updated",
+mods:"mods",dls:"downloads",dload:"Download",nofile:"File not added yet",by:"by",lic:"License",nores:"No results",neterr:"Service unavailable",
+srv:"A782 server",srvc:"Server is not open yet",copy:"Copy",copied:"Copied",
+steps:"Minecraft Java → Multiplayer → Add Server → IP",
+sttitle:"Live streams",stlead:"Minecraft and game streams run on TikTok.",sched:"Weekly schedule",watch:"Watch live",
+days:"days",hrs:"hrs",min:"min",sec:"sec",dn:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+gwtitle:"Giveaways",gwlead:"Collect tickets and join. The admin announces the winner.",
+tickets:"Tickets",tokens:"Tokens",diamonds:"Diamonds",daily:"Daily ticket",dailyok:"+1 ticket added",dailydone:"Already claimed today",
+login:"Please log in first",spin:"Spin",wtitle:"Lucky wheel",wlead:"Spend a ticket. Prizes are virtual with no cash value.",
+exch:"Exchange",ex1:"50 tokens → 1 ticket",ex2:"100 tokens → 10% coupon",exdone:"Exchange done",
+mywins:"My prizes",nowins:"No prizes yet",
+enter:"Enter",entered:"Entered",ended:"Ended",winner:"Winner",parts:"participants",cost:"Cost",
+req:"Requirement: follow on TikTok and add your game ID",draw:"Draw winner",again:"Again",close:"Close",
+notick:"Not enough tickets",joined:"You entered!",prizenote:"The admin delivers the prize. Send the code on Telegram.",
+me_t:"Profile",login_b:"Log in",reg_b:"Sign up",email:"Email",pass:"Password (6+)",nick:"Nickname",cont:"Continue",
+authnote:"Passwords are stored hashed on the server.",logout:"Log out",save:"Save",avurl:"Avatar URL",bgurl:"Banner URL",
+upload:"Upload from device",bio:"About me",mcn:"Minecraft IGN",ffid:"Free Fire ID",so2:"Standoff 2 ID",tgn:"Telegram",
+setl:"Settings",lang:"Language",theme:"Theme",dark:"Dark",light:"Light",motion:"Animations",motiond:"Transitions, shine, particles",
+admgo:"Open admin panel",admt:"Admin panel",pinph:"Enter PIN",open:"Unlock",lock:"Lock",pinnote:"The PIN is checked on the server",
+sec_site:"Site and stream",sec_gw:"Giveaways",sec_pr:"Store products",sec_mp:"Modpacks",sec_g:"Games and channels",sec_b:"Users",sec_o:"Orders",sec_d:"Data",
+name:"Name",handle:"Handle",tiktok:"TikTok link",tgl:"Telegram link",kaspin:"Kaspi number",ip:"Server IP",ver:"Version",wcost:"Spin cost (tickets)",
+snext:"Next stream time",ssched:"Schedule: day(0-6) | time | topic KK | RU | EN",slive:"Live now",stitle2:"Stream title",
+title:"Title",desc:"Description",price:"Price (₸)",cat:"Category",img:"Image URL",
+gicon:"Icon",gprize:"Prize",gcost:"Ticket cost",
+mtitle:"Modpack name",mver:"Minecraft version",mload:"Loader",mmods:"Mods count",msize:"Size (MB)",mfile:"File link (.zip, direct)",mkeys:"Key mods (comma separated)",
+gstatus:"Status",glink:"Telegram channel link",gdesc:"Description",gname:"Game name",
+live2:"Live",soon2:"Soon",
+add2:"Add",edit:"Edit",del:"Delete",saved:"Saved",deleted:"Deleted",bal:"Balance",mpaid:"Mark as paid",mpend:"Mark pending",
+noval:"Note: the PIN only protects the interface.",newf:"New entry",cancel:"Cancel",
+export:"Export (JSON)",imp:"Import (JSON)",rall:"Reset everything",confirm:"Delete all data?",badj:"Invalid JSON",impok:"Imported",
+ordsmall:"Order",nousers:"No users",pidh:"The file link should be from GitHub Releases or Google Drive."}
 };
+const E={
+kk:{generic:"Қате орын алды",login_required:"Алдымен кіріңіз",admin_required:"Админ кіруі керек",bad_login:"Email немесе құпиясөз қате",exists:"Бұл email тіркелген",invalid:"Деректер дұрыс емес",no_tickets:"Билет жеткіліксіз",daily_done:"Бүгін алынған",ended:"Розыгрыш аяқталған",already:"Сіз қатысып қойғансыз",not_enough:"Токен жеткіліксіз",empty_cart:"Себет бос",receipt_required:"Чек коды керек",not_found:"Табылмады",title_required:"Атауы керек",no_participants:"Қатысушылар жоқ",too_large:"Деректер тым үлкен",upstream:"Modrinth жауап бермеуде",bad_pin:"PIN қате",too_many:"Тым көп әрекет, 15 минуттан кейін көріңіз"},
+ru:{generic:"Произошла ошибка",login_required:"Сначала войдите",admin_required:"Нужен вход админа",bad_login:"Неверный email или пароль",exists:"Этот email уже зарегистрирован",invalid:"Неверные данные",no_tickets:"Недостаточно билетов",daily_done:"Уже получено сегодня",ended:"Розыгрыш завершён",already:"Вы уже участвуете",not_enough:"Недостаточно токенов",empty_cart:"Корзина пуста",receipt_required:"Нужен код чека",not_found:"Не найдено",title_required:"Нужно название",no_participants:"Участников нет",too_large:"Данные слишком большие",upstream:"Modrinth не отвечает",bad_pin:"Неверный PIN",too_many:"Слишком много попыток, попробуйте через 15 минут"},
+en:{generic:"Something went wrong",login_required:"Please log in first",admin_required:"Admin login required",bad_login:"Wrong email or password",exists:"This email is already registered",invalid:"Invalid data",no_tickets:"Not enough tickets",daily_done:"Already claimed today",ended:"Giveaway ended",already:"You already joined",not_enough:"Not enough tokens",empty_cart:"Cart is empty",receipt_required:"Receipt code is required",not_found:"Not found",title_required:"Title is required",no_participants:"No participants",too_large:"Data is too large",upstream:"Modrinth is not responding",bad_pin:"Wrong PIN",too_many:"Too many attempts, try again in 15 minutes"}
+};
+
 let LANG=localStorage.getItem("a782-lang")||"kk";
-const LI={kk:0,ru:1,en:2};
-const t=(k,v)=>{let s=T[k]?(T[k][LI[LANG]]??T[k][2]):k;if(v)s=s.replace(/\{(\w+)\}/g,(_,x)=>v[x]??"");return s};
-const L=o=>o&&typeof o==="object"?(o[LANG]||o.en||o.kk||""):(o??"");
+const t=k=>(T[LANG][k]??"");
+const L=o=>o&&typeof o==="object"?(o[LANG]||""):(o||"");
+const errMsg=e=>E[LANG][e.code]||E[LANG].generic;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const money=n=>Number(n||0).toLocaleString("en-US")+" ₸";
 const fmt=n=>Number(n||0).toLocaleString("en-US");
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const three=(base,obj,label)=>["kk","ru","en"].map(k=>`<label class="field">${label} · ${k.toUpperCase()}<input name="${base}_${k}" value="${esc(obj&&typeof obj==="object"?obj[k]:"")}"></label>`).join("");
-const errMsg=e=>{const k="err_"+(e.code||"generic");return T[k]?t(k):t("err_generic")};
+const words=s=>String(s).split(" ").map((w,i)=>`<span class="w"><span style="--i:${i}">${esc(w)}</span></span>`).join(" ");
 
-/* ===================== КҮЙ ===================== */
-let S=Object.assign({theme:"dark",motion:!matchMedia("(prefers-reduced-motion: reduce)").matches},JSON.parse(localStorage.getItem("a782-set")||"{}"));
-let TOKEN=localStorage.getItem("a782-token")||"", ADMIN=sessionStorage.getItem("a782-admin")||"";
-let D=null, ME=null, ROUTE="", AUTHMODE="login", pendIcon=null, payMethod="kaspi", storeCat="all", mpCat="all";
+let D=null, ME=null, TOKEN=localStorage.getItem("a782-token")||"", ADMIN=sessionStorage.getItem("a782-admin")||"";
+let S={theme:localStorage.getItem("a782-theme")||"dark", motion:localStorage.getItem("a782-motion")!=="0"};
 let cart=JSON.parse(localStorage.getItem("a782-cart")||"[]");
-let MC={type:"mod",q:"",loader:"",version:"",sort:"downloads",hits:null};
-let wheelAngle=0, spinning=false, cdT=null, toastT=null;
+let ROUTE="", STORE="all", MPC="all", MC={type:"mod",q:"",loader:"",version:"",sort:"downloads",hits:null};
+let AUTH="login", WHEEL=0, SPIN=false, cdT=null, toastT=null, sParts=[];
 const TABS=["home","gw","mc","store","me"];
-const saveS=()=>localStorage.setItem("a782-set",JSON.stringify(S));
+const PAGES={home:pHome,gw:pGw,mc:pMc,streams:pStreams,store:pStore,me:pMe,settings:pSettings,admin:pAdmin};
 const saveCart=()=>localStorage.setItem("a782-cart",JSON.stringify(cart));
-const inCart=id=>cart.some(i=>i.id===id);
 const cartCount=()=>cart.reduce((s,i)=>s+i.qty,0);
-const cartTotal=()=>cart.reduce((s,i)=>{const p=D.products.find(x=>x.id===i.id);return s+(p?p.price*i.qty:0)},0);
+const inCart=id=>cart.some(i=>i.id===id);
+const prodOf=id=>D.products.find(p=>p.id===id);
+const cartTotal=()=>cart.reduce((s,i)=>{const p=prodOf(i.id);return s+(p?p.price*i.qty:0)},0);
+const catName=c=>({pack:t("cat1"),over:t("cat2"),design:t("cat3"),guide:t("cat4")})[c]||"";
 
-async function api(method,path,body,admin){
+async function api(m,p,b,admin){
   const h={"Content-Type":"application/json"};
   if(TOKEN) h.Authorization="Bearer "+TOKEN;
   if(admin&&ADMIN) h["x-admin-token"]=ADMIN;
-  const r=await fetch(path,{method,headers:h,body:body?JSON.stringify(body):undefined});
+  const r=await fetch(p,{method:m,headers:h,body:b?JSON.stringify(b):undefined});
   const j=await r.json().catch(()=>({}));
-  if(!r.ok){const e=new Error(j.error||"error");e.code=j.error||"generic";throw e}
+  if(!r.ok){const e=new Error(j.error||"generic");e.code=j.error||"generic";throw e}
   return j;
 }
-function toast(msg,ok=true){
-  const el=$("#toast"); el.textContent=msg; el.className="toast on"+(ok?"":" bad");
-  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("on"),2600);
-}
-function openSheet(html){ $("#sheet").innerHTML=html; $("#sheetWrap").classList.add("on"); }
-function closeSheet(){ $("#sheetWrap").classList.remove("on"); }
-async function loadData(){ D=await api("GET","/api/data"); }
+function toast(msg,bad){const el=$("#toast");el.textContent=msg;el.className="toast on"+(bad?" bad":"");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),2600)}
+function openSheet(h){$("#sheet").innerHTML=h;$("#sheetWrap").classList.add("on")}
+function closeSheet(){$("#sheetWrap").classList.remove("on")}
+async function loadData(){D=await api("GET","/api/data")}
 
-/* ===================== ЭФФЕКТІЛЕР ===================== */
 const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}}),{threshold:.12});
-function observe(){ $$(".rv:not(.in)").forEach(el=>io.observe(el)); }
-function countUp(){
-  $$("[data-count]").forEach(el=>{
-    const end=+el.dataset.count, t0=performance.now();
-    const step=now=>{const p=Math.min(1,(now-t0)/1100);el.textContent=fmt(Math.round(end*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(step)};
-    requestAnimationFrame(step);
-  });
+function reveal(){$$(".rv:not(.in)").forEach(el=>io.observe(el))}
+function countUp(){$$("[data-count]").forEach(el=>{const end=+el.dataset.count,t0=performance.now();const st=now=>{const p=Math.min(1,(now-t0)/1100);el.textContent=fmt(Math.round(end*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(st)};requestAnimationFrame(st)})}
+function initFx(){
+  const c=$("#fx"),x=c.getContext("2d");let W,H;
+  const size=()=>{W=c.width=innerWidth;H=c.height=innerHeight;sParts=Array.from({length:Math.min(120,Math.floor(W*H/12000))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.3,v:Math.random()*.25+.05,a:Math.random()*6.28}))};
+  size();addEventListener("resize",size);
+  const loop=()=>{x.clearRect(0,0,W,H);if(S.motion){for(const p of sParts){p.y+=p.v;p.a+=.01;if(p.y>H)p.y=0;x.globalAlpha=.25+.45*Math.abs(Math.sin(p.a));x.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--ink");x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fill()}x.globalAlpha=1}requestAnimationFrame(loop)};
+  loop();
 }
-const words=s=>String(s).split(" ").map((w,i)=>`<span class="w"><span style="--i:${i}">${esc(w)}</span></span>`).join(" ");
-document.addEventListener("pointerdown",e=>{
-  const b=e.target.closest(".btn"); if(!b) return;
-  const r=b.getBoundingClientRect(); const s=document.createElement("i");
-  s.className="rip"; s.style.left=(e.clientX-r.left)+"px"; s.style.top=(e.clientY-r.top)+"px";
-  b.appendChild(s); setTimeout(()=>s.remove(),600);
-});
-document.addEventListener("pointermove",e=>{
-  const c=e.target.closest&&e.target.closest(".glass"); if(!c) return;
-  const r=c.getBoundingClientRect();
-  c.style.setProperty("--mx",(e.clientX-r.left)+"px");
-  c.style.setProperty("--my",(e.clientY-r.top)+"px");
-},{passive:true});
-document.addEventListener("change",e=>{
-  const inp=e.target; if(!inp.dataset.tofield) return;
-  const f=inp.files[0]; if(!f) return;
-  if(f.size>1.5e6){ toast(t("big"),false); return; }
-  const r=new FileReader();
-  r.onload=()=>{ inp.form.elements[inp.dataset.tofield].value=r.result; toast(t("uploaded")); };
-  r.readAsDataURL(f);
-});
-$("#sheetWrap").addEventListener("click",e=>{ if(e.target.id==="sheetWrap") closeSheet(); });
+document.addEventListener("pointerdown",e=>{const b=e.target.closest(".btn");if(!b)return;const r=b.getBoundingClientRect();const s=document.createElement("i");s.className="rip";s.style.left=(e.clientX-r.left)+"px";s.style.top=(e.clientY-r.top)+"px";b.appendChild(s);setTimeout(()=>s.remove(),600)});
+document.addEventListener("pointermove",e=>{const g=e.target.closest&&e.target.closest(".glass");if(!g)return;const r=g.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;g.style.setProperty("--mx",x+"px");g.style.setProperty("--my",y+"px");if(S.motion&&g.classList.contains("tilt")){g.style.transform=`perspective(900px) rotateX(${(y/r.height-.5)*-4}deg) rotateY(${(x/r.width-.5)*4}deg) translateY(-3px)`}},{passive:true});
+document.addEventListener("pointerout",e=>{const g=e.target.closest&&e.target.closest(".glass");if(g&&!g.contains(e.relatedTarget))g.style.transform=""});
+function applySettings(){document.documentElement.dataset.theme=S.theme;document.body.classList.toggle("calm",!S.motion);document.documentElement.lang=LANG}
 
-/* ===================== ШАПКА / НАВИГАЦИЯ ===================== */
 function chrome(){
   $("#brand").textContent=D.owner.name;
-  $("#dnav").innerHTML=[["home","nav_home"],["gw","nav_gw"],["mc","nav_mc"],["streams","nav_st"],["store","nav_store"],["me","nav_me"]]
-    .map(([k,l])=>`<a href="#${k}" data-r="${k}">${t(l)}</a>`).join("");
-  $("#tabbar").innerHTML=`<span class="ind"></span>`+[["home","home","nav_home"],["gw","gift","nav_gw"],["mc","cube","nav_mc"],["store","bag","nav_store"],["me","user","nav_me"]]
-    .map(([k,i,l])=>`<a href="#${k}" data-r="${k}">${ico(i)}<span>${t(l)}</span></a>`).join("");
+  $("#dnav").innerHTML=[["home","home"],["giveaways","gw"],["minecraft","mc"],["streams","st"],["store","store"],["me","me"]].map(([k,l])=>`<a href="#${k}" data-r="${k}">${t(l)}</a>`).join("");
+  $("#tabbar").innerHTML=`<span class="ind"></span>`+[["home","home","home"],["gw","gift","gw"],["mc","cube","mc"],["store","bag","store"],["me","user","me"]].map(([k,i,l])=>`<a href="#${k}" data-r="${k}">${ic(i)}<span>${t(l)}</span></a>`).join("");
   $("#lang").innerHTML=[["kk","KZ"],["ru","RU"],["en","EN"]].map(([k,l])=>`<button class="${LANG===k?"on":""}" data-lang="${k}">${l}</button>`).join("");
-  $("#gear").innerHTML=`<button class="icon-btn" data-go="settings" aria-label="settings">${ico("gear")}</button>`;
-  document.documentElement.lang=LANG;
+  $("#gear").innerHTML=`<button class="icon-btn" data-go="settings" aria-label="settings">${ic("gear")}</button>`;
 }
+const footer=()=>`<footer class="rv"><div class="links"><a href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener">TikTok ${esc(D.owner.handle)}</a><a href="${esc(D.owner.telegram)}" target="_blank" rel="noopener">${t("tg")}</a><a href="#giveaways">${t("gw")}</a><a href="#minecraft">${t("mc")}</a></div><span>© 2026 ${esc(D.owner.name)}</span></footer>`;
 
-/* ===================== КАРТАЛАР ===================== */
-const footer=()=>`<footer class="rv"><div class="links"><a href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener">TikTok ${esc(D.owner.handle)}</a><a href="${esc(D.owner.telegram)}" target="_blank" rel="noopener">${t("tg")}</a><a href="#gw">${t("nav_gw")}</a><a href="#mc">${t("nav_mc")}</a></div><span>© 2026 A782 DIGITAL</span></footer>`;
-
-const gwCard=(g,i=0)=>{
+function gameCard(g,i=0){
+  const live=g.status==="live";
+  return `<article class="glass tilt card rv" style="--d:${i*70}ms">
+    <div class="between row"><span class="tag ${live?"g":""}">${live?t("live"):t("soon")}</span></div>
+    <div class="row" style="gap:12px"><div class="ibox">${ic(g.icon||"gamepad")}</div><h3 style="margin:0;font-size:19px">${esc(g.name)}</h3></div>
+    <p class="mute">${esc(L(g.desc))}</p>
+    <div class="foot">${g.link?`<a class="btn sm" href="${esc(g.link)}" target="_blank" rel="noopener">${ic("ext")} ${t("chan")}</a>`:`<span class="tag">${t("soon")}</span>`}</div>
+  </article>`;
+}
+function gwCard(g,i=0){
   const joined=ME&&g.participants.includes(ME.nick);
-  const action=g.winner
-    ?`<div class="win">${ico("trophy")}<span>${t("winner")}: <b>${esc(g.winner.name)}</b></span></div>`
-    :`<button class="btn wide" data-enter="${esc(g.id)}" ${joined?"disabled":""}>${ico("check")} ${joined?t("entered"):t("enter")}</button>`;
-  return `<article class="glass gw rv ${g.winner?"":"glow"}" style="--d:${i*80}ms">
-    <div class="stats-row" style="margin:0;justify-content:space-between"><span class="tag a">${ico("gift")} ${esc(g.prize)}</span><span class="tag ${g.winner?"":"g"}">${g.winner?t("ended"):t("live")}</span></div>
-    <div class="gw-head"><div class="ibox">${ico(g.icon||"gift")}</div><div><h3 style="margin:0;font-size:18px">${esc(L(g.title))}</h3><span class="mute sm">${t("cost")}: ${g.cost} ${t("tickets_s")}</span></div></div>
-    <p class="mute">${esc(L(g.desc))}</p>${action}
-    <div class="foot"><span>${ico("users")} ${g.participants.length} ${t("participants")}</span></div></article>`;
-};
-const mpCard=(m,i=0)=>`<article class="glass mp rv" style="--d:${i*70}ms">
-  <div class="stats-row" style="margin:0;justify-content:space-between"><span class="tag a">${esc(m.version)} · ${esc(m.loader)}</span><span class="tag">${ico("star")} ${m.rating}</span></div>
-  <h3 style="font-size:20px;margin:0">${esc(m.title)}</h3><p class="mute">${esc(L(m.desc))}</p>
-  <div class="stats-row" style="margin:0;font-size:13px;color:var(--mute)"><span>${m.mods} ${t("mods")}</span><span>· ${m.sizeMb} MB</span><span>· ${fmt(m.downloads)} ${t("dls")}</span></div>
-  <div class="stats-row" style="margin:0">${m.keyMods.map(k=>`<span class="tag">${esc(k)}</span>`).join("")}</div>
-  <div style="margin-top:auto">${m.file?`<a class="btn wide" href="${esc(m.file)}" target="_blank" rel="noopener">${ico("dl")} ${t("download")}</a>`:`<button class="btn ghost wide" data-nofile="1">${ico("clock")} ${t("nofile")}</button>`}</div></article>`;
-const productCard=(p,i=0)=>`<article class="glass rv" style="--d:${(i%8)*60}ms;display:flex;flex-direction:column;gap:10px">
-  <div class="stats-row" style="margin:0;justify-content:space-between"><span class="tag">${esc(p.type||"")}</span><b style="color:var(--acc);font:700 20px var(--fh)">${money(p.price)}</b></div>
-  <h3 style="font-size:18px;margin:0">${esc(L(p.name))}</h3><p class="mute" style="flex:1">${esc(L(p.desc))}</p>
-  <button class="btn ghost sm" data-add="${esc(p.id)}" ${inCart(p.id)?"disabled":""}>${ico("cart")} ${inCart(p.id)?t("in_cart"):t("add")}</button></article>`;
-const mrHTML=()=>{
+  const action=g.winner?`<div class="win">${ic("trophy")}<span>${t("winner")}: <b>${esc(g.winner.name)}</b></span></div>`
+    :`<button class="btn wide" data-enter="${esc(g.id)}" ${joined?"disabled":""}>${ic("check")} ${joined?t("entered"):t("enter")}</button>`;
+  return `<article class="glass tilt card ${g.winner?"":"glow"} rv" style="--d:${i*80}ms">
+    <div class="between row"><span class="tag a">${ic("gift")} ${esc(L(g.prize))}</span><span class="tag ${g.winner?"":"g"}">${g.winner?t("ended"):t("live")}</span></div>
+    <div class="row" style="gap:12px"><div class="ibox">${ic(g.icon||"gift")}</div><div><h3 style="margin:0;font-size:18px">${esc(L(g.title))}</h3><span class="mute sm">${t("cost")}: ${g.cost} ${t("tickets").toLowerCase()}</span></div></div>
+    <p class="mute">${esc(L(g.desc))}</p>
+    ${action}
+    <div class="foot"><span>${ic("users")} ${g.participants.length} ${t("parts")}</span></div>
+  </article>`;
+}
+function mpCard(m,i=0){
+  return `<article class="glass tilt card rv" style="--d:${i*70}ms">
+    <div class="between row"><span class="tag a">${esc(m.version)} · ${esc(m.loader)}</span><span class="tag">${ic("star")} ${m.rating}</span></div>
+    <h3 style="font-size:20px;margin:0">${esc(m.title)}</h3>
+    <p class="mute">${esc(L(m.desc))}</p>
+    <div class="specs"><span>${m.mods} ${t("mods")}</span><span>${m.sizeMb} MB</span><span>${fmt(m.downloads)} ${t("dls")}</span></div>
+    <div class="row">${m.keyMods.map(k=>`<span class="tag">${esc(k)}</span>`).join("")}</div>
+    <div style="margin-top:auto">${m.file?`<a class="btn wide" href="${esc(m.file)}" target="_blank" rel="noopener">${ic("dl")} ${t("dload")}</a>`:`<button class="btn ghost wide" data-nofile="1">${ic("clock")} ${t("nofile")}</button>`}</div>
+  </article>`;
+}
+function prodCard(p,i=0){
+  return `<article class="glass tilt card rv" style="--d:${(i%8)*60}ms">
+    <div class="between row"><span class="tag">${esc(catName(p.cat))}</span><b style="color:var(--acc);font:700 20px var(--fh)">${money(p.price)}</b></div>
+    <h3 style="font-size:18px;margin:0">${esc(L(p.name))}</h3>
+    <p class="mute" style="flex:1">${esc(L(p.desc))}</p>
+    <button class="btn ghost sm" data-add="${esc(p.id)}" ${inCart(p.id)?"disabled":""}>${ic("cart")} ${inCart(p.id)?t("inc"):t("add")}</button>
+  </article>`;
+}
+function mrHTML(){
   if(MC.hits==="loading") return `<div class="spin"></div>`;
-  if(MC.hits==="error") return `<div class="notice">${t("net_err")}</div>`;
+  if(MC.hits==="error") return `<div class="notice">${t("neterr")}</div>`;
   if(!MC.hits) return "";
-  if(!MC.hits.length) return `<div class="empty">—</div>`;
+  if(!MC.hits.length) return `<div class="empty">${t("nores")}</div>`;
   return `<div class="mr-list">${MC.hits.map((h,i)=>`<article class="glass mr rv" style="--d:${i*40}ms" data-pid="${esc(h.id)}" data-title="${esc(h.title)}">
     <img src="${esc(h.icon||"")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
     <div class="mr-i"><b>${esc(h.title)}</b><p>${t("by")} ${esc(h.author)} · ${fmt(h.downloads)} · ${esc(h.license||"")}</p></div></article>`).join("")}</div>`;
-};
-const winsHTML=()=>ME&&ME.wins.length
-  ?ME.wins.map(w=>`<div class="glass ver"><div><b>${esc(L(w.title))}</b><small class="mute" style="display:block">${esc(w.date)}</small></div>${w.code?`<span class="tag">${esc(w.code)}</span>`:""}</div>`).join("")
-  :`<p class="mute">${t("no_prizes")}</p>`;
-const ordersTable=list=>{
-  if(!list.length) return `<p class="mute">${t("no_orders")}</p>`;
-  return `<div class="glass tw"><table><tr><th>#</th><th>${t("total")}</th><th>Status</th></tr>${list.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${money(o.total)}</td><td><span class="tag ${o.status==="paid"?"g":""}">${o.status==="paid"?t("st_paid"):t("st_pending")}</span></td></tr>`).join("")}</table></div>`;
-};
+}
+const winsHTML=()=>ME&&ME.wins.length?ME.wins.map(w=>`<div class="glass ex" style="margin:0"><div><b>${esc(L(w.title))}</b><small class="mute" style="display:block">${esc(w.date)}</small></div>${w.code?`<span class="tag">${esc(w.code)}</span>`:""}</div>`).join(""):`<p class="mute">${t("nowins")}</p>`;
+function ordersTable(list){
+  if(!list.length) return `<p class="mute">${t("noorders")}</p>`;
+  return `<div class="glass table"><table><tr><th>#</th><th>${t("total")}</th><th>—</th></tr>${list.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${money(o.total)}</td><td><span class="tag ${o.status==="paid"?"g":""}">${o.status==="paid"?t("paid"):t("pend")}</span></td></tr>`).join("")}</table></div>`;
+}
 
-/* ===================== БЕТТЕР ===================== */
 function pHome(){
   const ga=D.giveaways.filter(g=>!g.winner);
   const dl=D.modpacks.reduce((s,m)=>s+m.downloads,0);
-  return `
-  <section class="hero">
-    <p class="eyebrow rv">${t("eyebrow")}</p>
-    <h1>${words(t("h_title"))}</h1>
-    <p class="lead rv">${t("h_lead")}</p>
-    <div class="stats-row rv" style="margin-top:24px"><a class="btn" href="#gw">${ico("gift")} ${t("h_gw")}</a><a class="btn ghost" href="#mc">${ico("cube")} ${t("h_mc")}</a></div>
+  return `<section class="hero">
+    <p class="eyebrow rv">${t("tag")}</p>
+    <h1>${words(t("htitle"))}</h1>
+    <p class="lead rv">${t("hlead")}</p>
+    <div class="row rv" style="margin-top:24px"><a class="btn" href="#giveaways">${ic("gift")} ${t("bgw")}</a><a class="btn ghost" href="#minecraft">${ic("cube")} ${t("bmc")}</a></div>
     <div class="stats rv">
-      <div class="glass stat"><b data-count="${ga.length}">0</b><span>${t("st_gw")}</span></div>
-      <div class="glass stat"><b data-count="${D.modpacks.length}">0</b><span>${t("st_mp")}</span></div>
-      <div class="glass stat"><b data-count="${dl}">0</b><span>${t("st_dl")}</span></div>
+      <div class="glass stat"><b data-count="${ga.length}">0</b><span>${t("sgw")}</span></div>
+      <div class="glass stat"><b data-count="${D.modpacks.length}">0</b><span>${t("smp")}</span></div>
+      <div class="glass stat"><b data-count="${dl}">0</b><span>${t("sdl")}</span></div>
     </div>
   </section>
-  <a class="glass stream-card rv" href="#streams"><span class="live-dot ${D.stream.live?"on":""}"></span>
-    <div><b>${esc(L(D.stream.title))}</b><small class="mute" style="display:block">${D.stream.live?t("live"):t("next_stream")}</small></div><span class="arrow">${ico("arrow")}</span></a>
-  <section class="block-s"><h2 class="block-s rv">${t("gw_sect")}</h2><div class="grid">${ga.slice(0,2).map(gwCard).join("")||`<div class="empty">—</div>`}</div></section>
-  <section class="block-s"><h2 class="block-s rv">${t("mp_sect")}</h2><div class="grid">${D.modpacks.slice(0,2).map(mpCard).join("")}</div></section>
-  <section class="glass block-s rv"><p class="eyebrow">${t("comm_h")}</p><h2 class="block-s" style="margin:6px 0">${t("comm_h")}</h2><p class="mute">${t("comm_p")}</p>
-    <a class="btn" href="${esc(D.owner.telegram)}" target="_blank" rel="noopener" style="margin-top:14px">${ico("send")} ${t("order")}</a></section>
+  <a class="glass rv" href="#streams" style="display:flex;align-items:center;gap:14px;margin-top:26px"><span class="dot ${D.stream.live?"on":""}"></span>
+    <div><b>${esc(L(D.stream.title))}</b><small class="mute" style="display:block">${D.stream.live?t("live"):t("next")}</small></div><span style="margin-left:auto;color:var(--acc)">${ic("arrow")}</span></a>
+  <section class="bl"><h2 class="bl rv">${t("secgw")}</h2><div class="grid">${ga.slice(0,2).map(gwCard).join("")||`<div class="empty">${t("nores")}</div>`}</div></section>
+  <section class="bl"><h2 class="bl rv">${t("secmp")}</h2><div class="grid">${D.modpacks.slice(0,2).map(mpCard).join("")}</div></section>
+  <section class="bl"><h2 class="bl rv">${t("secg")}</h2><div class="grid">${D.games.map(gameCard).join("")}</div></section>
+  <section class="glass bl rv"><p class="eyebrow">${t("ck")}</p><h2 class="bl" style="margin:6px 0">${t("ct")}</h2><p class="mute">${t("cp")}</p>
+    <a class="btn" href="${esc(D.owner.telegram)}" target="_blank" rel="noopener" style="margin-top:14px">${ic("send")} ${t("ctg")}</a></section>
+  <div class="marquee"><div><span>Minecraft · Shaders · Packs · Giveaways · Streams ✦</span><span>Minecraft · Shaders · Packs · Giveaways · Streams ✦</span></div></div>
   ${footer()}`;
 }
 function pGw(){
-  return `<header class="ph rv"><p class="eyebrow">${ico("gift")} ${t("nav_gw")}</p><h1>${t("gw_h")}</h1><p class="lead">${t("gw_p")}</p></header>
-  ${ME?`<div class="stats-row rv"><span class="tag">${t("tickets")} <b>${ME.tickets}</b></span><span class="tag">${t("tokens")} <b>${ME.tokens}</b></span><span class="tag">${t("diamonds")} <b>${ME.diamonds}</b></span></div>`:`<p class="notice rv">${t("need_login")}</p>`}
-  <section class="glass wheel-wrap rv">
-    <div class="wheel-box"><div class="ptr"></div><canvas id="wheel" width="600" height="600"></canvas><button class="hub" id="hub" aria-label="spin">${ico("refresh")}</button></div>
-    <div><h2 class="block-s" style="margin:0">${t("wheel_h")}</h2><p class="mute" style="margin:8px 0 16px">${t("wheel_p")}</p>
-      <button class="btn" id="spinBtn">${ico("play")} ${t("spin")} · ${D.wheelCost} ${t("tickets_s")}</button>
-      ${ME?`<button class="btn ghost" id="daily" style="margin-top:10px;width:100%">${ico("plus")} ${t("daily")}</button>`:""}</div>
+  return `<header class="ph rv"><p class="eyebrow">${ic("gift")} ${t("gw")}</p><h1>${t("gwtitle")}</h1><p class="lead">${t("gwlead")}</p></header>
+  ${ME?`<div class="row rv"><span class="tag">${t("tickets")} <b>${ME.tickets}</b></span><span class="tag">${t("tokens")} <b>${ME.tokens}</b></span><span class="tag">${t("diamonds")} <b>${ME.diamonds}</b></span></div>`:`<p class="notice rv">${t("login")}</p>`}
+  <section class="glass wheel-wrap rv" style="margin-top:20px">
+    <div class="wheel-box"><div class="ptr"></div><canvas id="wheel" width="600" height="600"></canvas><button class="hub" id="hub" aria-label="spin">${ic("refresh")}</button></div>
+    <div><h2 class="bl" style="margin:0">${t("wtitle")}</h2><p class="mute" style="margin:8px 0 16px">${t("wlead")}</p>
+      <button class="btn" id="spinBtn">${ic("play")} ${t("spin")} · ${D.wheelCost} ${t("tickets").toLowerCase()}</button>
+      ${ME?`<button class="btn ghost" id="daily" style="margin-top:10px;width:100%">${ic("plus")} ${t("daily")}</button>`:""}</div>
   </section>
-  <section class="block-s"><h3 class="rv">${t("exch_h")}</h3>
-    <div class="glass ex"><span>${t("ex_tkt")}</span><button class="btn ghost sm" data-ex="ticket">${ico("refresh")}</button></div>
-    <div class="glass ex"><span>${t("ex_cpn")}</span><button class="btn ghost sm" data-ex="coupon">${ico("refresh")}</button></div></section>
-  <section class="block-s"><h3 class="rv">${t("gw_sect")}</h3><div class="grid">${D.giveaways.map(gwCard).join("")||`<div class="empty">—</div>`}</div></section>
-  ${ME?`<section class="glass block-s rv"><h3>${t("my_wins")}</h3>${winsHTML()}</section>`:""}
+  <section class="bl"><h3 class="rv">${t("exch")}</h3>
+    <div class="glass ex"><span>${t("ex1")}</span><button class="btn ghost sm" data-ex="ticket">${ic("refresh")}</button></div>
+    <div class="glass ex"><span>${t("ex2")}</span><button class="btn ghost sm" data-ex="coupon">${ic("refresh")}</button></div>
+  </section>
+  <section class="bl"><h2 class="bl rv">${t("secgw")}</h2><div class="grid">${D.giveaways.map(gwCard).join("")||`<div class="empty">${t("nores")}</div>`}</div></section>
+  ${ME?`<section class="glass bl rv"><h3>${t("mywins")}</h3>${winsHTML()}<p class="mute sm" style="margin-top:10px">${t("prizenote")}</p></section>`:""}
   ${footer()}`;
 }
 function pMc(){
-  const cats=[["all","c_all"],["rpg","c_rpg"],["pvp","c_pvp"],["tech","c_tech"],["anime","c_anime"],["surv","c_surv"]];
-  const list=D.modpacks.filter(m=>mpCat==="all"||m.cat===mpCat);
-  return `<header class="ph rv"><p class="eyebrow">${ico("cube")} Minecraft</p><h1>${t("mc_h")}</h1><p class="lead">${t("mc_p")}</p></header>
-  <form class="search rv" id="mcForm">${ico("search")}<input id="mcQ" value="${esc(MC.q)}" placeholder="${esc(t("search_ph"))}" autocomplete="off"><button class="btn sm" type="submit">${t("search")}</button></form>
-  <div class="pills rv">${["mod","modpack","resourcepack","shader"].map(k=>`<button class="pill ${MC.type===k?"on":""}" data-mtype="${k}">${t("type_"+k)}</button>`).join("")}</div>
+  const cats=[["all","cat0"],["rpg","cat1"],["pvp","cat2"],["tech","cat3"],["anime","cat4"]];
+  const mcat={rpg:"RPG",pvp:"PvP",tech:"Tech",anime:"Anime",surv:"Survival"};
+  const list=D.modpacks.filter(m=>MPC==="all"||m.cat===MPC);
+  return `<header class="ph rv"><p class="eyebrow">${ic("cube")} Minecraft</p><h1>${t("mctitle")}</h1><p class="lead">${t("mclead")}</p></header>
+  <form class="search rv" id="mcForm">${ic("search")}<input id="mcQ" value="${esc(MC.q)}" placeholder="${esc(t("sph"))}" autocomplete="off"><button class="btn sm" type="submit">${t("search")}</button></form>
+  <div class="pills rv">${["mod","modpack","resourcepack","shader"].map(k=>`<button class="pill ${MC.type===k?"on":""}" data-mtype="${k}">${t({mod:"tmod",modpack:"tpack",resourcepack:"tres",shader:"tshd"}[k])}</button>`).join("")}</div>
   <div class="filters rv">
     <select id="fLoader"><option value="">${t("any")}</option>${["fabric","forge","neoforge","quilt"].map(x=>`<option value="${x}" ${MC.loader===x?"selected":""}>${x}</option>`).join("")}</select>
     <select id="fVer"><option value="">${t("any")}</option>${["1.21.1","1.20.1","1.19.2"].map(x=>`<option value="${x}" ${MC.version===x?"selected":""}>${x}</option>`).join("")}</select>
-    <select id="fSort">${[["downloads","s_dl"],["follows","s_fol"],["newest","s_new"],["updated","s_upd"]].map(([v,k])=>`<option value="${v}" ${MC.sort===v?"selected":""}>${t(k)}</option>`).join("")}</select>
+    <select id="fSort">${[["downloads","sdn"],["follows","sfol"],["newest","snew"],["updated","supd"]].map(([v,k])=>`<option value="${v}" ${MC.sort===v?"selected":""}>${t(k)}</option>`).join("")}</select>
   </div>
   <div id="mrOut">${mrHTML()}</div>
-  <h2 class="block-s rv">${t("mp_sect")}</h2>
-  <div class="pills rv">${cats.map(([k,l])=>`<button class="pill ${mpCat===k?"on":""}" data-mpcat="${k}">${t(l)}</button>`).join("")}</div>
-  <div class="grid">${list.map(mpCard).join("")||`<div class="empty">—</div>`}</div>
-  <section class="glass block-s rv" id="server"><p class="eyebrow">${ico("pin")} ${t("srv_h")}</p>
-    ${D.server.ip?`<div class="ipbox">${esc(D.server.ip)}</div><div><button class="btn sm" id="copyIp">${ico("copy")} ${t("copy")}</button></div>`:`<p class="mute" style="margin-top:8px">${t("srv_closed")}</p>`}</section>
+  <h2 class="bl rv">${t("secmp")}</h2>
+  <div class="pills rv">${cats.map(([k,l])=>`<button class="pill ${MPC===k?"on":""}" data-mpcat="${k}">${t(l)}</button>`).join("")}</div>
+  <div class="grid">${list.map(mpCard).join("")||`<div class="empty">${t("nores")}</div>`}</div>
+  <section class="glass bl rv" id="server"><p class="eyebrow">${ic("pin")} ${t("srv")}</p>
+    ${D.server.ip?`<div class="ipbox">${esc(D.server.ip)}</div><div><button class="btn sm" id="copyIp">${ic("copy")} ${t("copy")}</button></div>`:`<p class="mute" style="margin-top:8px">${t("srvc")}</p>`}
+    <p class="mute sm" style="margin-top:10px">${t("steps")}</p></section>
   ${footer()}`;
 }
 function pStreams(){
-  return `<header class="ph rv"><p class="eyebrow">${ico("radio")} ${t("nav_st")}</p><h1>${t("st_h")}</h1><p class="lead">${t("st_p")}</p></header>
-  <section class="glass rv"><span class="tag ${D.stream.live?"g":""}">${D.stream.live?t("live"):t("offline")}</span>
-    <h2 style="font:700 26px var(--fh);margin:12px 0 4px">${esc(L(D.stream.title))}</h2><p class="mute">${t("next_stream")}</p>
+  return `<header class="ph rv"><p class="eyebrow">${ic("radio")} ${t("st")}</p><h1>${t("sttitle")}</h1><p class="lead">${t("stlead")}</p></header>
+  <section class="glass rv"><span class="tag ${D.stream.live?"g":""}">${D.stream.live?t("live"):t("off")}</span>
+    <h2 style="font:700 26px var(--fh);margin:12px 0 4px">${esc(L(D.stream.title))}</h2><p class="mute">${t("next")}</p>
     <div class="cd" id="cd"></div>
-    <a class="btn wide" href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener" style="margin-top:18px">${ico("play")} ${D.stream.live?t("watch"):t("follow")}</a></section>
-  <h2 class="block-s rv">${t("sched_h")}</h2>
-  <div class="grid">${D.stream.schedule.map((s,i)=>`<div class="glass rv" style="--d:${i*80}ms"><b>${esc(s.day)} · ${esc(s.time)}</b><p class="mute">${esc(s.topic)}</p></div>`).join("")}</div>
+    <a class="btn wide" href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener" style="margin-top:18px">${ic("play")} ${D.stream.live?t("watch"):t("follow")}</a></section>
+  <h2 class="bl rv">${t("sched")}</h2>
+  <div class="grid">${D.stream.schedule.map((s,i)=>`<div class="glass rv" style="--d:${i*80}ms"><b>${t("dn")[s.day]||""} · ${esc(s.time)}</b><p class="mute">${esc(L(s.topic))}</p></div>`).join("")}</div>
   ${footer()}`;
 }
 function pStore(){
-  const list=D.products.filter(p=>storeCat==="all"||p.cat===storeCat);
+  const list=D.products.filter(p=>STORE==="all"||p.cat===STORE);
   const n=cartCount();
-  return `<header class="ph rv"><p class="eyebrow">${ico("bag")} ${t("nav_store")}</p><h1>${t("store_h")}</h1><p class="lead">${t("store_p")}</p></header>
-  <div class="pills rv">${[["all","c_all"],["pack","c_pack"],["over","c_over"],["design","c_design"]].map(([k,l])=>`<button class="pill ${storeCat===k?"on":""}" data-scat="${k}">${t(l)}</button>`).join("")}</div>
-  <div class="grid">${list.map(productCard).join("")||`<div class="empty">—</div>`}</div>
+  return `<header class="ph rv"><p class="eyebrow">${ic("bag")} ${t("store")}</p><h1>${t("stitle")}</h1><p class="lead">${t("slead")}</p></header>
+  <div class="pills rv">${[["all","cat0"],["pack","cat1"],["over","cat2"],["design","cat3"],["guide","cat4"]].map(([k,l])=>`<button class="pill ${STORE===k?"on":""}" data-scat="${k}">${t(l)}</button>`).join("")}</div>
+  <div class="grid">${list.map(prodCard).join("")||`<div class="empty">${t("nores")}</div>`}</div>
   ${n?`<div class="cart-bar"><span>${t("cart")}: ${n}</span><b>${money(cartTotal())}</b><button class="btn sm" id="openCart">${t("checkout")}</button></div>`:""}
-  <h2 class="block-s rv">${t("orders")}</h2><div id="ordersBox">${ME?"":`<p class="notice">${t("need_login")}</p>`}</div>
+  <h2 class="bl rv">${t("orders")}</h2><div id="ordersBox">${ME?"":`<p class="notice">${t("login")}</p>`}</div>
   ${footer()}`;
 }
 function pMe(){
-  if(!ME) return `<header class="ph rv"><p class="eyebrow">${ico("user")} ${t("nav_me")}</p><h1>${t("me_h")}</h1></header>
+  if(!ME) return `<header class="ph rv"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${t("me_t")}</h1></header>
   <section class="glass auth rv">
-    <div class="seg"><button class="on" data-auth="login">${t("login")}</button><button data-auth="reg">${t("register")}</button></div>
+    <div class="seg"><button class="${AUTH==="login"?"on":""}" data-auth="login">${t("login_b")}</button><button class="${AUTH==="reg"?"on":""}" data-auth="reg">${t("reg_b")}</button></div>
     <form id="authForm" class="form" style="margin-top:14px">
-      <input name="nick" placeholder="${esc(t("nick"))}" style="display:none">
+      <input name="nick" placeholder="${esc(t("nick"))}" style="display:${AUTH==="reg"?"block":"none"}">
       <input name="email" type="email" placeholder="${esc(t("email"))}" required>
-      <input name="password" type="password" minlength="6" placeholder="${esc(t("password"))}" required>
-      <button class="btn wide" type="submit">${t("continue")}</button>
+      <input name="password" type="password" minlength="6" placeholder="${esc(t("pass"))}" required>
+      <button class="btn wide" type="submit">${t("cont")}</button>
     </form>
-    <p class="mute sm" style="margin-top:12px">${t("auth_note")}</p></section>
+    <p class="mute sm" style="margin-top:12px">${t("authnote")}</p></section>
   ${footer()}`;
-  const uc=ME;
-  return `<header class="ph rv"><p class="eyebrow">${ico("user")} ${t("nav_me")}</p><h1>${esc(uc.nick)}</h1></header>
+  const u=ME;
+  return `<header class="ph rv"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1></header>
   <section class="glass rv" style="padding:0;overflow:hidden">
-    <div class="prof-banner" style="${uc.banner?`background-image:url('${esc(uc.banner)}')`:""}"></div>
-    <div class="prof-top"><div class="avatar">${uc.avatar?`<img src="${esc(uc.avatar)}" alt="">`:ico(uc.icon||"user")}</div>
-      <div class="stats-row"><span class="tag">${t("tickets")} <b>${uc.tickets}</b></span><span class="tag">${t("tokens")} <b>${uc.tokens}</b></span><span class="tag">${t("diamonds")} <b>${uc.diamonds}</b></span></div></div>
+    <div class="prof-banner" style="${u.banner?`background-image:url('${esc(u.banner)}')`:""}"></div>
+    <div class="prof-top"><div class="avatar">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:ic(u.icon||"user")}</div>
+      <div class="row"><span class="tag">${t("tickets")} <b>${u.tickets}</b></span><span class="tag">${t("tokens")} <b>${u.tokens}</b></span><span class="tag">${t("diamonds")} <b>${u.diamonds}</b></span></div></div>
     <form id="profForm" class="form" style="padding:0 22px 22px">
-      <div class="icons">${["user","gem","bolt","cube","trophy","shield","star"].map(k=>`<button type="button" class="ibtn ${!uc.avatar&&uc.icon===k?"on":""}" data-icon="${k}">${ico(k)}</button>`).join("")}</div>
+      <div class="icons">${["user","gem","bolt","cube","trophy","shield","star","swords"].map(k=>`<button type="button" class="ibtn ${!u.avatar&&u.icon===k?"on":""}" data-icon="${k}">${ic(k)}</button>`).join("")}</div>
       <div class="g2">
-        <label class="field">${t("avatar_url")}<input name="avatar" value="${esc(uc.avatar)}" placeholder="https://"></label>
-        <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="avatar"></label>
-        <label class="field">${t("banner_url")}<input name="banner" value="${esc(uc.banner)}" placeholder="https://"></label>
-        <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="banner"></label>
-        <label class="field">${t("nick")}<input name="nick" value="${esc(uc.nick)}" required></label>
-        <label class="field">${t("mc_nick")}<input name="mc" value="${esc(uc.mc)}"></label>
-        <label class="field">${t("ff_id")}<input name="ff" value="${esc(uc.ff)}"></label>
-        <label class="field">${t("so2_id")}<input name="so2" value="${esc(uc.so2)}"></label>
-        <label class="field">${t("tg_nick")}<input name="tg" value="${esc(uc.tg)}"></label>
+        <label class="field">${t("avurl")}<input name="avatar" value="${esc(u.avatar.startsWith("data:")?"":u.avatar)}" placeholder="https://"></label>
+        <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="avatar" data-max="200"></label>
+        <label class="field">${t("bgurl")}<input name="banner" value="${esc(u.banner.startsWith("data:")?"":u.banner)}" placeholder="https://"></label>
+        <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="banner" data-max="480"></label>
+        <label class="field">${t("nick")}<input name="nick" value="${esc(u.nick)}" required></label>
+        <label class="field">${t("mcn")}<input name="mc" value="${esc(u.mc)}"></label>
+        <label class="field">${t("ffid")}<input name="ff" value="${esc(u.ff)}"></label>
+        <label class="field">${t("so2")}<input name="so2" value="${esc(u.so2)}"></label>
+        <label class="field">${t("tgn")}<input name="tg" value="${esc(u.tg)}"></label>
       </div>
-      <label class="field">${t("bio")}<textarea name="bio" rows="3">${esc(uc.bio)}</textarea></label>
-      <div class="stats-row"><button class="btn" type="submit">${ico("check")} ${t("save")}</button><button class="btn ghost" type="button" id="logout">${ico("x")} ${t("logout")}</button></div>
+      <label class="field">${t("bio")}<textarea name="bio" rows="3">${esc(u.bio)}</textarea></label>
+      <div class="row"><button class="btn" type="submit">${t("save")}</button><button class="btn ghost" type="button" id="logout">${t("logout")}</button></div>
     </form></section>
-  <section class="glass block-s rv"><h3>${t("my_wins")}</h3>${winsHTML()}</section>
-  <section class="glass block-s rv"><h3>${t("orders")}</h3><div id="ordersBox"></div></section>
-  <div class="stats-row" style="margin-top:22px"><a class="btn ghost sm" href="#settings">${ico("gear")} ${t("nav_set")}</a><a class="btn ghost sm" href="#admin">${ico("lock")} ${t("admin")}</a></div>
+  <section class="glass bl rv"><h3>${t("mywins")}</h3>${winsHTML()}</section>
+  <section class="glass bl rv"><h3>${t("orders")}</h3><div id="ordersBox"></div></section>
+  <div class="row bl"><a class="btn ghost sm" href="#settings">${ic("gear")} ${t("setl")}</a></div>
   ${footer()}`;
 }
 function pSettings(){
-  return `<header class="ph rv"><p class="eyebrow">${ico("gear")} ${t("nav_set")}</p><h1>${t("set_h")}</h1></header>
+  const sw=(k,l,d)=>`<div class="set"><div><b>${l}</b><small class="mute" style="display:block">${d}</small></div><label class="switch"><input type="checkbox" id="mo" ${S.motion?"checked":""}><span></span></label></div>`;
+  return `<header class="ph rv"><p class="eyebrow">${ic("gear")} ${t("setl")}</p><h1>${t("setl")}</h1></header>
   <section class="glass rv"><h3>${t("lang")}</h3><div class="seg">${[["kk","Қазақша"],["ru","Русский"],["en","English"]].map(([k,l])=>`<button class="${LANG===k?"on":""}" data-lang="${k}">${l}</button>`).join("")}</div></section>
-  <section class="glass rv block-s"><h3>${t("theme")}</h3><div class="seg">${[["dark",t("dark")],["light",t("light")]].map(([k,l])=>`<button class="${S.theme===k?"on":""}" data-theme="${k}">${l}</button>`).join("")}</div></section>
-  <section class="glass rv block-s"><div class="set"><div><b>${t("motion")}</b><small class="mute" style="display:block">${t("motion_d")}</small></div>
-    <label class="switch"><input type="checkbox" id="mo" ${S.motion?"checked":""}><span></span></label></div></section>
-  <section class="glass rv block-s"><div class="set"><b>${t("admin")}</b><a class="btn ghost sm" href="#admin">${ico("lock")} ${t("open")}</a></div></section>
+  <section class="glass rv bl"><h3>${t("theme")}</h3><div class="seg">${[["dark",t("dark")],["light",t("light")]].map(([k,l])=>`<button class="${S.theme===k?"on":""}" data-theme="${k}">${l}</button>`).join("")}</div></section>
+  <section class="glass rv bl">${sw("mo",t("motion"),t("motiond"))}</section>
+  <section class="glass rv bl" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><b>${t("admt")}</b><a class="btn ghost sm" href="#admin">${ic("lock")} ${t("admgo")}</a></section>
   ${footer()}`;
 }
-function pAdmin(){
-  if(!ADMIN) return `<header class="ph rv"><p class="eyebrow">${ico("lock")} ${t("admin")}</p><h1>${t("admin")}</h1></header>
-    <form id="pinForm" class="glass auth rv"><input name="pin" type="password" inputmode="numeric" placeholder="${t("pin")}" required>
-    <button class="btn wide" type="submit" style="margin-top:12px">${t("open")}</button><p class="mute sm" style="margin-top:10px">${t("pin_note")}</p></form>${footer()}`;
-  const o=D.owner,s=D.stream,sv=D.server;
-  const sel=(name,opts)=>`<select name="${name}">${opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select>`;
-  return `<header class="ph rv"><p class="eyebrow">${ico("lock")} ${t("admin")}</p><h1>${t("admin_h")}</h1>
-    <div class="stats-row"><button class="btn ghost sm" id="adminOut">${ico("lock")} ${t("lock")}</button></div></header>
 
+/* ===================== АДМИН ===================== */
+const FORMS={games:"fGame",giveaways:"fGw",products:"fPr",modpacks:"fMp"};
+function ml(base,label,val){
+  return ["kk","ru","en"].map(k=>`<label class="field">${label} · ${k.toUpperCase()}<input name="${base}_${k}" value="${esc(val&&typeof val==="object"?val[k]:"")}"></label>`).join("");
+}
+function pAdmin(){
+  if(!ADMIN) return `<header class="ph rv"><p class="eyebrow">${ic("lock")} ${t("adm")}</p><h1>${t("admt")}</h1></header>
+    <form id="pinForm" class="glass auth rv"><input name="pin" type="password" inputmode="numeric" placeholder="${esc(t("pinph"))}" required>
+    <button class="btn wide" type="submit" style="margin-top:12px">${t("open")}</button><p class="mute sm" style="margin-top:10px">${t("pinnote")}</p></form>${footer()}`;
+  const o=D.owner,s=D.stream;
+  const schedTxt=s.schedule.map(x=>`${x.day} | ${x.time} | ${x.topic.kk} | ${x.topic.ru} | ${x.topic.en}`).join("\n");
+  const sel=(name,opts)=>`<select name="${name}">${opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select>`;
+  return `<header class="ph rv"><p class="eyebrow">${ic("lock")} ${t("adm")}</p><h1>${t("admt")}</h1>
+    <div class="row"><button class="btn ghost sm" id="admOut">${ic("lock")} ${t("lock")}</button></div></header>
   <section class="glass rv"><h3>${t("sec_site")}</h3>
     <form id="fSite" class="form"><div class="g2">
       <label class="field">${t("name")}<input name="name" value="${esc(o.name)}"></label>
-      <label class="field">Handle<input name="handle" value="${esc(o.handle)}"></label>
-      <label class="field">TikTok<input name="tiktok" value="${esc(o.tiktok)}"></label>
-      <label class="field">Telegram<input name="telegram" value="${esc(o.telegram)}"></label>
-      <label class="field">${t("kaspi_num")}<input name="kaspi" value="${esc(o.kaspi)}"></label>
-      <label class="field">${t("avatar_url")}<input name="avatar" value="${esc(o.avatar)}"></label>
-      <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="avatar"></label>
-      <label class="field">${t("banner_url")}<input name="banner" value="${esc(o.banner)}"></label>
-      <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="banner"></label>
-      ${three("bio",o.bio,t("bio"))}
-      ${three("stitle",s.title,t("s_title"))}
-      <label class="field">${t("s_next")}<input name="nextAt" type="datetime-local" value="${esc(String(s.nextAt).slice(0,16))}"></label>
-      <label class="field">${t("s_sched")}<textarea name="sched" rows="3">${esc(s.schedule.map(x=>`${x.day} | ${x.time} | ${x.topic}`).join("\n"))}</textarea></label>
-      <label class="field">IP<input name="ip" value="${esc(sv.ip)}"></label>
-      <label class="field">${t("version")}<input name="version" value="${esc(sv.version)}"></label>
-      <label class="field">${t("wheel_cost")}<input name="wheelCost" type="number" min="1" value="${D.wheelCost}"></label>
+      <label class="field">${t("handle")}<input name="handle" value="${esc(o.handle)}"></label>
+      <label class="field">${t("tiktok")}<input name="tiktok" value="${esc(o.tiktok)}"></label>
+      <label class="field">${t("tgl")}<input name="telegram" value="${esc(o.telegram)}"></label>
+      <label class="field">${t("kaspin")}<input name="kaspi" value="${esc(o.kaspi)}"></label>
+      <label class="field">${t("avurl")}<input name="avatar" value="${esc(o.avatar.startsWith("data:")?"":o.avatar)}"></label>
+      <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="avatar" data-max="200" data-form="fSite"></label>
+      <label class="field">${t("bgurl")}<input name="banner" value="${esc(o.banner.startsWith("data:")?"":o.banner)}"></label>
+      <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="banner" data-max="480" data-form="fSite"></label>
+      ${ml("bio","Bio",o.bio)}
+      ${ml("stitle",t("stitle2"),s.title)}
+      <label class="field">${t("snext")}<input name="nextAt" type="datetime-local" value="${esc(String(s.nextAt).slice(0,16))}"></label>
+      <label class="field">${t("ip")}<input name="ip" value="${esc(D.server.ip)}"></label>
+      <label class="field">${t("ver")}<input name="version" value="${esc(D.server.version)}"></label>
+      <label class="field">${t("wcost")}<input name="wheelCost" type="number" min="1" value="${D.wheelCost}"></label>
     </div>
-    <label class="row sm" style="margin:6px 0"><input type="checkbox" name="live" ${s.live?"checked":""}> ${t("s_live")}</label>
-    <div><button class="btn" type="submit">${ico("check")} ${t("save")}</button></div></form></section>
+    <label class="field">${t("ssched")}<textarea name="sched" rows="3">${esc(schedTxt)}</textarea></label>
+    <label class="row" style="color:var(--ink)"><input type="checkbox" name="live" ${s.live?"checked":""}> ${t("slive")}</label>
+    <div><button class="btn" type="submit">${ic("check")} ${t("save")}</button></div></form></section>
 
-  <section class="glass block-s rv"><h3>${t("gw_adm")} (${D.giveaways.length})</h3>
+  <section class="glass rv bl"><h3>${t("sec_g")} (${D.games.length})</h3>
+    ${D.games.map(g=>`<div class="ex-row"><span>${esc(g.name)} · ${g.status==="live"?t("live2"):t("soon2")}</span><span class="row"><button class="btn ghost sm" data-edit="games:${g.id}">${t("edit")}</button><button class="btn red sm" data-del="games:${g.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fGame" class="form" style="margin-top:14px"><input type="hidden" name="id">
+      <div class="g2"><label class="field">${t("gname")}<input name="name" required></label>
+        <label class="field">${t("gstatus")}${sel("status",[["live","Live"],["soon","Soon"]])}</label></div>
+      <div class="g2"><label class="field">${t("glink")}<input name="link" placeholder="https://t.me/..."></label>
+        <label class="field">${t("gicon")}${sel("icon",[["gamepad","gamepad"],["cube","cube"],["swords","swords"],["shield","shield"],["flame","flame"],["users","users"]])}</label></div>
+      <div class="g3">${ml("desc",t("gdesc"),{})}</div>
+      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGame">${t("cancel")}</button></div></form></section>
+
+  <section class="glass rv bl"><h3>${t("sec_gw")} (${D.giveaways.length})</h3>
     ${D.giveaways.map(g=>`<div class="ex-row"><span>${esc(L(g.title))} · ${g.participants.length}${g.winner?` · ${t("winner")}: ${esc(g.winner.name)}`:""}</span>
-      <span class="stats-row" style="margin:0"><button class="btn sm" data-draw="${g.id}">${t("draw")}</button><button class="btn red sm" data-del="giveaways:${g.id}">${ico("x")}</button></span></div>`).join("")}
-    <form id="fGw" class="form" style="margin-top:14px"><div class="g2">${three("title",{},t("title"))}${three("desc",{},t("desc"))}</div>
-      <div class="g3"><label class="field">${t("prize")}<input name="prize" required></label><label class="field">${t("cost")}<input name="cost" type="number" value="1" min="1"></label>
-      <label class="field">${t("icon")}${sel("icon",[["gift","gift"],["users","users"],["gem","gem"],["bolt","bolt"],["trophy","trophy"],["shield","shield"],["star","star"]])}</label></div>
-      <div><button class="btn sm" type="submit">${ico("plus")} ${t("add")}</button></div></form></section>
+      <span class="row"><button class="btn sm" data-draw="${g.id}">${t("draw")}</button><button class="btn ghost sm" data-edit="giveaways:${g.id}">${t("edit")}</button><button class="btn red sm" data-del="giveaways:${g.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fGw" class="form" style="margin-top:14px"><input type="hidden" name="id">
+      <div class="g3">${ml("title",t("title"),{})}</div>
+      <div class="g3">${ml("desc",t("desc"),{})}</div>
+      <div class="g3">${ml("prize",t("gprize"),{})}</div>
+      <div class="g2"><label class="field">${t("gcost")}<input name="cost" type="number" value="1" min="1"></label>
+        <label class="field">${t("gicon")}${sel("icon",[["gift","gift"],["users","users"],["gem","gem"],["bolt","bolt"],["trophy","trophy"],["star","star"],["swords","swords"]])}</label></div>
+      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGw">${t("cancel")}</button></div></form></section>
 
-  <section class="glass block-s rv"><h3>${t("prod_adm")} (${D.products.length})</h3>
-    ${D.products.map(p=>`<div class="ex-row"><span>${esc(L(p.name))} · ${money(p.price)}</span><button class="btn red sm" data-del="products:${p.id}">${ico("x")}</button></div>`).join("")}
-    <form id="fPr" class="form" style="margin-top:14px"><div class="g2">${three("name",{},t("name"))}${three("desc",{},t("desc"))}</div>
-      <div class="g3"><label class="field">${t("price")}<input name="price" type="number" required></label>
-      <label class="field">${t("cat")}${sel("cat",[["pack","pack"],["over","over"],["design","design"]])}</label>
-      <label class="field">${t("type")}<input name="type" value="Digital"></label></div>
-      <label class="field">${t("img_url")}<input name="img"></label>
-      <div><button class="btn sm" type="submit">${ico("plus")} ${t("add")}</button></div></form></section>
+  <section class="glass rv bl"><h3>${t("sec_pr")} (${D.products.length})</h3>
+    ${D.products.map(p=>`<div class="ex-row"><span>${esc(L(p.name))} · ${money(p.price)}</span><span class="row"><button class="btn ghost sm" data-edit="products:${p.id}">${t("edit")}</button><button class="btn red sm" data-del="products:${p.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fPr" class="form" style="margin-top:14px"><input type="hidden" name="id">
+      <div class="g3">${ml("name",t("title"),{})}</div>
+      <div class="g3">${ml("desc",t("desc"),{})}</div>
+      <div class="g2"><label class="field">${t("price")}<input name="price" type="number" required></label>
+        <label class="field">${t("cat")}${sel("cat",[["pack","pack"],["over","over"],["design","design"],["guide","guide"]])}</label></div>
+      <label class="field">${t("img")}<input name="img" placeholder="https://"></label>
+      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fPr">${t("cancel")}</button></div></form></section>
 
-  <section class="glass block-s rv"><h3>${t("mp_adm")} (${D.modpacks.length})</h3>
-    ${D.modpacks.map(m=>`<div class="ex-row"><span>${esc(m.title)} · ${esc(m.version)} ${esc(m.loader)}</span><button class="btn red sm" data-del="modpacks:${m.id}">${ico("x")}</button></div>`).join("")}
-    <form id="fMp" class="form" style="margin-top:14px"><label class="field">${t("title")}<input name="title" required></label>
-      <div class="g3"><label class="field">${t("version")}<input name="version" value="1.20.1"></label>
-      <label class="field">Loader${sel("loader",[["Fabric","Fabric"],["Forge","Forge"],["NeoForge","NeoForge"]])}</label>
-      <label class="field">${t("cat")}${sel("cat",[["rpg","rpg"],["pvp","pvp"],["tech","tech"],["anime","anime"],["surv","surv"]])}</label></div>
-      <div class="g3"><label class="field">Mods<input name="mods" type="number" value="50"></label><label class="field">MB<input name="sizeMb" type="number" value="200"></label><label class="field">${t("keys")}<input name="keys"></label></div>
-      <label class="field">${t("file_url")}<input name="file" placeholder="https://"></label>
-      <div class="g2">${three("desc",{},t("desc"))}</div>
-      <div><button class="btn sm" type="submit">${ico("plus")} ${t("add")}</button></div></form></section>
+  <section class="glass rv bl"><h3>${t("sec_mp")} (${D.modpacks.length})</h3>
+    ${D.modpacks.map(m=>`<div class="ex-row"><span>${esc(m.title)} · ${esc(m.version)} ${esc(m.loader)}</span><span class="row"><button class="btn ghost sm" data-edit="modpacks:${m.id}">${t("edit")}</button><button class="btn red sm" data-del="modpacks:${m.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fMp" class="form" style="margin-top:14px"><input type="hidden" name="id">
+      <label class="field">${t("mtitle")}<input name="title" required></label>
+      <div class="g3"><label class="field">${t("mver")}<input name="version" value="1.20.1"></label>
+        <label class="field">${t("mload")}${sel("loader",[["Fabric","Fabric"],["Forge","Forge"],["NeoForge","NeoForge"],["Quilt","Quilt"]])}</label>
+        <label class="field">${t("cat")}${sel("cat",[["rpg","rpg"],["pvp","pvp"],["tech","tech"],["anime","anime"],["surv","surv"]])}</label></div>
+      <div class="g3"><label class="field">${t("mmods")}<input name="mods" type="number" value="50"></label>
+        <label class="field">${t("msize")}<input name="sizeMb" type="number" value="200"></label>
+        <label class="field">${t("mkeys")}<input name="keys"></label></div>
+      <label class="field">${t("mfile")}<input name="file" placeholder="https://"></label>
+      <div class="g3">${ml("desc",t("desc"),{})}</div>
+      <p class="mute sm">${t("pidh")}</p>
+      <div class="row"><button class="btn sm" type="submit">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div></form></section>
 
-  <section class="glass block-s rv"><h3>${t("users_h")}</h3><div id="usersBox"></div></section>
-  <section class="glass block-s rv"><h3>${t("ord_adm")}</h3><div id="ordersAdm"></div></section>
+  <section class="glass rv bl"><h3>${t("sec_b")}</h3><div id="usersBox"></div></section>
+  <section class="glass rv bl"><h3>${t("sec_o")}</h3><div id="ordersAdm"></div></section>
   ${footer()}`;
 }
+function fillForm(form,obj){
+  for(const el of form.elements){
+    if(!el.name) continue;
+    if(el.type==="checkbox"){el.checked=!!obj[el.name];continue}
+    const m=el.name.match(/^(.+)_(kk|ru|en)$/);
+    let v;
+    if(m) v=(obj[m[1]]||{})[m[2]];
+    else if(el.name==="keys") v=(obj.keyMods||[]).join(", ");
+    else v=obj[el.name];
+    el.value=v??"";
+  }
+}
+function formObj(form){
+  const o={};
+  new FormData(form).forEach((v,k)=>o[k]=v);
+  if(form.elements.live) o.live=form.elements.live.checked;
+  return o;
+}
 
-const PAGES={home:pHome,gw:pGw,mc:pMc,streams:pStreams,store:pStore,me:pMe,settings:pSettings,admin:pAdmin};
-
-/* ===================== ЕНГІЗУ / РЕНДЕР ===================== */
+/* ===================== КОНТЕНТ ЖҮКТЕУ ЖӘНЕ АКЦИЯЛАР ===================== */
 function render(keep){
   const r=location.hash.slice(1)||"home";
-  const key=PAGES[r]?r:"home";
+  const key=r==="giveaways"?"gw":r==="minecraft"?"mc":r==="streams"?"streams":PAGES[r]?r:"home";
+  const pageKey=key==="gw"?"gw":key==="mc"?"minecraft":key;
+  const fn=key==="gw"?pGw:key==="mc"?pMc:key==="streams"?pStreams:PAGES[key]||pHome;
   const changed=key!==ROUTE;
   const dir=(TABS.indexOf(key)>=TABS.indexOf(ROUTE)||TABS.indexOf(ROUTE)<0)?1:-1;
   ROUTE=key;
-  const y=window.scrollY;
-  $$("[data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r===key));
+  const y=scrollY;
+  applySettings(); chrome();
+  $$("[data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r===(key==="gw"?"giveaways":key==="mc"?"minecraft":key==="streams"?"streams":key)));
   const ti=TABS.indexOf(key); if(ti>=0) $("#tabbar").style.setProperty("--i",ti);
-  $("#main").innerHTML=`<div class="pg ${changed?"anim":""}" style="--dir:${dir}">${PAGES[key]()}</div>`;
-  window.scrollTo(0,keep?y:0);
+  $("#main").innerHTML=`<section class="pg" style="--dir:${dir}">${fn()}</section>`;
+  scrollTo(0,keep?y:0);
   bindPage(key);
+  reveal();
 }
-
 function bindPage(key){
-  observe();
-  if(key==="home") setTimeout(countUp,350);
+  if(key==="home") setTimeout(countUp,300);
   if(key==="gw") drawWheel();
-  if(key==="streams") startCountdown();
+  if(key==="streams") startCd();
   if(key==="mc"&&MC.hits===null) searchMC();
-  if(key==="store"||key==="me") loadOrders();
-  if(key==="admin") loadAdmin();
+  if(key==="store"||(key==="me"&&ME)) loadOrders();
+  if(key==="admin"&&ADMIN) loadAdmin();
 }
-
 async function loadOrders(){
   const box=$("#ordersBox"); if(!box||!TOKEN) return;
   try{ const r=await api("GET","/api/orders"); box.innerHTML=ordersTable(r.orders); }
   catch(e){ box.innerHTML=`<div class="notice">${errMsg(e)}</div>`; }
 }
+function startCd(){
+  clearInterval(cdT);
+  const target=new Date(D.stream.nextAt).getTime();
+  const tick=()=>{
+    const box=$("#cd"); if(!box){clearInterval(cdT);return}
+    if(isNaN(target)){box.innerHTML="";return}
+    const d=Math.max(0,target-Date.now());
+    box.innerHTML=[[Math.floor(d/864e5),t("days")],[Math.floor(d%864e5/36e5),t("hrs")],[Math.floor(d%36e5/6e4),t("min")],[Math.floor(d%6e4/1e3),t("sec")]]
+      .map(([v,l])=>`<div><b>${String(v).padStart(2,"0")}</b><span>${l}</span></div>`).join("");
+  };
+  tick(); cdT=setInterval(tick,1000);
+}
 
-/* ===================== ДӨҢГЕК ===================== */
+/* ===================== WHEEL ===================== */
+const WCOL=["#f5b041","#7dd3fc","#34d399","#f472b6","#a78bfa","#fb923c"];
 function drawWheel(){
   const c=$("#wheel"); if(!c) return;
-  const ctx=c.getContext("2d"), size=c.width, cen=size/2, r=cen-6;
-  const n=D.prizes.length, sl=Math.PI*2/n;
-  const COL=["#F5B041","#7DD3FC","#34D399","#F472B6","#A78BFA","#FB923C"];
+  const ctx=c.getContext("2d"),size=c.width,cen=size/2,r=cen-6,n=D.prizes.length,sl=Math.PI*2/n;
   ctx.clearRect(0,0,size,size);
-  ctx.save(); ctx.translate(cen,cen); ctx.rotate(wheelAngle);
+  ctx.save();ctx.translate(cen,cen);ctx.rotate(WHEEL);
   D.prizes.forEach((p,i)=>{
     const a0=i*sl;
-    ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r,a0,a0+sl); ctx.closePath();
-    ctx.fillStyle=COL[i%COL.length]; ctx.fill();
-    ctx.strokeStyle="rgba(0,0,0,.25)"; ctx.lineWidth=3; ctx.stroke();
-    ctx.save(); ctx.rotate(a0+sl/2); ctx.textAlign="right"; ctx.fillStyle="#0a0b10";
-    ctx.font="bold 24px Inter, sans-serif"; ctx.fillText(L(p.label),r-28,8); ctx.restore();
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,a0,a0+sl);ctx.closePath();
+    ctx.fillStyle=WCOL[i%WCOL.length];ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,.25)";ctx.lineWidth=3;ctx.stroke();
+    ctx.save();ctx.rotate(a0+sl/2);ctx.textAlign="right";ctx.fillStyle="#0a0b10";
+    ctx.font="bold 24px Inter, sans-serif";ctx.fillText(L(p.label),r-28,8);ctx.restore();
   });
   ctx.restore();
 }
 async function spin(){
-  if(spinning) return;
-  if(!TOKEN){ toast(t("need_login"),false); location.hash="#me"; return; }
+  if(SPIN) return;
+  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
   let r;
-  try{ r=await api("POST","/api/wheel/spin"); }
-  catch(e){ toast(errMsg(e),false); return; }
-  spinning=true;
-  const n=D.prizes.length, sl=Math.PI*2/n, cur=wheelAngle;
+  try{ r=await api("POST","/api/wheel/spin") }catch(e){ toast(errMsg(e),true); return }
+  SPIN=true;
+  const n=D.prizes.length,sl=Math.PI*2/n,cur=WHEEL;
   const base=1.5*Math.PI-(r.index*sl+sl/2);
   const delta=((base-cur)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
   const target=cur+Math.PI*2*5+delta;
-  const t0=performance.now(), dur=4000;
+  const t0=performance.now(),dur=4000;
   const step=now=>{
-    const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,4);
-    wheelAngle=cur+(target-cur)*e; drawWheel();
+    const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);
+    WHEEL=cur+(target-cur)*e;drawWheel();
     if(p<1) requestAnimationFrame(step);
-    else{
-      spinning=false; ME=r.user;
-      toast(L(r.prize.label)+(r.code?` · ${r.code}`:""));
-      render(true);
-    }
+    else{SPIN=false;ME=r.user;toast(L(r.prize.label)+(r.code?` · ${r.code}`:""));render(true)}
   };
   requestAnimationFrame(step);
 }
@@ -842,88 +843,90 @@ function addToCart(id){
   const f=cart.find(i=>i.id===id);
   if(f) f.qty++; else cart.push({id,qty:1});
   saveCart();
-  const p=D.products.find(x=>x.id===id);
-  toast(`${L(p.name)} ${t("added")}`);
+  toast(`${L(prodOf(id).name)} ${t("added")}`);
   render(true);
 }
-async function enterGiveaway(id){
-  if(!TOKEN){ toast(t("need_login"),false); location.hash="#me"; return; }
-  try{
-    const r=await api("POST",`/api/giveaways/${id}/enter`);
-    ME=r.user; await loadData(); toast(t("entered")); render(true);
-  }catch(e){ toast(errMsg(e),false); }
+async function enterGw(id){
+  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
+  try{ const r=await api("POST",`/api/giveaways/${id}/enter`); ME=r.user; await loadData(); toast(t("joined")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
 }
 async function exchange(kind){
-  if(!TOKEN){ toast(t("need_login"),false); location.hash="#me"; return; }
-  try{
-    const r=await api("POST","/api/me/exchange",{kind});
-    ME=r.user; toast(t("ex_done")); render(true);
-  }catch(e){ toast(errMsg(e),false); }
+  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
+  try{ const r=await api("POST","/api/me/exchange",{kind}); ME=r.user; toast(t("exdone")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
 }
 async function claimDaily(){
-  if(!TOKEN){ toast(t("need_login"),false); location.hash="#me"; return; }
-  try{
-    const r=await api("POST","/api/me/daily");
-    ME=r.user; toast(t("daily_ok")); render(true);
-  }catch(e){ toast(errMsg(e),false); }
+  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
+  try{ const r=await api("POST","/api/me/daily"); ME=r.user; toast(t("dailyok")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
 }
 async function logout(){
-  try{ await api("POST","/api/logout"); }catch(e){}
-  TOKEN=""; ME=null; localStorage.removeItem("a782-token");
-  toast(t("bye")); render(true);
+  try{ await api("POST","/api/logout") }catch(e){}
+  TOKEN="";ME=null;localStorage.removeItem("a782-token");
+  toast(t("logout")); render(true);
 }
 async function openVersions(pid,title){
-  const head=`<div class="mhead"><b style="font:700 20px var(--fh)">${esc(title)}</b><button class="icon-btn" data-close>${ico("x")}</button></div>`;
+  const head=`<div class="mhead"><b style="font:700 20px var(--fh)">${esc(title)}</b><button class="icon-btn" data-close>${ic("x")}</button></div>`;
   openSheet(head+`<div class="spin"></div>`);
   try{
     const r=await api("GET",`/api/mc/versions?id=${encodeURIComponent(pid)}`);
-    openSheet(head+`<div class="vlist">${r.versions.map(v=>`<div class="glass ver"><div><b>${esc(v.name)}</b><small class="mute" style="display:block">${esc(v.games.join(", "))} · ${esc(v.loaders.join(", "))}</small></div>${v.file?`<a class="btn sm" href="${esc(v.file)}" target="_blank" rel="noopener">${ico("dl")} ${t("download")}</a>`:""}</div>`).join("")||`<p class="mute">${t("no_results")}</p>`}</div>`);
-  }catch(err){
-    openSheet(head+`<div class="notice">${errMsg(err)}</div>`);
-  }
+    openSheet(head+`<div style="display:grid;gap:10px">${r.versions.map(v=>`<div class="glass ex" style="margin:0"><div><b>${esc(v.name)}</b><small class="mute" style="display:block">${esc(v.games.join(", "))} · ${esc(v.loaders.join(", "))}</small></div>${v.file?`<a class="btn sm" href="${esc(v.file)}" target="_blank" rel="noopener">${ic("dl")} ${t("dload")}</a>`:""}</div>`).join("")||`<p class="mute">${t("nores")}</p>`}</div>`);
+  }catch(err){ openSheet(head+`<div class="notice">${errMsg(err)}</div>`) }
 }
 async function searchMC(){
-  MC.hits="loading"; updateMC();
+  MC.hits="loading";updateMC();
   const p=new URLSearchParams({q:MC.q,type:MC.type,loader:MC.loader,version:MC.version,sort:MC.sort});
-  try{ const r=await api("GET","/api/mc/search?"+p); MC.hits=r.hits; }
-  catch(e){ MC.hits="error"; }
+  try{ const r=await api("GET","/api/mc/search?"+p); MC.hits=r.hits }catch(e){ MC.hits="error" }
   updateMC();
 }
-function updateMC(){ const o=$("#mrOut"); if(o){ o.innerHTML=mrHTML(); observe(); } }
+function updateMC(){ const o=$("#mrOut"); if(o){ o.innerHTML=mrHTML(); reveal() } }
 
 /* ===================== СЕБЕТ ===================== */
-function cartSheetHTML(){
-  const items=cart.map(i=>{
-    const p=D.products.find(x=>x.id===i.id); if(!p) return "";
-    return `<div class="line"><div><b>${esc(L(p.name))}</b><small class="mute" style="display:block">${money(p.price)}</small></div>
-      <div class="qty"><button data-cdec="${esc(i.id)}">${ico("minus")}</button><b>${i.qty}</b><button data-cinc="${esc(i.id)}">${ico("plus")}</button></div></div>`;
-  }).join("");
-  return `<div class="mhead"><b style="font:700 22px var(--fh)">${t("cart")}</b><button class="icon-btn" data-close>${ico("x")}</button></div>
-    ${items||`<p class="mute">${t("cart_empty")}</p>`}
+function cartSheet(){
+  const items=cart.map(i=>{const p=prodOf(i.id);if(!p)return "";return `<div class="line"><div><b>${esc(L(p.name))}</b><small class="mute" style="display:block">${money(p.price)}</small></div>
+    <div class="qty"><button data-cdec="${esc(i.id)}">${ic("minus")}</button><b>${i.qty}</b><button data-cinc="${esc(i.id)}">${ic("plus")}</button></div></div>`}).join("");
+  const kaspi=!!D.owner.kaspi;
+  const method=kaspi?(sParts.method||"kaspi"):"telegram";
+  const tv=totalsNow();
+  return `<div class="mhead"><b style="font:700 22px var(--fh)">${t("cart")}</b><button class="icon-btn" data-close>${ic("x")}</button></div>
+    ${items||`<p class="mute">${t("cempty")}</p>`}
     <form id="cartForm" class="form" style="margin-top:14px">
-      <label class="field">${t("coupon")}<input name="coupon"></label>
-      ${D.demoPay?`<div class="seg">
-        <button type="button" data-pm="kaspi" class="${payMethod==="kaspi"?"on":""}">${t("m_kaspi")}</button>
-        <button type="button" data-pm="demo" class="${payMethod==="demo"?"on":""}">${t("m_demo")}</button></div>`:""}
-      <input type="hidden" name="method" value="${payMethod}">
-      <p class="mute sm">${payMethod==="kaspi"?`${t("kaspi_txt")}<br><b>${D.owner.kaspi?esc(D.owner.kaspi):t("kaspi_none")}</b>`:t("demo_txt")}</p>
-      ${payMethod==="kaspi"?`<label class="field">${t("receipt")}<input name="receipt" required></label>`:""}
-      <div class="total"><span>${t("total")}</span><span>${money(cartTotal())}</span></div>
-      <button class="btn wide" type="submit">${ico("receipt")} ${t("send_order")}</button>
+      <label class="field">${t("coupon")}<input name="coupon" value="${esc(sParts.coupon||"")}"></label>
+      <div class="seg">
+        ${kaspi?`<button type="button" class="${method==="kaspi"?"on":""}" data-pm="kaspi">${t("mkaspi")}</button>`:""}
+        <button type="button" class="${method==="telegram"?"on":""}" data-pm="telegram">${t("mtg")}</button>
+        ${D.demoPay?`<button type="button" class="${method==="demo"?"on":""}" data-pm="demo">${t("mdemo")}</button>`:""}
+      </div>
+      <input type="hidden" name="method" value="${method}">
+      <p class="mute sm">${method==="kaspi"?`${t("kaspit")}<br><b>${esc(D.owner.kaspi)}</b>`:method==="telegram"?t("tgt"):t("demot")}</p>
+      ${method==="kaspi"?`<label class="field">${t("receipt")}<input name="receipt" required></label>`:""}
+      <div class="total"><span>${t("total")}</span><span>${money(tv)}</span></div>
+      <button class="btn wide" type="submit">${ic("receipt")} ${method==="demo"?t("demob"):t("send")}</button>
     </form>`;
 }
-function openCartSheet(){
-  if(!cart.length){ toast(t("cart_empty"),false); return; }
-  if(!D.demoPay) payMethod="kaspi";
-  openSheet(cartSheetHTML());
+function totalsNow(){
+  const sub=cartTotal();
+  const pct=sParts.couponPct||0;
+  return Math.max(0,sub-Math.round(sub*pct/100));
+}
+function openCart(){
+  if(!cart.length){toast(t("cempty"),true);return}
+  openSheet(cartSheet());
 }
 function changeQty(id,d){
-  const it=cart.find(i=>i.id===id); if(!it) return;
-  it.qty+=d;
-  if(it.qty<=0) cart=cart.filter(i=>i!==it);
+  const it=cart.find(i=>i.id===id);if(!it)return;
+  it.qty+=d;if(it.qty<=0) cart=cart.filter(i=>i!==it);
   saveCart();
-  if(!cart.length){ closeSheet(); return render(true); }
-  openSheet(cartSheetHTML()); render(true);
+  if(!cart.length){closeSheet();return render(true)}
+  openSheet(cartSheet());render(true);
+}
+function orderText(order){
+  const lines=order.items.map(i=>`- ${L(i.name)||i.name} x${i.qty} = ${money(i.price*i.qty)}`).join("\n");
+  return `A782 ${order.id}\n${lines}\n${t("total")}: ${money(order.total)}`;
+}
+async function copyText(txt){
+  try{ await navigator.clipboard.writeText(txt); return true }catch(e){ return false }
 }
 
 /* ===================== АДМИН ТІЗІМДЕРІ ===================== */
@@ -931,176 +934,161 @@ async function loadAdmin(){
   if(!ADMIN) return;
   try{
     const [{users},{orders}]=await Promise.all([api("GET","/api/admin/users",null,true),api("GET","/api/admin/orders",null,true)]);
-    const ub=$("#usersBox"), ob=$("#ordersAdm");
-    if(ub) ub.innerHTML=users.length?`<div class="tw"><table>
-      <tr><th>${t("nick")}</th><th>${t("email")}</th><th>${t("tickets")}</th><th>${t("tokens")}</th><th>${t("diamonds")}</th></tr>
+    const ub=$("#usersBox"),ob=$("#ordersAdm");
+    if(ub) ub.innerHTML=users.length?`<div class="table"><table><tr><th>${t("nick")||"Nick"}</th><th>${t("email")}</th><th>${t("tickets")}</th><th>${t("tokens")}</th><th>${t("diamonds")}</th></tr>
       ${users.map(u=>`<tr><td>${esc(u.nick)}</td><td>${esc(u.email)}</td>
-        <td>${u.tickets} <button class="btn ghost sm" data-ubal="${u.id}|tickets|1">+1</button></td>
-        <td>${u.tokens} <button class="btn ghost sm" data-ubal="${u.id}|tokens|100">+100</button></td>
-        <td>${u.diamonds} <button class="btn ghost sm" data-ubal="${u.id}|diamonds|100">+100</button></td></tr>`).join("")}
-      </table></div>`:`<p class="mute">${t("no_users")}</p>`;
-    if(ob) ob.innerHTML=orders.length?`<div class="tw"><table>
-      <tr><th>#</th><th>${t("nick")}</th><th>${t("total")}</th><th>Status</th><th></th></tr>
+        <td>${u.tickets} <button class="btn ghost sm" data-bal="${u.id}|tickets|1">+1</button></td>
+        <td>${u.tokens} <button class="btn ghost sm" data-bal="${u.id}|tokens|100">+100</button></td>
+        <td>${u.diamonds} <button class="btn ghost sm" data-bal="${u.id}|diamonds|100">+100</button></td></tr>`).join("")}</table></div>`:`<p class="mute">${t("nousers")}</p>`;
+    if(ob) ob.innerHTML=orders.length?`<div class="table"><table><tr><th>#</th><th>${t("nick")||"Nick"}</th><th>${t("total")}</th><th>${t("pend")}</th><th></th></tr>
       ${orders.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${esc(o.nick)}</td><td>${money(o.total)}</td>
-        <td>${esc(o.method)} · ${o.status==="paid"?t("st_paid"):t("st_pending")}</td>
-        <td><button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mark_pend"):t("mark_paid")}</button></td></tr>`).join("")}
-      </table></div>`:`<p class="mute">${t("no_orders")}</p>`;
-  }catch(e){ toast(errMsg(e),false); }
+        <td>${esc(o.method)} · ${o.status==="paid"?t("paid"):t("pend")}</td>
+        <td><button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button></td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
+  }catch(e){ toast(errMsg(e),true) }
 }
-async function adminDraw(id){
-  try{
-    await api("POST",`/api/admin/giveaways/${id}/draw`,null,true);
-    await loadData(); toast(t("winner_ok")); render(true);
-  }catch(e){ toast(errMsg(e),false); }
-}
-async function adminDelete(spec){
-  const [kind,id]=spec.split(":");
-  try{
-    await api("DELETE",`/api/admin/${kind}/${id}`,null,true);
-    await loadData(); toast(t("saved")); render(true);
-  }catch(e){ toast(errMsg(e),false); }
-}
-async function adminBal(spec){
-  const [id,field,delta]=spec.split("|");
-  try{
-    await api("POST",`/api/admin/users/${id}/balance`,{field,delta:+delta},true);
-    loadAdmin();
-  }catch(e){ toast(errMsg(e),false); }
-}
-async function adminOrder(spec){
-  const [id,status]=spec.split("|");
-  try{
-    await api("POST",`/api/admin/orders/${id}/status`,{status},true);
-    loadAdmin();
-  }catch(e){ toast(errMsg(e),false); }
-}
+const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
 
 /* ===================== ОҚИҒАЛАР ===================== */
 document.addEventListener("click",e=>{
-  const go=e.target.closest("[data-go]"); if(go){ location.hash="#"+go.dataset.go; return; }
-  const lg=e.target.closest("[data-lang]"); if(lg){ LANG=lg.dataset.lang; localStorage.setItem("a782-lang",LANG); chrome(); render(true); return; }
-  if(e.target.closest("[data-close]")){ closeSheet(); return; }
-  const cp=e.target.closest("[data-copy]"); if(cp){ navigator.clipboard?.writeText(cp.dataset.copy); toast(t("copied")); return; }
-  const pid=e.target.closest("[data-pid]"); if(pid){ openVersions(pid.dataset.pid,pid.dataset.title); return; }
-
-  const btn=e.target.closest("button"); if(!btn) return;
-  if(btn.dataset.add){ addToCart(btn.dataset.add); return; }
-  if(btn.dataset.enter){ enterGiveaway(btn.dataset.enter); return; }
-  if(btn.dataset.nofile){ toast(t("nofile"),false); return; }
-  if(btn.dataset.scat){ storeCat=btn.dataset.scat; render(true); return; }
-  if(btn.dataset.mpcat){ mpCat=btn.dataset.mpcat; render(true); return; }
-  if(btn.dataset.mtype){ MC.type=btn.dataset.mtype; render(true); searchMC(); return; }
-  if(btn.dataset.auth){
-    AUTHMODE=btn.dataset.auth;
-    $$("[data-auth]").forEach(b=>b.classList.toggle("on",b.dataset.auth===AUTHMODE));
-    const n=$("#authForm input[name=nick]"); if(n) n.style.display=AUTHMODE==="reg"?"block":"none";
-    return;
-  }
-  if(btn.dataset.icon){ pendIcon=btn.dataset.icon; $$("[data-icon]").forEach(b=>b.classList.toggle("on",b===btn)); return; }
-  if(btn.dataset.ex){ exchange(btn.dataset.ex); return; }
-  if(btn.dataset.draw){ adminDraw(btn.dataset.draw); return; }
-  if(btn.dataset.del){ adminDelete(btn.dataset.del); return; }
-  if(btn.dataset.ubal){ adminBal(btn.dataset.ubal); return; }
-  if(btn.dataset.ost){ adminOrder(btn.dataset.ost); return; }
-  if(btn.dataset.cinc){ changeQty(btn.dataset.cinc,1); return; }
-  if(btn.dataset.cdec){ changeQty(btn.dataset.cdec,-1); return; }
-  if(btn.dataset.pm){ payMethod=btn.dataset.pm; openSheet(cartSheetHTML()); return; }
-  if(btn.dataset.theme){ S.theme=btn.dataset.theme; saveS(); applyTheme(); render(true); return; }
-
+  const go=e.target.closest("[data-go]");if(go){location.hash="#"+go.dataset.go;return}
+  const lg=e.target.closest("[data-lang]");if(lg){LANG=lg.dataset.lang;localStorage.setItem("a782-lang",LANG);render(true);return}
+  if(e.target.closest("[data-close]")){closeSheet();return}
+  const pid=e.target.closest("[data-pid]");if(pid){openVersions(pid.dataset.pid,pid.dataset.title);return}
+  const btn=e.target.closest("button");if(!btn)return;
+  const d=btn.dataset;
+  if(d.add){addToCart(d.add);return}
+  if(d.enter){enterGw(d.enter);return}
+  if(d.nofile){toast(t("nofile"),true);return}
+  if(d.scat){STORE=d.scat;render(true);return}
+  if(d.mpcat){MPC=d.mpcat;render(true);return}
+  if(d.mtype){MC.type=d.mtype;render(true);searchMC();return}
+  if(d.auth){AUTH=d.auth;render(true);return}
+  if(d.icon){const v=d.icon;$$("[data-icon]").forEach(b=>b.classList.toggle("on",b===btn));pendingIcon=v;return}
+  if(d.ex){exchange(d.ex);return}
+  if(d.cinc){changeQty(d.cinc,1);return}
+  if(d.cdec){changeQty(d.cdec,-1);return}
+  if(d.pm){sParts.method=d.pm;openSheet(cartSheet());return}
+  if(d.theme){S.theme=d.theme;localStorage.setItem("a782-theme",S.theme);render(true);return}
+  if(d.draw){adminDraw(d.draw);return}
+  if(d.del){adminDelete(d.del);return}
+  if(d.edit){adminEdit(d.edit);return}
+  if(d.reset){const f=document.getElementById(d.reset);if(f){f.reset();if(f.elements.id)f.elements.id.value=""}return}
+  if(d.bal){adminBal(d.bal);return}
+  if(d.ost){adminOrder(d.ost);return}
   switch(btn.id){
-    case "spinBtn": case "hub": spin(); return;
-    case "daily": claimDaily(); return;
-    case "openCart": openCartSheet(); return;
-    case "copyIp": navigator.clipboard?.writeText(D.server.ip); toast(t("copied")); return;
-    case "logout": logout(); return;
-    case "adminOut": ADMIN=""; sessionStorage.removeItem("a782-admin"); render(true); return;
-    case "resetAccent": return;
+    case "spinBtn":case "hub":spin();return;
+    case "daily":claimDaily();return;
+    case "openCart":openCart();return;
+    case "copyIp":copyText(D.server.ip).then(ok=>toast(t("copied"),!ok));return;
+    case "logout":logout();return;
+    case "admOut":ADMIN="";sessionStorage.removeItem("a782-admin");render(true);return;
   }
 });
-
+let pendingIcon=null;
 document.addEventListener("change",e=>{
-  const id=e.target.id;
-  if(id==="fLoader"){ MC.loader=e.target.value; searchMC(); return; }
-  if(id==="fVer"){ MC.version=e.target.value; searchMC(); return; }
-  if(id==="fSort"){ MC.sort=e.target.value; searchMC(); return; }
-  if(id==="mo"){ S.motion=e.target.checked; saveS(); applyTheme(); return; }
+  const el=e.target,id=el.id;
+  if(id==="fLoader"){MC.loader=el.value;searchMC();return}
+  if(id==="fVer"){MC.version=el.value;searchMC();return}
+  if(id==="fSort"){MC.sort=el.value;searchMC();return}
+  if(id==="mo"){S.motion=el.checked;localStorage.setItem("a782-motion",S.motion?"1":"0");applySettings();return}
+  if(el.dataset.tofield){
+    const f=el.files[0];if(!f)return;
+    const max=+el.dataset.max||200;
+    const img=new Image(),url=URL.createObjectURL(f);
+    img.onload=()=>{
+      const k=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      const data=c.toDataURL("image/jpeg",.7);
+      URL.revokeObjectURL(url);
+      if(data.length>60000){toast(t("big")||"Too large",true);return}
+      el.form.elements[el.dataset.tofield].value=data;
+      toast(t("saved"));
+    };
+    img.src=url;
+  }
 });
-
-document.addEventListener("input",e=>{
-  if(e.target.id==="mcQ") MC.q=e.target.value.trim();
-});
+document.addEventListener("input",e=>{if(e.target.id==="mcQ")MC.q=e.target.value.trim()});
 
 document.addEventListener("submit",async e=>{
   e.preventDefault();
-  const f=e.target, o=Object.fromEntries(new FormData(f).entries());
+  const f=e.target,o=formObj(f);
   try{
     switch(f.id){
       case "pinForm":{
         const r=await api("POST","/api/admin/login",{pin:o.pin});
-        ADMIN=r.token; sessionStorage.setItem("a782-admin",ADMIN);
-        render(true); return;
+        ADMIN=r.token;sessionStorage.setItem("a782-admin",ADMIN);render(true);return;
       }
       case "authForm":{
-        const reg=AUTHMODE==="reg";
-        const r=await api("POST",reg?"/api/register":"/api/login",
-          reg?{email:o.email,password:o.password,nick:o.nick}:{email:o.email,password:o.password});
-        TOKEN=r.token; localStorage.setItem("a782-token",TOKEN); ME=r.user;
-        await loadData(); toast(t("welcome")); render(true); return;
+        const reg=AUTH==="reg";
+        const r=await api("POST",reg?"/api/register":"/api/login",reg?{email:o.email,password:o.password,nick:o.nick}:{email:o.email,password:o.password});
+        TOKEN=r.token;localStorage.setItem("a782-token",TOKEN);ME=r.user;
+        await loadData();render(true);return;
       }
       case "profForm":{
-        const r=await api("PUT","/api/me",{nick:o.nick,mc:o.mc,ff:o.ff,so2:o.so2,tg:o.tg,bio:o.bio,
-          avatar:o.avatar,banner:o.banner,icon:pendIcon||ME.icon});
-        ME=r.user; pendIcon=null; toast(t("saved")); render(true); return;
+        const r=await api("PUT","/api/me",{nick:o.nick,mc:o.mc,ff:o.ff,so2:o.so2,tg:o.tg,bio:o.bio,avatar:o.avatar,banner:o.banner,icon:pendingIcon||ME.icon});
+        ME=r.user;pendingIcon=null;toast(t("saved"));render(true);return;
       }
-      case "mcForm":{
-        MC.q=$("#mcQ").value.trim(); searchMC(); return;
-      }
+      case "mcForm":{MC.q=$("#mcQ").value.trim();searchMC();return}
       case "cartForm":{
-        if(!TOKEN){ closeSheet(); toast(t("need_login"),false); location.hash="#me"; return; }
-        const order=await api("POST","/api/orders",{items:cart.map(i=>({id:i.id,qty:i.qty})),
-          coupon:o.coupon||"",method:o.method||"kaspi",receipt:o.receipt||""});
-        cart=[]; saveCart(); closeSheet();
+        if(!TOKEN){closeSheet();toast(t("login"),true);location.hash="#me";return}
+        const order=await api("POST","/api/orders",{items:cart.map(i=>({id:i.id,qty:i.qty})),coupon:o.coupon||"",method:o.method||"telegram",receipt:o.receipt||""});
+        cart=[];saveCart();closeSheet();
         ME=(await api("GET","/api/me")).user;
-        toast(`${t("order_ok")} · ${order.id}`); render(true); return;
+        if(order.method==="telegram"||order.method==="kaspi"){
+          const ok=await copyText(orderText(order));
+          window.open(D.owner.telegram,"_blank","noopener");
+          toast(t("tgok"),!ok);
+        } else toast(t("ok"));
+        render(true);return;
       }
-      case "fSite":{
-        await api("PUT","/api/admin/site",o,true);
-        await loadData(); toast(t("saved")); render(true); return;
-      }
-      case "fGw":{
-        await api("POST","/api/admin/giveaways",o,true);
-        await loadData(); toast(t("saved")); render(true); return;
-      }
-      case "fPr":{
-        await api("POST","/api/admin/products",o,true);
-        await loadData(); toast(t("saved")); render(true); return;
-      }
-      case "fMp":{
-        await api("POST","/api/admin/modpacks",o,true);
-        await loadData(); toast(t("saved")); render(true); return;
+      case "fSite":{await api("PUT","/api/admin/site",o,true);await loadData();toast(t("saved"));render(true);return}
+      case "fGame":case "fGw":case "fPr":case "fMp":{
+        const ep=ADMIN_ENDPOINT[{fGame:"games",fGw:"giveaways",fPr:"products",fMp:"modpacks"}[f.id]];
+        await api("POST",ep,o,true);
+        await loadData();toast(t("saved"));render(true);return;
       }
     }
-  }catch(err){ toast(errMsg(err),false); }
+  }catch(err){ toast(errMsg(err),true) }
 });
 
-window.addEventListener("hashchange",()=>render());
+function adminEdit(spec){
+  const [kind,id]=spec.split(":");
+  const item=(D[kind]||[]).find(x=>x.id===id);if(!item)return;
+  const form=document.getElementById(FORMS[kind]);if(!form)return;
+  fillForm(form,item);
+  if(form.elements.id) form.elements.id.value=item.id;
+  form.scrollIntoView({behavior:"smooth",block:"center"});
+}
+async function adminDelete(spec){
+  const [kind,id]=spec.split(":");
+  try{ await api("DELETE",`/api/admin/${kind}/${id}`,null,true); await loadData(); toast(t("deleted")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
+}
+async function adminDraw(id){
+  try{ await api("POST",`/api/admin/giveaways/${id}/draw`,null,true); await loadData(); render(true) }
+  catch(e){ toast(errMsg(e),true) }
+}
+async function adminBal(spec){
+  const [id,field,delta]=spec.split("|");
+  try{ await api("POST",`/api/admin/users/${id}/balance`,{field,delta:+delta},true); loadAdmin() }
+  catch(e){ toast(errMsg(e),true) }
+}
+async function adminOrder(spec){
+  const [id,status]=spec.split("|");
+  try{ await api("POST",`/api/admin/orders/${id}/status`,{status},true); loadAdmin() }
+  catch(e){ toast(errMsg(e),true) }
+}
 
-/* ===================== ІСКЕ ҚОСУ ===================== */
+addEventListener("hashchange",()=>render());
 (async function init(){
-  document.documentElement.dataset.theme=S.theme;
-  document.body.classList.toggle("calm",!S.motion);
-  try{ await loadData(); }
-  catch(e){
-    $("#splash").classList.add("off");
-    $("#main").innerHTML=`<div class="notice">${t("net_err")}</div>`;
-    return;
-  }
-  if(TOKEN){
-    try{ ME=(await api("GET","/api/me")).user; }
-    catch(e){ TOKEN=""; localStorage.removeItem("a782-token"); }
-  }
-  chrome(); render();
-  setTimeout(()=>$("#splash").classList.add("off"),700);
+  initFx();
+  applySettings();
+  try{ await loadData() }
+  catch(e){ $("#splash").classList.add("off"); $("#main").innerHTML=`<div class="notice">${E[LANG].generic}</div>`; return }
+  if(TOKEN){ try{ ME=(await api("GET","/api/me")).user }catch(e){ TOKEN="";localStorage.removeItem("a782-token") } }
+  render();
+  setTimeout(()=>$("#splash").classList.add("off"),600);
 })();
 </script>
 </body>
