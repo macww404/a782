@@ -1,4 +1,4 @@
-// A782 DIGITAL — backend. Node.js 18+ керек, басқа ешқандай пакет қажет емес.
+// A782 DIGITAL — backend v3. Node.js 18+, басқа пакет қажет емес.
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -9,14 +9,16 @@ const DATA_FILE = path.join(__dirname, "data.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
 const ADMIN_PIN = process.env.ADMIN_PIN || crypto.randomBytes(3).toString("hex");
 const DEMO_PAY = process.env.DEMO_PAY !== "0";
-const UA = "A782DIGITAL/2.0 (+https://t.me/Asxm_A782)";
-const ICONS = ["gift", "users", "gem", "bolt", "trophy", "shield", "star", "user"];
-const AVATAR_ICONS = ["user", "gem", "bolt", "cube", "trophy", "shield", "star"];
 const JB_ID = process.env.JSONBIN_ID, JB_KEY = process.env.JSONBIN_KEY;
 const REMOTE = !!(JB_ID && JB_KEY);
+const UA = "A782DIGITAL/3.0 (+https://t.me/Asxm_A782)";
+const ICONS = ["gift", "users", "gem", "bolt", "trophy", "shield", "star", "swords", "cube", "flame"];
+const AVATARS = ["user", "gem", "bolt", "cube", "trophy", "shield", "star", "swords"];
+const P_CATS = ["pack", "over", "design", "guide"];
+const M_CATS = ["rpg", "pvp", "tech", "anime", "surv"];
 
-console.log("Admin PIN:", ADMIN_PIN, process.env.ADMIN_PIN ? "(ADMIN_PIN арқылы)" : "(кездейсоқ)");
-console.log("Деректер сақтау:", REMOTE ? "JSONBin" : "жергілікті data.json");
+console.log("Admin PIN:", ADMIN_PIN, process.env.ADMIN_PIN ? "(ADMIN_PIN)" : "(кездейсоқ)");
+console.log("Деректер:", REMOTE ? "JSONBin" : "data.json");
 
 const L3 = (kk, ru, en) => ({ kk, ru, en });
 
@@ -33,9 +35,9 @@ function seed() {
       title: L3("Minecraft survival — жаңа маусым", "Minecraft survival — новый сезон", "Minecraft survival — new season"),
       nextAt: "2026-11-10T20:00:00+05:00",
       schedule: [
-        { day: "Mon", time: "20:00", topic: "Minecraft survival" },
-        { day: "Wed", time: "20:00", topic: "Modpack night" },
-        { day: "Sat", time: "19:00", topic: "Duo & build battle" }
+        { day: 0, time: "20:00", topic: L3("Minecraft survival", "Minecraft survival", "Minecraft survival") },
+        { day: 2, time: "20:00", topic: L3("Модпак түні", "Ночь модпаков", "Modpack night") },
+        { day: 5, time: "19:00", topic: L3("Дуэт және құрылыс", "Дуэт и стройка", "Duo and building") }
       ]
     },
     server: { ip: "", version: "1.20.1" },
@@ -51,42 +53,67 @@ function seed() {
     coupons: { A782: 10, WELCOME: 5 },
     giveaways: [
       { id: "g1", icon: "gift", title: L3("100 алмаз (Free Fire)", "100 алмазов (Free Fire)", "100 diamonds (Free Fire)"),
-        desc: L3("Жеңімпазға ойын ID-і арқылы беріледі.", "Победитель получит по игровому ID.", "Winner receives by game ID."),
-        prize: "100 алмаз", cost: 1, participants: [], winner: null },
+        desc: L3("Жеңімпазға ойын ID-і арқылы беріледі.", "Победитель получит по игровому ID.", "The winner receives by game ID."),
+        prize: L3("100 алмаз", "100 алмазов", "100 diamonds"), cost: 1, participants: [], winner: null },
       { id: "g2", icon: "users", title: L3("Менімен бірге Minecraft ойнау", "Игра в Minecraft со мной", "Play Minecraft with me"),
         desc: L3("2 сағат жеке серверде бірге ойнау.", "2 часа на приватном сервере вместе.", "2 hours on a private server together."),
-        prize: "DUO сессия", cost: 1, participants: [], winner: null }
+        prize: L3("Дуэт сессиясы", "Сессия вдвоём", "Duo session"), cost: 1, participants: [], winner: null }
     ],
     products: [
-      { id: "p1", cat: "over", name: L3("Стрим оверлейі", "Оверлей для стрима", "Stream overlay"), desc: L3("Оверлей, панельдер, сахна.", "Оверлей, панели, сцены.", "Overlay, panels, scenes."), price: 4500, type: "Overlay", img: "" },
-      { id: "p2", cat: "design", name: L3("Лендинг шаблоны", "Шаблон лендинга", "Landing template"), desc: L3("HTML/CSS бейімделген лендинг.", "Адаптивный лендинг HTML/CSS.", "Responsive HTML/CSS landing."), price: 7900, type: "Template", img: "" },
-      { id: "p3", cat: "pack", name: L3("Қыс текстуралары", "Зимние текстуры", "Winter textures"), desc: L3("16x қыс пакі.", "Пак 16x.", "16x winter pack."), price: 1500, type: "Resource pack", img: "" }
+      { id: "p1", cat: "over", name: L3("Стрим оверлейі", "Оверлей для стрима", "Stream overlay"),
+        desc: L3("Оверлей, панельдер, сахна.", "Оверлей, панели, сцены.", "Overlay, panels, scenes."), price: 4500, img: "" },
+      { id: "p2", cat: "design", name: L3("Лендинг шаблоны", "Шаблон лендинга", "Landing template"),
+        desc: L3("HTML/CSS бейімделген лендинг.", "Адаптивный лендинг HTML/CSS.", "Responsive HTML/CSS landing."), price: 7900, img: "" },
+      { id: "p3", cat: "pack", name: L3("Қыс текстуралары", "Зимние текстуры", "Winter textures"),
+        desc: L3("16x қыс пакі.", "Пак 16x.", "16x winter pack."), price: 1500, img: "" }
     ],
     modpacks: [
-      { id: "m1", cat: "rpg", title: "A782 Ultimate RPG & Shaders", version: "1.20.1", loader: "Fabric", mods: 145, sizeMb: 380, downloads: 1420, rating: 4.9, file: "", keyMods: ["Distant Horizons", "Iris", "Better Combat"], desc: L3("Жаңа әлем және шейдерлер.", "Новый мир и шейдеры.", "New world and shaders.") },
-      { id: "m2", cat: "pvp", title: "Cyber PvP & FPS Boost", version: "1.20.4", loader: "Fabric", mods: 42, sizeMb: 110, downloads: 3890, rating: 5, file: "", keyMods: ["Sodium", "Entity Culling"], desc: L3("FPS арттыратын топтама.", "Сборка для роста FPS.", "Pack for higher FPS.") }
+      { id: "m1", cat: "rpg", title: "A782 Ultimate RPG & Shaders", version: "1.20.1", loader: "Fabric", mods: 145, sizeMb: 380,
+        downloads: 1420, rating: 4.9, file: "", keyMods: ["Distant Horizons", "Iris", "Better Combat"],
+        desc: L3("Жаңа әлем және шейдерлер.", "Новый мир и шейдеры.", "New world and shaders.") },
+      { id: "m2", cat: "pvp", title: "Cyber PvP & FPS Boost", version: "1.20.4", loader: "Fabric", mods: 42, sizeMb: 110,
+        downloads: 3890, rating: 5, file: "", keyMods: ["Sodium", "Entity Culling"],
+        desc: L3("FPS арттыратын топтама.", "Сборка для роста FPS.", "Pack for higher FPS.") }
     ],
-    users: [],
-    orders: [],
-    sessions: {}
+    games: [
+      { id: "mc", name: "Minecraft", icon: "cube", status: "live", link: "https://t.me/Asxm_A782",
+        desc: L3("Модпактар, серверлер және стримдер.", "Модпаки, серверы и стримы.", "Modpacks, servers and streams.") },
+      { id: "so2", name: "Standoff 2", icon: "swords", status: "soon", link: "",
+        desc: L3("Стримдер мен хайлайттар жақында.", "Стримы и хайлайты скоро.", "Streams and highlights coming soon.") },
+      { id: "coc", name: "Clash of Clans", icon: "shield", status: "soon", link: "",
+        desc: L3("Стримдер мен хайлайттар жақында.", "Стримы и хайлайты скоро.", "Streams and highlights coming soon.") },
+      { id: "ff", name: "Free Fire", icon: "flame", status: "soon", link: "",
+        desc: L3("Стримдер мен розыгрыштар жақында.", "Стримы и розыгрыши скоро.", "Streams and giveaways coming soon.") },
+      { id: "dc", name: "Discord", icon: "users", status: "soon", link: "",
+        desc: L3("Қауымдастық сервері жақында.", "Сервер сообщества скоро.", "Community server coming soon.") }
+    ],
+    users: [], orders: [], sessions: {}
   };
 }
 
-/* ---------- Деректерді сақтау: JSONBin немесе жергілікті файл ---------- */
 let db = seed();
 let remoteReady = !REMOTE;
 let saveTimer = null;
 
+function migrate() {
+  const s = seed();
+  for (const k of Object.keys(s)) if (db[k] === undefined) db[k] = s[k];
+  if (!db.owner.bio || typeof db.owner.bio !== "object") db.owner.bio = s.owner.bio;
+  if (!db.stream.title || typeof db.stream.title !== "object") db.stream.title = s.stream.title;
+  if (!Array.isArray(db.stream.schedule) || db.stream.schedule.some(x => typeof x.day !== "number")) db.stream.schedule = s.stream.schedule;
+}
+
 async function loadDB() {
   if (!REMOTE) {
     if (fs.existsSync(DATA_FILE)) db = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-    else fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
+    migrate();
     return;
   }
   const r = await fetch(`https://api.jsonbin.io/v3/b/${JB_ID}/latest`, { headers: { "X-Master-Key": JB_KEY } });
   if (!r.ok) throw new Error("JSONBin " + r.status);
   const j = await r.json();
   if (j.record && j.record.owner) db = j.record;
+  migrate();
   remoteReady = true;
   console.log("JSONBin-нен деректер жүктелді");
 }
@@ -114,39 +141,38 @@ const uid = () => crypto.randomBytes(8).toString("hex");
 const randCode = () => crypto.randomBytes(3).toString("hex").toUpperCase();
 const hashPw = (pw, salt) => crypto.scryptSync(pw, salt, 64).toString("hex");
 const str = (v, max = 200) => String(v ?? "").trim().slice(0, max);
-const tr = (b, base) => {
-  const kk = str(b[base + "_kk"], 300), ru = str(b[base + "_ru"], 300), en = str(b[base + "_en"], 300);
-  return { kk: kk || en, ru: ru || kk, en: en || kk };
-};
-const safeUrl = v => (/^https?:\/\/[^\s]+$/.test(str(v, 500)) ? str(v, 500) : "");
+const tr = (b, base, max = 400) => ({ kk: str(b[base + "_kk"], max), ru: str(b[base + "_ru"], max), en: str(b[base + "_en"], max) });
+const safeUrl = v => (/^https?:\/\/\S+$/.test(str(v, 500)) ? str(v, 500) : "");
 const safeImg = v => {
-  const s = str(v, 3000000);
-  return /^https?:\/\//.test(s) || /^data:image\/(png|jpe?g|webp|gif);base64,/.test(s) ? s : "";
+  const s = str(v, 70000);
+  if (/^https:\/\/\S+$/.test(s)) return s;
+  if (/^data:image\/(png|jpe?g|webp);base64,/.test(s)) return s;
+  return "";
 };
 const upsert = (arr, item) => {
   const i = arr.findIndex(x => x.id === item.id);
-  if (i >= 0) arr[i] = item; else arr.unshift(item);
+  if (i >= 0) arr[i] = { ...arr[i], ...item }; else arr.unshift(item);
 };
-function fail(status, code) {
-  const e = new Error(code); e.status = status; e.code = code; throw e;
-}
+function fail(status, code) { const e = new Error(code); e.status = status; e.code = code; throw e; }
 const pubUser = u => ({
   id: u.id, nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
   avatar: u.avatar, banner: u.banner, icon: u.icon,
   tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds, wins: u.wins
 });
-const pubGw = g => ({
-  ...g,
-  participants: g.participants.map(p => p.nick),
-  winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null
-});
+const pubGw = g => ({ ...g, participants: g.participants.map(p => p.nick), winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null });
 const pubData = () => ({
   owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
-  prizes: db.prizes, coupons: db.coupons, demoPay: DEMO_PAY,
+  prizes: db.prizes, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
   giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
 });
+function parseSchedule(txt) {
+  return str(txt, 3000).split("\n").map(l => l.split("|").map(x => x.trim()))
+    .filter(a => a.length >= 5 && /^[0-6]$/.test(a[0]))
+    .slice(0, 20)
+    .map(a => ({ day: +a[0], time: a[1].slice(0, 5), topic: { kk: a[2].slice(0, 120), ru: a[3].slice(0, 120), en: a[4].slice(0, 120) } }));
+}
 
-function readBody(req, limit = 64 * 1024) {
+function readBody(req, limit = 100 * 1024) {
   return new Promise((resolve, reject) => {
     let size = 0; const chunks = [];
     req.on("data", c => {
@@ -167,7 +193,6 @@ function send(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
-/* ---------- сессия және админ ---------- */
 function userFrom(req) {
   const h = req.headers.authorization || "";
   const tok = h.startsWith("Bearer ") ? h.slice(7) : "";
@@ -184,7 +209,6 @@ function isAdmin(req) {
 }
 const pinHits = new Map();
 
-/* ---------- Modrinth прокси (5 минут кэш) ---------- */
 const mcCache = new Map();
 async function cached(key, load) {
   const hit = mcCache.get(key);
@@ -195,8 +219,7 @@ async function cached(key, load) {
 }
 async function upstream(url) {
   let r;
-  try { r = await fetch(url, { headers: { "User-Agent": UA } }); }
-  catch { fail(502, "upstream"); }
+  try { r = await fetch(url, { headers: { "User-Agent": UA } }); } catch { fail(502, "upstream"); }
   if (!r.ok) fail(502, "upstream");
   return r.json();
 }
@@ -212,10 +235,7 @@ async function mcSearch(sp) {
   const url = `https://api.modrinth.com/v2/search?query=${encodeURIComponent(q)}&facets=${encodeURIComponent(JSON.stringify(facets))}&index=${q ? "relevance" : sort}&limit=20`;
   return cached(url, async () => {
     const d = await upstream(url);
-    return { hits: d.hits.map(h => ({
-      id: h.project_id, title: h.title, author: h.author, desc: h.description,
-      icon: h.icon_url, downloads: h.downloads, license: h.license
-    })) };
+    return { hits: d.hits.map(h => ({ id: h.project_id, title: h.title, author: h.author, desc: h.description, icon: h.icon_url, downloads: h.downloads, license: h.license })) };
   });
 }
 async function mcVersions(id) {
@@ -224,15 +244,12 @@ async function mcVersions(id) {
   return cached(url, async () => {
     const vs = await upstream(url);
     return { versions: vs.slice(0, 12).map(v => ({
-      name: v.name,
-      games: (v.game_versions || []).slice(0, 4),
-      loaders: v.loaders || [],
+      name: v.name, games: (v.game_versions || []).slice(0, 4), loaders: v.loaders || [],
       file: ((v.files || []).find(f => f.primary) || (v.files || [])[0] || {}).url || ""
     })) };
   });
 }
 
-/* ---------- маршруттар ---------- */
 async function route(req, url, user) {
   const p = url.pathname, m = req.method;
   const need = () => user || fail(401, "login_required");
@@ -274,12 +291,12 @@ async function route(req, url, user) {
   if (m === "GET" && p === "/api/me") return [200, { user: pubUser(need()) }];
   if (m === "PUT" && p === "/api/me") {
     const u = need();
-    const b = await readBody(req, 3 * 1024 * 1024);
+    const b = await readBody(req, 80 * 1024);
     u.nick = str(b.nick, 24) || u.nick;
     u.mc = str(b.mc, 32); u.ff = str(b.ff, 32); u.so2 = str(b.so2, 32); u.tg = str(b.tg, 40); u.bio = str(b.bio, 200);
     if (b.avatar !== undefined) u.avatar = b.avatar === "" ? "" : (safeImg(b.avatar) || u.avatar);
     if (b.banner !== undefined) u.banner = b.banner === "" ? "" : (safeImg(b.banner) || u.banner);
-    if (AVATAR_ICONS.includes(b.icon)) u.icon = b.icon;
+    if (AVATARS.includes(b.icon)) u.icon = b.icon;
     saveDB();
     return [200, { user: pubUser(u) }];
   }
@@ -301,7 +318,7 @@ async function route(req, url, user) {
       u.tokens -= 100;
       const code = "EX-" + randCode();
       u.codes[code] = 10;
-      u.wins.unshift({ id: uid(), title: { kk: "Купон 10%", ru: "Купон 10%", en: "10% coupon" }, code, date: new Date().toLocaleDateString("en-GB") });
+      u.wins.unshift({ id: uid(), title: L3("Купон 10%", "Купон 10%", "10% coupon"), code, date: new Date().toLocaleDateString("en-GB") });
     } else fail(400, "invalid");
     saveDB();
     return [200, { user: pubUser(u) }];
@@ -358,7 +375,8 @@ async function route(req, url, user) {
     if (db.coupons[code]) pct = db.coupons[code];
     else if (u.codes[code]) { pct = u.codes[code]; used = code; }
     const disc = Math.round(sub * pct / 100);
-    const method = b.method === "demo" && DEMO_PAY ? "demo" : "kaspi";
+    const method = ["kaspi", "telegram", "demo"].includes(b.method) ? b.method : "telegram";
+    if (method === "demo" && !DEMO_PAY) fail(400, "invalid");
     const receipt = str(b.receipt, 80);
     if (method === "kaspi" && receipt.length < 3) fail(400, "receipt_required");
     const order = {
@@ -394,7 +412,7 @@ async function route(req, url, user) {
 
 async function adminRoute(req, m, p) {
   if (m === "PUT" && p === "/api/admin/site") {
-    const b = await readBody(req, 3 * 1024 * 1024);
+    const b = await readBody(req);
     const o = db.owner, s = db.stream;
     db.owner = {
       ...o,
@@ -403,17 +421,16 @@ async function adminRoute(req, m, p) {
       tiktok: safeUrl(b.tiktok) || o.tiktok,
       telegram: safeUrl(b.telegram) || o.telegram,
       kaspi: str(b.kaspi, 40),
-      avatar: safeImg(b.avatar) || o.avatar,
-      banner: safeImg(b.banner) || o.banner,
-      bio: tr(b, "bio")
+      avatar: b.avatar === undefined ? o.avatar : safeImg(b.avatar),
+      banner: b.banner === undefined ? o.banner : safeImg(b.banner),
+      bio: tr(b, "bio", 200)
     };
     db.stream = {
       ...s,
       live: !!b.live,
-      title: tr(b, "stitle"),
+      title: tr(b, "stitle", 120),
       nextAt: str(b.nextAt, 40) || s.nextAt,
-      schedule: str(b.sched, 2000).split("\n").map(x => x.split("|").map(y => y.trim())).filter(a => a[0]).slice(0, 20)
-        .map(a => ({ day: (a[0] || "").slice(0, 20), time: (a[1] || "").slice(0, 10), topic: (a[2] || "").slice(0, 80) }))
+      schedule: parseSchedule(b.sched)
     };
     db.server = { ip: str(b.ip, 80), version: str(b.version, 20) };
     db.wheelCost = Math.max(1, parseInt(b.wheelCost) || 1);
@@ -422,30 +439,30 @@ async function adminRoute(req, m, p) {
   }
   if (m === "POST" && p === "/api/admin/giveaways") {
     const b = await readBody(req);
-    const title = tr(b, "title");
-    if (!title.kk) fail(400, "title_required");
+    const title = tr(b, "title", 120);
+    if (!title.kk && !title.ru && !title.en) fail(400, "title_required");
+    const old = db.giveaways.find(x => x.id === str(b.id, 40));
     upsert(db.giveaways, {
-      id: uid(),
+      id: old ? old.id : uid(),
       icon: ICONS.includes(b.icon) ? b.icon : "gift",
-      title, desc: tr(b, "desc"),
-      prize: str(b.prize, 80),
+      title, desc: tr(b, "desc", 300), prize: tr(b, "prize", 120),
       cost: Math.max(1, parseInt(b.cost) || 1),
-      participants: [], winner: null
+      participants: old ? old.participants : [], winner: old ? old.winner : null
     });
     saveDB();
     return [200, { ok: true }];
   }
   if (m === "POST" && p === "/api/admin/products") {
-    const b = await readBody(req, 3 * 1024 * 1024);
-    const name = tr(b, "name");
-    if (!name.kk) fail(400, "title_required");
+    const b = await readBody(req);
+    const name = tr(b, "name", 120);
+    if (!name.kk && !name.ru && !name.en) fail(400, "title_required");
+    const old = db.products.find(x => x.id === str(b.id, 40));
     upsert(db.products, {
-      id: uid(),
-      cat: ["pack", "over", "design", "guide"].includes(b.cat) ? b.cat : "pack",
-      name, desc: tr(b, "desc"),
+      id: old ? old.id : uid(),
+      cat: P_CATS.includes(b.cat) ? b.cat : "pack",
+      name, desc: tr(b, "desc", 300),
       price: Math.max(0, parseInt(b.price) || 0),
-      type: str(b.type, 30) || "Digital",
-      img: safeImg(b.img)
+      img: safeImg(b.img) || (old ? old.img : "")
     });
     saveDB();
     return [200, { ok: true }];
@@ -454,23 +471,41 @@ async function adminRoute(req, m, p) {
     const b = await readBody(req);
     const title = str(b.title, 120);
     if (!title) fail(400, "title_required");
+    const old = db.modpacks.find(x => x.id === str(b.id, 40));
     upsert(db.modpacks, {
-      id: uid(),
-      cat: ["rpg", "pvp", "tech", "anime", "surv"].includes(b.cat) ? b.cat : "rpg",
+      id: old ? old.id : uid(),
+      cat: M_CATS.includes(b.cat) ? b.cat : "rpg",
       title,
       version: str(b.version, 20) || "1.20.1",
       loader: str(b.loader, 20) || "Fabric",
       mods: parseInt(b.mods) || 0,
       sizeMb: parseInt(b.sizeMb) || 0,
-      downloads: 0, rating: 5,
+      downloads: old ? old.downloads : 0,
+      rating: old ? old.rating : 5,
       file: safeUrl(b.file),
       keyMods: str(b.keys, 400).split(",").map(x => x.trim()).filter(Boolean).slice(0, 12),
-      desc: tr(b, "desc")
+      desc: tr(b, "desc", 300)
     });
     saveDB();
     return [200, { ok: true }];
   }
-  const del = p.match(/^\/api\/admin\/(giveaways|products|modpacks)\/([\w-]+)$/);
+  if (m === "POST" && p === "/api/admin/games") {
+    const b = await readBody(req);
+    const name = str(b.name, 40);
+    if (!name) fail(400, "title_required");
+    const old = db.games.find(x => x.id === str(b.id, 40));
+    upsert(db.games, {
+      id: old ? old.id : uid(),
+      name,
+      icon: ICONS.includes(b.icon) ? b.icon : "gamepad",
+      status: b.status === "live" ? "live" : "soon",
+      link: safeUrl(b.link),
+      desc: tr(b, "desc", 200)
+    });
+    saveDB();
+    return [200, { ok: true }];
+  }
+  const del = p.match(/^\/api\/admin\/(giveaways|products|modpacks|games)\/([\w-]+)$/);
   if (m === "DELETE" && del) {
     db[del[1]] = db[del[1]].filter(x => x.id !== del[2]);
     saveDB();
@@ -512,7 +547,6 @@ async function adminRoute(req, m, p) {
   fail(404, "not_found");
 }
 
-/* ---------- статикалық файлдар және сервер ---------- */
 const MIME = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
   ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".ico": "image/x-icon"
@@ -543,5 +577,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 loadDB()
-  .catch(e => console.error("Жүктеу қатесі:", e.message))
+  .catch(e => { console.error("Жүктеу қатесі:", e.message); migrate(); })
   .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: порт ${PORT}`)));
