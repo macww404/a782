@@ -1,4 +1,4 @@
-// A782 DIGITAL вЂ” backend v3. Node.js 18+, Р±Р°СЃТ›Р° РїР°РєРµС‚ Т›Р°Р¶РµС‚ РµРјРµСЃ.
+// A782 DIGITAL — backend v3. Node.js 18+, басқа пакет қажет емес.
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -20,15 +20,15 @@ const AVATARS = ["user", "gem", "bolt", "cube", "trophy", "shield", "star", "swo
 const P_CATS = ["pack", "over", "design", "guide"];
 const M_CATS = ["rpg", "pvp", "tech", "anime", "surv"];
 
-console.log("Р”РµСЂРµРєС‚РµСЂ:", REMOTE ? "JSONBin" : "data.json");
+console.log("Деректер:", REMOTE ? "JSONBin" : "data.json");
 
 const L3 = (kk, ru, en) => ({ kk, ru, en });
 const VIP_TIERS = ["VIP-FREE", "VIP-PLUS", "VIP-PRO", "VIP-ULTRA"];
 const VIP_META = {
- "VIP-FREE": { icon:"sparkles", color:"#8be9fd", perks: L3("7 РєТЇРЅ ULTRA Studio|500 С‚Р°ТЈРґР°СѓР»С‹ С„Р°Р№Р»/РѕР№С‹РЅ|9 РїСЂРѕС„РёР»СЊ С‚ТЇСЃС– Р¶У™РЅРµ 5 Р¶С‹Р»РґР°Рј СЃС–Р»С‚РµРјРµ", "7 РґРЅРµР№ ULTRA Studio|Р”Рѕ 500 РёР·Р±СЂР°РЅРЅС‹С…|9 С‚РµРј Рё 5 Р±С‹СЃС‚СЂС‹С… СЃСЃС‹Р»РѕРє", "7 days ULTRA Studio|500 saved items|9 themes and 5 shortcuts") },
- "VIP-PLUS": { icon:"star", color:"#48d5ff", perks: L3("60 С‚Р°ТЈРґР°СѓР»С‹ СЃР°Т›С‚Р°|3 РїСЂРѕС„РёР»СЊ С‚ТЇСЃС– Р¶У™РЅРµ СЃС‚Р°С‚СѓСЃ|1 Р¶С‹Р»РґР°Рј СЃС–Р»С‚РµРјРµ", "60 СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…|3 С‚РµРјС‹ Рё СЃС‚Р°С‚СѓСЃ|1 Р±С‹СЃС‚СЂС‹Р№ РїРµСЂРµС…РѕРґ", "60 saved items|3 themes and status|1 quick link") },
- "VIP-PRO": { icon:"gem", color:"#b18cff", perks: L3("160 С‚Р°ТЈРґР°СѓР»С‹ СЃР°Т›С‚Р°|6 С‚ТЇСЃ Р¶У™РЅРµ РїСЂРѕС„РёР»СЊ Т±СЂР°РЅС‹|3 Р¶С‹Р»РґР°Рј СЃС–Р»С‚РµРјРµ", "160 СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…|6 С‚РµРј Рё РїРѕРґРїРёСЃСЊ РїСЂРѕС„РёР»СЏ|3 Р±С‹СЃС‚СЂС‹С… РїРµСЂРµС…РѕРґР°", "160 saved items|6 themes and headline|3 shortcuts") },
- "VIP-ULTRA": { icon:"crown", color:"#ffc76d", perks: L3("500 С‚Р°ТЈРґР°СѓР»С‹ СЃР°Т›С‚Р°|9 СЌРєСЃРєР»СЋР·РёРІ С‚ТЇСЃ Р¶У™РЅРµ СЃС‚Р°С‚СѓСЃ|5 Р¶С‹Р»РґР°Рј СЃС–Р»С‚РµРјРµ, ULTRA РґРёР·Р°Р№РЅ", "500 СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…|9 СЌРєСЃРєР»СЋР·РёРІРЅС‹С… С‚РµРј Рё СЃС‚Р°С‚СѓСЃ|5 Р±С‹СЃС‚СЂС‹С… СЃСЃС‹Р»РѕРє, ULTRA СЃС‚РёР»СЊ", "500 saved items|9 exclusive themes and status|5 shortcuts, ULTRA style") }
+ "VIP-FREE": { icon:"sparkles", color:"#8be9fd", perks: L3("7 күн ULTRA Studio|500 таңдаулы файл/ойын|9 профиль түсі және 5 жылдам сілтеме", "7 дней ULTRA Studio|До 500 избранных|9 тем и 5 быстрых ссылок", "7 days ULTRA Studio|500 saved items|9 themes and 5 shortcuts") },
+ "VIP-PLUS": { icon:"star", color:"#48d5ff", perks: L3("60 таңдаулы сақта|3 профиль түсі және статус|1 жылдам сілтеме", "60 сохранённых|3 темы и статус|1 быстрый переход", "60 saved items|3 themes and status|1 quick link") },
+ "VIP-PRO": { icon:"gem", color:"#b18cff", perks: L3("160 таңдаулы сақта|6 түс және профиль ұраны|3 жылдам сілтеме", "160 сохранённых|6 тем и подпись профиля|3 быстрых перехода", "160 saved items|6 themes and headline|3 shortcuts") },
+ "VIP-ULTRA": { icon:"crown", color:"#ffc76d", perks: L3("500 таңдаулы сақта|9 эксклюзив түс және статус|5 жылдам сілтеме, ULTRA дизайн", "500 сохранённых|9 эксклюзивных тем и статус|5 быстрых ссылок, ULTRA стиль", "500 saved items|9 exclusive themes and status|5 shortcuts, ULTRA style") }
 };
 const tierOf = (plan) => VIP_TIERS.includes(plan?.tier) ? plan.tier : VIP_TIERS.includes(plan?.name?.toUpperCase()) ? plan.name.toUpperCase() : "VIP-PLUS";
 // Practical Premium capabilities are checked on the server, never just in the UI.
@@ -48,66 +48,66 @@ function seed() {
       name: "A782 DIGITAL", handle: "@a782_asxm",
       tiktok: "https://www.tiktok.com/@a782_asxm", telegram: "https://t.me/Asxm_A782",
       kaspi: "", avatar: "", banner: "",
-      bio: L3("Minecraft РјРѕРґРїР°РєС‚Р°СЂС‹, С€РµР№РґРµСЂР»РµСЂ, СЃС‚СЂРёРјРґРµСЂ Р¶У™РЅРµ РґРёР·Р°Р№РЅ.", "РњРѕРґРїР°РєРё Minecraft, С€РµР№РґРµСЂС‹, СЃС‚СЂРёРјС‹ Рё РґРёР·Р°Р№РЅ.", "Minecraft modpacks, shaders, streams and design.")
+      bio: L3("Minecraft модпактары, шейдерлер, стримдер және дизайн.", "Модпаки Minecraft, шейдеры, стримы и дизайн.", "Minecraft modpacks, shaders, streams and design.")
     },
     stream: {
       live: false,
-      title: L3("Minecraft survival вЂ” Р¶Р°ТЈР° РјР°СѓСЃС‹Рј", "Minecraft survival вЂ” РЅРѕРІС‹Р№ СЃРµР·РѕРЅ", "Minecraft survival вЂ” new season"),
+      title: L3("Minecraft survival — жаңа маусым", "Minecraft survival — новый сезон", "Minecraft survival — new season"),
       nextAt: "2026-11-10T20:00:00+05:00",
       schedule: [
         { day: 0, time: "20:00", topic: L3("Minecraft survival", "Minecraft survival", "Minecraft survival") },
-        { day: 2, time: "20:00", topic: L3("РњРѕРґРїР°Рє С‚ТЇРЅС–", "РќРѕС‡СЊ РјРѕРґРїР°РєРѕРІ", "Modpack night") },
-        { day: 5, time: "19:00", topic: L3("Р”СѓСЌС‚ Р¶У™РЅРµ Т›Т±СЂС‹Р»С‹СЃ", "Р”СѓСЌС‚ Рё СЃС‚СЂРѕР№РєР°", "Duo and building") }
+        { day: 2, time: "20:00", topic: L3("Модпак түні", "Ночь модпаков", "Modpack night") },
+        { day: 5, time: "19:00", topic: L3("Дуэт және құрылыс", "Дуэт и стройка", "Duo and building") }
       ]
     },
     server: { ip: "", version: "1.20.1" },
     wheelCost: 1,
     prizes: [
-      { label: L3("+50 С‚РѕРєРµРЅ", "+50 С‚РѕРєРµРЅРѕРІ", "+50 tokens"), kind: "tokens", val: 50, weight: 30 },
-      { label: L3("+1 Р±РёР»РµС‚", "+1 Р±РёР»РµС‚", "+1 ticket"), kind: "tickets", val: 1, weight: 30 },
-      { label: L3("+100 Р°Р»РјР°Р·", "+100 Р°Р»РјР°Р·РѕРІ", "+100 diamonds"), kind: "diamonds", val: 100, weight: 8 },
-      { label: L3("РљСѓРїРѕРЅ 10%", "РљСѓРїРѕРЅ 10%", "10% coupon"), kind: "coupon", val: 10, weight: 20 },
-      { label: L3("+250 С‚РѕРєРµРЅ", "+250 С‚РѕРєРµРЅРѕРІ", "+250 tokens"), kind: "tokens", val: 250, weight: 7 },
-      { label: L3("+2 Р±РёР»РµС‚", "+2 Р±РёР»РµС‚Р°", "+2 tickets"), kind: "tickets", val: 2, weight: 5 }
+      { label: L3("+50 токен", "+50 токенов", "+50 tokens"), kind: "tokens", val: 50, weight: 30 },
+      { label: L3("+1 билет", "+1 билет", "+1 ticket"), kind: "tickets", val: 1, weight: 30 },
+      { label: L3("+100 алмаз", "+100 алмазов", "+100 diamonds"), kind: "diamonds", val: 100, weight: 8 },
+      { label: L3("Купон 10%", "Купон 10%", "10% coupon"), kind: "coupon", val: 10, weight: 20 },
+      { label: L3("+250 токен", "+250 токенов", "+250 tokens"), kind: "tokens", val: 250, weight: 7 },
+      { label: L3("+2 билет", "+2 билета", "+2 tickets"), kind: "tickets", val: 2, weight: 5 }
     ],
     coupons: { A782: 10, WELCOME: 5 },
     giveaways: [
-      { id: "g1", icon: "gift", title: L3("100 Р°Р»РјР°Р· (Free Fire)", "100 Р°Р»РјР°Р·РѕРІ (Free Fire)", "100 diamonds (Free Fire)"),
-        desc: L3("Р–РµТЈС–РјРїР°Р·Т“Р° РѕР№С‹РЅ ID-С– Р°СЂТ›С‹Р»С‹ Р±РµСЂС–Р»РµРґС–.", "РџРѕР±РµРґРёС‚РµР»СЊ РїРѕР»СѓС‡РёС‚ РїРѕ РёРіСЂРѕРІРѕРјСѓ ID.", "The winner receives by game ID."),
-        prize: L3("100 Р°Р»РјР°Р·", "100 Р°Р»РјР°Р·РѕРІ", "100 diamonds"), cost: 1, participants: [], winner: null },
-      { id: "g2", icon: "users", title: L3("РњРµРЅС–РјРµРЅ Р±С–СЂРіРµ Minecraft РѕР№РЅР°Сѓ", "РРіСЂР° РІ Minecraft СЃРѕ РјРЅРѕР№", "Play Minecraft with me"),
-        desc: L3("2 СЃР°Т“Р°С‚ Р¶РµРєРµ СЃРµСЂРІРµСЂРґРµ Р±С–СЂРіРµ РѕР№РЅР°Сѓ.", "2 С‡Р°СЃР° РЅР° РїСЂРёРІР°С‚РЅРѕРј СЃРµСЂРІРµСЂРµ РІРјРµСЃС‚Рµ.", "2 hours on a private server together."),
-        prize: L3("Р”СѓСЌС‚ СЃРµСЃСЃРёСЏСЃС‹", "РЎРµСЃСЃРёСЏ РІРґРІРѕС‘Рј", "Duo session"), cost: 1, participants: [], winner: null }
+      { id: "g1", icon: "gift", title: L3("100 алмаз (Free Fire)", "100 алмазов (Free Fire)", "100 diamonds (Free Fire)"),
+        desc: L3("Жеңімпазға ойын ID-і арқылы беріледі.", "Победитель получит по игровому ID.", "The winner receives by game ID."),
+        prize: L3("100 алмаз", "100 алмазов", "100 diamonds"), cost: 1, participants: [], winner: null },
+      { id: "g2", icon: "users", title: L3("Менімен бірге Minecraft ойнау", "Игра в Minecraft со мной", "Play Minecraft with me"),
+        desc: L3("2 сағат жеке серверде бірге ойнау.", "2 часа на приватном сервере вместе.", "2 hours on a private server together."),
+        prize: L3("Дуэт сессиясы", "Сессия вдвоём", "Duo session"), cost: 1, participants: [], winner: null }
     ],
     products: [
-      { id: "p1", cat: "over", name: L3("РЎС‚СЂРёРј РѕРІРµСЂР»РµР№С–", "РћРІРµСЂР»РµР№ РґР»СЏ СЃС‚СЂРёРјР°", "Stream overlay"),
-        desc: L3("РћРІРµСЂР»РµР№, РїР°РЅРµР»СЊРґРµСЂ, СЃР°С…РЅР°.", "РћРІРµСЂР»РµР№, РїР°РЅРµР»Рё, СЃС†РµРЅС‹.", "Overlay, panels, scenes."), price: 4500, img: "" },
-      { id: "p2", cat: "design", name: L3("Р›РµРЅРґРёРЅРі С€Р°Р±Р»РѕРЅС‹", "РЁР°Р±Р»РѕРЅ Р»РµРЅРґРёРЅРіР°", "Landing template"),
-        desc: L3("HTML/CSS Р±РµР№С–РјРґРµР»РіРµРЅ Р»РµРЅРґРёРЅРі.", "РђРґР°РїС‚РёРІРЅС‹Р№ Р»РµРЅРґРёРЅРі HTML/CSS.", "Responsive HTML/CSS landing."), price: 7900, img: "" },
-      { id: "p3", cat: "pack", name: L3("ТљС‹СЃ С‚РµРєСЃС‚СѓСЂР°Р»Р°СЂС‹", "Р—РёРјРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹", "Winter textures"),
-        desc: L3("16x Т›С‹СЃ РїР°РєС–.", "РџР°Рє 16x.", "16x winter pack."), price: 1500, img: "" }
+      { id: "p1", cat: "over", name: L3("Стрим оверлейі", "Оверлей для стрима", "Stream overlay"),
+        desc: L3("Оверлей, панельдер, сахна.", "Оверлей, панели, сцены.", "Overlay, panels, scenes."), price: 4500, img: "" },
+      { id: "p2", cat: "design", name: L3("Лендинг шаблоны", "Шаблон лендинга", "Landing template"),
+        desc: L3("HTML/CSS бейімделген лендинг.", "Адаптивный лендинг HTML/CSS.", "Responsive HTML/CSS landing."), price: 7900, img: "" },
+      { id: "p3", cat: "pack", name: L3("Қыс текстуралары", "Зимние текстуры", "Winter textures"),
+        desc: L3("16x қыс пакі.", "Пак 16x.", "16x winter pack."), price: 1500, img: "" }
     ],
     modpacks: [
       { id: "m1", cat: "rpg", title: "A782 Ultimate RPG & Shaders", version: "1.20.1", loader: "Fabric", mods: 145, sizeMb: 380,
         downloads: 1420, rating: 4.9, file: "", keyMods: ["Distant Horizons", "Iris", "Better Combat"],
-        desc: L3("Р–Р°ТЈР° У™Р»РµРј Р¶У™РЅРµ С€РµР№РґРµСЂР»РµСЂ.", "РќРѕРІС‹Р№ РјРёСЂ Рё С€РµР№РґРµСЂС‹.", "New world and shaders.") },
+        desc: L3("Жаңа әлем және шейдерлер.", "Новый мир и шейдеры.", "New world and shaders.") },
       { id: "m2", cat: "pvp", title: "Cyber PvP & FPS Boost", version: "1.20.4", loader: "Fabric", mods: 42, sizeMb: 110,
         downloads: 3890, rating: 5, file: "", keyMods: ["Sodium", "Entity Culling"],
-        desc: L3("FPS Р°СЂС‚С‚С‹СЂР°С‚С‹РЅ С‚РѕРїС‚Р°РјР°.", "РЎР±РѕСЂРєР° РґР»СЏ СЂРѕСЃС‚Р° FPS.", "Pack for higher FPS.") }
+        desc: L3("FPS арттыратын топтама.", "Сборка для роста FPS.", "Pack for higher FPS.") }
     ],
     games: [
       { id: "so2", name: "Standoff 2", icon: "swords", status: "soon", link: "",
-        desc: L3("Standoff 2 РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Standoff 2.", "A dedicated Standoff 2 players chat.") },
+        desc: L3("Standoff 2 ойыншыларының жеке чаты.", "Отдельный чат игроков Standoff 2.", "A dedicated Standoff 2 players chat.") },
       { id: "roblox", name: "Roblox", icon: "gamepad", status: "soon", link: "",
-        desc: L3("Roblox РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Roblox.", "A dedicated Roblox players chat.") },
+        desc: L3("Roblox ойыншыларының жеке чаты.", "Отдельный чат игроков Roblox.", "A dedicated Roblox players chat.") },
       { id: "ff", name: "Free Fire", icon: "flame", status: "soon", link: "",
-        desc: L3("Free Fire РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Free Fire.", "A dedicated Free Fire players chat.") },
+        desc: L3("Free Fire ойыншыларының жеке чаты.", "Отдельный чат игроков Free Fire.", "A dedicated Free Fire players chat.") },
       { id: "brawl", name: "Brawl Stars", icon: "star", status: "soon", link: "",
-        desc: L3("Brawl Stars РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Brawl Stars.", "A dedicated Brawl Stars players chat.") },
+        desc: L3("Brawl Stars ойыншыларының жеке чаты.", "Отдельный чат игроков Brawl Stars.", "A dedicated Brawl Stars players chat.") },
       { id: "coc", name: "Clash of Clans", icon: "shield", status: "soon", link: "",
-        desc: L3("Clash of Clans РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Clash of Clans.", "A dedicated Clash of Clans players chat.") },
+        desc: L3("Clash of Clans ойыншыларының жеке чаты.", "Отдельный чат игроков Clash of Clans.", "A dedicated Clash of Clans players chat.") },
       { id: "mc", name: "Minecraft", icon: "cube", status: "live", link: "",
-        desc: L3("Minecraft РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Minecraft.", "A dedicated Minecraft players chat.") }
+        desc: L3("Minecraft ойыншыларының жеке чаты.", "Отдельный чат игроков Minecraft.", "A dedicated Minecraft players chat.") }
     ],
     vipPlans: [
       {id:"vip-free",tier:"VIP-FREE",name:"VIP-FREE",price:0,durationDays:7,active:true},
@@ -154,7 +154,7 @@ async function loadDB() {
   if (j.record && j.record.owner) db = j.record;
   migrate();
   remoteReady = true;
-  console.log("JSONBin-РЅРµРЅ РґРµСЂРµРєС‚РµСЂ Р¶ТЇРєС‚РµР»РґС–");
+  console.log("JSONBin-нен деректер жүктелді");
 }
 
 function saveDB() {
@@ -171,8 +171,8 @@ function saveDB() {
       method: "PUT",
       headers: { "Content-Type": "application/json", "X-Master-Key": JB_KEY },
       body: JSON.stringify(db)
-    }).then(r => { if (!r.ok) console.error("JSONBin СЃР°Т›С‚Р°Сѓ Т›Р°С‚РµСЃС–:", r.status); })
-      .catch(e => console.error("JSONBin СЃР°Т›С‚Р°Сѓ Т›Р°С‚РµСЃС–:", e.message));
+    }).then(r => { if (!r.ok) console.error("JSONBin сақтау қатесі:", r.status); })
+      .catch(e => console.error("JSONBin сақтау қатесі:", e.message));
   }, 500);
 }
 
@@ -189,11 +189,11 @@ async function saveVipNow() {
       body: JSON.stringify(db)
     });
     if (!response.ok) {
-      console.error("VIP JSONBin СЃР°Т›С‚Р°Сѓ Т›Р°С‚РµСЃС–:", response.status);
+      console.error("VIP JSONBin сақтау қатесі:", response.status);
       fail(503, "storage_failed");
     }
   } catch (error) {
-    console.error("VIP СЃР°Т›С‚Р°Сѓ Т›Р°С‚РµСЃС–:", error.message);
+    console.error("VIP сақтау қатесі:", error.message);
     fail(503, "storage_failed");
   }
 }
@@ -389,7 +389,7 @@ async function route(req, url, user) {
       u.tokens -= 100;
       const code = "EX-" + randCode();
       u.codes[code] = 10;
-      u.wins.unshift({ id: uid(), title: L3("РљСѓРїРѕРЅ 10%", "РљСѓРїРѕРЅ 10%", "10% coupon"), code, date: new Date().toLocaleDateString("en-GB") });
+      u.wins.unshift({ id: uid(), title: L3("Купон 10%", "Купон 10%", "10% coupon"), code, date: new Date().toLocaleDateString("en-GB") });
     } else fail(400, "invalid");
     saveDB();
     return [200, { user: pubUser(u) }];
@@ -450,7 +450,7 @@ async function route(req, url, user) {
     const preset=str(b.preset,24);
     if(!caps.presets.includes(preset)) fail(400,"invalid");
     const statusEmoji=str(b.statusEmoji,24);
-    if(!["вњ¦","вљЎ","рџЋ®","рџљЂ","рџ’Ћ","рџ‘‘","рџЊЊ","рџ›ЎпёЏ","рџЋЁ","вњЁ"].includes(statusEmoji)) fail(400,"invalid");
+    if(!["✦","⚡","🎮","🚀","💎","👑","🌌","🛡️","🎨","✨"].includes(statusEmoji)) fail(400,"invalid");
     const status=str(b.status,32), headline=str(b.headline,70);
     // All user input is still escaped in the browser before inserting into HTML.
     if(status.length>32 || headline.length>70)fail(400,"invalid");
@@ -752,5 +752,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 loadDB()
-  .catch(e => { console.error("Р–ТЇРєС‚РµСѓ Т›Р°С‚РµСЃС–:", e.message); migrate(); })
-  .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: РїРѕСЂС‚ ${PORT}`)));
+  .catch(e => { console.error("Жүктеу қатесі:", e.message); migrate(); })
+  .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: порт ${PORT}`)));
