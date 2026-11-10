@@ -708,6 +708,8 @@ const words=s=>String(s).split(" ").map((w,i)=>`<span class="w"><span style="--i
 
 let D=null, ME=null, TOKEN=localStorage.getItem("a782-token")||"", ADMIN=sessionStorage.getItem("a782-admin")||"";
 const ownerView=()=>!!ME?.isOwner;
+// Keep a clicked admin form only in memory while the owner renews an expired PIN session.
+let pendingAdminSave=null;
 function clearAdminSession(){ADMIN="";sessionStorage.removeItem("a782-admin")}
 let S={theme:localStorage.getItem("a782-theme")||"dark", motion:localStorage.getItem("a782-motion")!=="0"};
 let cart=JSON.parse(localStorage.getItem("a782-cart")||"[]");
@@ -728,7 +730,7 @@ async function api(m,p,b,admin){
   if(admin&&ADMIN) h["x-admin-token"]=ADMIN;
   const r=await fetch(p,{method:m,headers:h,body:b?JSON.stringify(b):undefined});
   const j=await r.json().catch(()=>({}));
-  if(!r.ok){const e=new Error(j.error||"generic");e.code=j.error||"generic";throw e}
+  if(!r.ok){const e=new Error(j.error||"generic");e.code=j.error||"generic";e.status=r.status;throw e}
   return j;
 }
 function toast(msg,bad){const el=$("#toast");el.innerHTML=`<span class="toast-emblem">${ic(bad?'x':'check')}</span><span class="toast-message">${esc(msg)}</span><span class="toast-timer"></span>`;el.className="toast on"+(bad?" bad":"");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),3300)}
@@ -1121,7 +1123,9 @@ function pAdmin(){
   if(!ownerView()) return `<header class="ph"><h1>404</h1></header><p class="mute">${tri('Бет табылмады','Страница не найдена','Page not found')}</p>${footer()}`;
   if(!ADMIN) return `<header class="ph rv"><p class="eyebrow">${ic("lock")} ${t("adm")}</p><h1>${t("admt")}</h1></header>
     <form id="pinForm" class="glass auth rv"><input name="pin" type="password" inputmode="numeric" placeholder="${esc(t("pinph"))}" required>
-    <button class="btn wide" type="submit" style="margin-top:12px">${t("open")}</button><p class="mute sm" style="margin-top:10px">${t("pinnote")}</p></form>${footer()}`;
+    <button class="btn wide" type="submit" style="margin-top:12px">${t("open")}</button>
+    ${pendingAdminSave?`<p class="notice" role="status" style="margin-top:12px">${tri('Админ сессиясы жаңаруы керек. PIN енгізсең, басқан «Қосу» әрекетің жалғасады.','Сессия администратора истекла. Введи PIN, чтобы завершить сохранение.','Admin session expired. Enter your PIN to finish saving.')}</p>`:''}
+    <p class="mute sm" style="margin-top:10px">${t("pinnote")}</p></form>${footer()}`;
   const o=D.owner,s=D.stream;
   const schedTxt=s.schedule.map(x=>`${x.day} | ${x.time} | ${x.topic.kk} | ${x.topic.ru} | ${x.topic.en}`).join("\n");
   const sel=(name,opts)=>`<select name="${name}">${opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select>`;
@@ -1157,7 +1161,7 @@ function pAdmin(){
         <label class="field">${t("glink")}<input name="link" placeholder="https://t.me/..."></label>
         <label class="field">${t("gicon")}${sel("icon",[["gamepad","gamepad"],["cube","cube"],["swords","swords"],["flame","flame"],["star","star"],["shield","shield"]])}</label></div>
       <div class="g3">${ml("desc",t("gdesc"),{})}</div>
-      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fGame">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGame">${t("cancel")}</button></div></form></section>
+      <div class="row"><button class="btn sm" type="submit" data-adminsubmit="fGame">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGame">${t("cancel")}</button></div><p data-admin-status role="status" aria-live="polite" style="min-height:20px;font-size:13px;margin-top:5px;color:var(--mute)"></p></form></section>
 
   <section class="glass rv bl"><h3>${t("sec_gw")} (${D.giveaways.length})</h3>
     ${D.giveaways.map(g=>`<div class="ex-row"><span>${esc(L(g.title))} · ${g.participants.length}${g.winner?` · ${t("winner")}: ${esc(g.winner.name)}`:""}</span>
@@ -1179,7 +1183,7 @@ function pAdmin(){
       <div class="g2"><label class="field">${t("price")}<input name="price" type="number" required></label>
         <label class="field">${t("cat")}${sel("cat",[["pack","pack"],["over","over"],["design","design"],["guide","guide"]])}</label></div>
       <label class="field">${t("img")}<input name="img" placeholder="https://"></label>
-      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fPr">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fPr">${t("cancel")}</button></div></form></section>
+      <div class="row"><button class="btn sm" type="submit" data-adminsubmit="fPr">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fPr">${t("cancel")}</button></div><p data-admin-status role="status" aria-live="polite" style="min-height:20px;font-size:13px;margin-top:5px;color:var(--mute)"></p><p class="mute sm" style="font-size:11px;opacity:.8">A782 STORE ADD FIX V5 · 09.11.2026</p></form></section>
 
   <section class="glass rv bl"><h3>${t("sec_mp")} (${D.modpacks.length})</h3>
     ${D.modpacks.map(m=>`<div class="ex-row"><span>${esc(m.title)} · ${esc(m.version)} ${esc(m.loader)}</span><span class="row"><button class="btn ghost sm" data-edit="modpacks:${m.id}">${t("edit")}</button><button class="btn red sm" data-del="modpacks:${m.id}">${t("del")}</button></span></div>`).join("")}
@@ -1194,7 +1198,7 @@ function pAdmin(){
       <label class="field">${t("mfile")}<input name="file" placeholder="https://"></label>
       <div class="g3">${ml("desc",t("desc"),{})}</div>
       <p class="mute sm">${t("pidh")}</p>
-      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fMp">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div></form></section>
+      <div class="row"><button class="btn sm" type="submit" data-adminsubmit="fMp">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div><p data-admin-status role="status" aria-live="polite" style="min-height:20px;font-size:13px;margin-top:5px;color:var(--mute)"></p></form></section>
 
   <section class="glass rv bl"><h3>✦ VIP тарифтері</h3><div id="vipAdminPlans"></div>
     <p class="mute sm">${tri("Деңгейді «Өңдеу» арқылы таңдаңыз. VIP-FREE әрқашан 7 күн және тегін.","Нажмите «Изменить» для нужного уровня. FREE всегда бесплатен на 7 дней.","Select a tier via Edit. FREE is always a 7-day free trial.")}</p>
@@ -1423,6 +1427,7 @@ async function copyText(txt){
 /* ===================== АДМИН ТІЗІМДЕРІ ===================== */
 async function loadAdmin(){
   if(!ADMIN) return;
+  const sessionAtStart=ADMIN;
   try{
     const [{users},{orders},{plans}]=await Promise.all([api("GET","/api/admin/users",null,true),api("GET","/api/admin/orders",null,true),api("GET","/api/admin/vip-plans",null,true)]);
     window.vipAdminPlans=plans;
@@ -1442,7 +1447,18 @@ async function loadAdmin(){
       ${orders.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${esc(o.nick)}</td><td>${money(o.total)}</td>
         <td>${o.type==="vip"?"✦ VIP "+esc(o.planName):esc(o.method)} · ${o.status==="paid"?t("paid"):t("pend")}</td>
         <td>${o.type==="vip"?`<button class="btn sm" data-vipapprove="${esc(o.id)}">${o.approvedAt?"VIP расталды · тексеру":"VIP растау / қосу"}</button>`:`<button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button>`}</td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
-  }catch(e){ toast(errMsg(e),true) }
+  }catch(e){
+    if(e.code==='admin_required' && ADMIN===sessionAtStart){
+      clearAdminSession();
+      if(ROUTE==='admin' && ownerView()){
+        render(true);
+        toast(tri('Админ PIN сессиясы аяқталды. Қайта PIN енгіз.','Сессия админа истекла. Введи PIN заново.','Admin session expired. Re-enter your PIN.'),true);
+        document.querySelector('#pinForm input[name="pin"]')?.focus();
+      }
+      return;
+    }
+    toast(errMsg(e),true);
+  }
 }
 const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
 
@@ -1453,15 +1469,17 @@ function adminFormError(form,message,focusName){
   let box=form.querySelector('[data-admin-error]');
   if(!box){box=document.createElement('p');box.dataset.adminError='1';box.setAttribute('role','alert');box.style.cssText='color:var(--bad);font-size:13px;margin-top:6px;white-space:pre-wrap';form.appendChild(box)}
   box.textContent=message;
+  const status=form.querySelector('[data-admin-status]');
+  if(status){status.textContent=message;status.style.color='var(--bad)'}
   toast(message,true);
   const field=focusName && form.elements.namedItem(focusName);
   if(field&&typeof field.focus==='function')field.focus({preventScroll:false});
 }
-function clearAdminFormError(form){const box=form.querySelector('[data-admin-error]');if(box)box.remove()}
+function clearAdminFormError(form){const box=form.querySelector('[data-admin-error]');if(box)box.remove();const status=form.querySelector('[data-admin-status]');if(status){status.textContent='';status.style.color='var(--mute)'}}
 async function submitAdminForm(form){
-  if(!form||!ADMIN_FORM_KINDS[form.id]||form.dataset.submitting==='1')return;
+  if(!form||!ADMIN_FORM_KINDS[form.getAttribute('id')]||form.dataset.submitting==='1')return;
   clearAdminFormError(form);
-  const fields=formObj(form), kind=ADMIN_FORM_KINDS[form.id];
+  const fields=formObj(form), kind=ADMIN_FORM_KINDS[form.getAttribute('id')];
   const hasText=prefix=>['kk','ru','en'].some(lang=>String(fields[prefix+'_'+lang]||'').trim());
   const titleError=tri('Атауын толтыр (KK, RU немесе EN).','Укажи название (KK, RU или EN).','Enter a title in KK, RU or EN.');
   if(kind==='products'){
@@ -1482,16 +1500,28 @@ async function submitAdminForm(form){
   if(button)button.disabled=true;
   const originalText=button?button.innerHTML:'';
   if(button)button.textContent=tri('Сақталып жатыр…','Сохраняется…','Saving…');
+  const status=form.querySelector('[data-admin-status]');
+  if(status){status.textContent=tri('Серверге жіберіліп жатыр…','Отправка на сервер…','Sending to server…');status.style.color='var(--acc)'}
   try{
     await api('POST',ADMIN_ENDPOINT[kind],fields,true);
     await loadData();
     render(true);
     toast(tri('Сәтті қосылды / сақталды ✓','Добавлено / сохранено ✓','Added / saved ✓'));
   }catch(err){
+    if(err.code==='admin_required'){
+      // Render redeploy/restart clears server-side admin tokens, not sessionStorage.
+      // Don't discard what the owner typed; reauthenticate and retry the clicked save.
+      pendingAdminSave={id:form.getAttribute('id'),fields:{...fields}};
+      clearAdminSession();
+      render(true);
+      toast(tri('PIN сессиясы аяқталды. Қайта PIN енгіз: тауар жоғалмайды.','Сессия PIN истекла. Введи PIN: данные не потеряются.','PIN session expired. Re-enter PIN; your draft is kept.'),true);
+      document.querySelector('#pinForm input[name="pin"]')?.focus();
+      return;
+    }
     const reason=err.code==='title_required'?titleError:
       err.code==='admin_required'?tri('Админ сессиясы аяқталған. Қайта кір.','Сессия администратора истекла. Войди снова.','Admin session expired. Sign in again.'):
       err.code==='too_large'?tri('Дерек көлемі тым үлкен.','Слишком большой объём данных.','Payload is too large.'):
-      tri('Сақталмады. Сервер жауабы: ','Не сохранено. Ответ сервера: ','Not saved. Server response: ')+(err.code||err.message||'generic');
+      tri('Сақталмады. Сервер жауабы: ','Не сохранено. Ответ сервера: ','Not saved. Server response: ')+(err.code||err.message||'generic')+(err.status?' (HTTP '+err.status+')':'');
     adminFormError(form,reason);
   }finally{
     delete form.dataset.submitting;
@@ -1512,7 +1542,7 @@ document.addEventListener("click",async e=>{
   const pid=e.target.closest("[data-pid]");if(pid){openVersions(pid.dataset.pid,pid.dataset.title);return}
   const btn=e.target.closest("button");if(!btn)return;
   const d=btn.dataset;
-  if(d.adminsubmit){e.preventDefault();await submitAdminForm(document.getElementById(d.adminsubmit));return}
+  if(d.adminsubmit){e.preventDefault();try{await submitAdminForm(document.getElementById(d.adminsubmit))}catch(err){const f=document.getElementById(d.adminsubmit);if(f)adminFormError(f,tri('Сақтау қатесі: ','Ошибка сохранения: ','Save error: ')+(err.code||err.message||'unknown'));console.error('A782 admin button error',err)}return}
   if(d.add){addToCart(d.add);return}
   if(d.enter){enterGw(d.enter);return}
   if(d.nofile){toast(t("nofile"),true);return}
@@ -1565,7 +1595,7 @@ document.addEventListener("click",async e=>{
     case "openCart":openCart();return;
     case "copyIp":copyText(D.server.ip).then(ok=>toast(t("copied"),!ok));return;
     case "logout":logout();return;
-    case "admOut":ADMIN="";sessionStorage.removeItem("a782-admin");render(true);return;
+    case "admOut":pendingAdminSave=null;clearAdminSession();render(true);return;
   }
 });
 let pendingIcon=null;
@@ -1640,7 +1670,7 @@ document.addEventListener('change',e=>{
 document.addEventListener("input",e=>{
   if(e.target.id==="mcQ")MC.q=e.target.value.trim();
   const form=e.target.closest('form');
-  if(form && ADMIN_FORM_KINDS[form.id])clearAdminFormError(form);
+  if(form && ADMIN_FORM_KINDS[form.getAttribute('id')])clearAdminFormError(form);
 });
 if(matchMedia("(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)").matches){
  document.addEventListener("pointermove",e=>{
@@ -1658,11 +1688,26 @@ document.addEventListener("submit",async e=>{
   e.preventDefault();
   const f=e.target,o=formObj(f);
   try{
-    switch(f.id){
+    switch(f.getAttribute('id')){
       case "pinForm":{
         if(!ownerView()){toast(tri('Қолжетімсіз','Нет доступа','Access denied'),true);return}
         const r=await api("POST","/api/admin/login",{pin:o.pin});
-        ADMIN=r.token;sessionStorage.setItem("a782-admin",ADMIN);render(true);return;
+        ADMIN=r.token;
+        sessionStorage.setItem("a782-admin",ADMIN);
+        const retry=pendingAdminSave;
+        pendingAdminSave=null;
+        render(true);
+        if(retry){
+          const target=document.getElementById(retry.id);
+          if(target){
+            for(const [name,value] of Object.entries(retry.fields)){
+              const field=target.elements.namedItem(name);
+              if(field && 'value' in field)field.value=String(value??'');
+            }
+            await submitAdminForm(target);
+          }
+        }
+        return;
       }
       case "authForm":{
         const reg=AUTH==="reg";
@@ -1706,7 +1751,7 @@ document.addEventListener("submit",async e=>{
       }
       case "fSite":{await api("PUT","/api/admin/site",o,true);await loadData();toast(t("saved"));render(true);return}
       case "fGame":case "fGw":case "fPr":case "fMp":{
-        await submitAdminForm(f);return;
+        try{await submitAdminForm(f)}catch(err){adminFormError(f,tri("Сақтау қатесі: ","Ошибка сохранения: ","Save error: ")+(err.code||err.message||"unknown"));console.error("A782 admin submit error",err)}return;
       }
     }
   }catch(err){ toast(errMsg(err),true) }
