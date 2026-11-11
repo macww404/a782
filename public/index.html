@@ -1182,6 +1182,29 @@ body.calm .winter-sky i,body.calm .winter-stars{animation:none!important}
 @media(max-width:600px){.chance-row{grid-template-columns:minmax(85px,1fr) 75px 100px;gap:7px}.winter-sky i:nth-child(n+9){display:none}.reel-prize{backdrop-filter:none!important}.reel-machine.is-spinning .reel-marker{filter:none!important}}
 @media(prefers-reduced-motion:reduce){.pg{animation:none!important}.dnav a,.tabbar a,.btn,.icon-btn{transition:none!important}}
 body.calm .pg{animation:none!important}
+
+/* Frostglass: a lit display window over a horizontal gallery. */
+.reel-panel{background:radial-gradient(ellipse at 50% 0%,#214354 0%,#101f2b 44%,#0a111b 90%)!important;border:1px solid #668b9f55!important;box-shadow:0 24px 72px #0005,inset 0 1px #c9eff83b!important}
+.reel-machine{isolation:isolate;border-radius:24px!important;background:radial-gradient(ellipse at 50% 100%,#659dae55,transparent 66%),linear-gradient(#08111a,#142633)!important;padding-block:24px!important}
+.reel-upper-rail,.reel-lower-rail{display:none!important}
+.reel-viewport{position:relative;z-index:1}
+.frost-window{position:absolute;z-index:4;pointer-events:none;inset:9px auto 9px 50%;transform:translateX(-50%);width:clamp(100px,18%,146px);border:1px solid #a8e7ff88;border-radius:20px;background:linear-gradient(150deg,#a8e7ff18,transparent 40%,#e5f7ff14);box-shadow:0 0 28px #84d7fb25,inset 0 0 19px #8cdcff24}
+.frost-window i{position:absolute;left:50%;top:-11px;translate:-50% 0;font-style:normal;color:#e1faff;background:#152d3d;border:1px solid #a8e7ff88;border-radius:50%;width:24px;height:24px;text-align:center;line-height:22px}
+.reel-prize{background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--rare) 23%,transparent),transparent 72%),linear-gradient(160deg,#1b2e3c,#101723)!important;border:1px solid color-mix(in srgb,var(--rare) 76%,transparent)!important;border-radius:16px!important;box-shadow:inset 0 1px color-mix(in srgb,var(--rare) 35%,transparent),inset 0 -14px 26px #0003!important}
+.reel-prize[data-rarity="Rare"]{--rare:#78dfff}
+.reel-prize[data-rarity="Epic"]{--rare:#bd92ff}
+.reel-prize[data-rarity="Legendary"]{--rare:#ffd584}
+.reel-prize[data-rarity="Mythic"]{--rare:#ff9cbd;border-style:double!important;border-width:3px!important}
+.reel-prize.is-selected{animation:frost-win .55s ease-out both}
+@keyframes frost-win{0%{filter:brightness(1.55);transform:scale(.94)}100%{filter:brightness(1.13);transform:scale(1)}}
+.winter-sky i{filter:drop-shadow(0 0 6px #a7e9ff)}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ body:not(.calm) :is(.grid > .glass,.home-directory > a,.nexus-tier,.reel-prize){transition:transform .34s cubic-bezier(.2,.65,.3,1),box-shadow .34s,border-color .34s}
+ body:not(.calm) :is(.grid > .glass,.home-directory > a,.nexus-tier):hover{transform:perspective(850px) translateY(-5px) rotateX(4deg) rotateY(-3deg);box-shadow:0 18px 36px #0006,0 0 22px #8ddcf225;border-color:#99d7ec73}
+ body:not(.calm) .reel-machine:not(.is-spinning) .reel-prize:not(.is-selected):hover{transform:perspective(650px) translateY(-4px) rotateX(6deg)}
+}
+body.calm .reel-prize.is-selected{animation:none}
+@media(prefers-reduced-motion:reduce){.reel-prize.is-selected{animation:none}}
 </style></head>
 <body>
 <div id="splash"><div class="ring"></div><b>A782</b></div>
@@ -1583,8 +1606,8 @@ function reelCards(){
 }
 function chanceAdmin(){
  return `<section class="glass bl rv"><h3>${tri('Рулетка шанстары','Шансы рулетки','Roulette probabilities')}</h3><p class="mute">${tri('Барлығы 100%. 0% сыйлық ұтылмайды. Сиректік — бөлек белгі.','Сумма 100%. Призы с 0% не выпадают. Редкость — отдельная метка.','Total must be 100%. Zero-percent prizes cannot win. Rarity is a separate label.')}</p>
- <form id="chanceForm">${D.prizes.map(p=>`<div class="chance-row" data-chance-id="${esc(p.id)}"><label for="chance-${esc(p.id)}">${esc(L(p.label))}</label><input id="chance-${esc(p.id)}" aria-label="${esc(L(p.label))} %" type="number" min="0" max="100" step="0.01" required value="${p.chanceBps/100}"><select aria-label="Rarity">${['Common','Rare','Epic','Legendary'].map(r=>`<option ${r===p.rarity?'selected':''}>${r}</option>`).join('')}</select></div>`).join('')}<p id="chancesTotal" role="status"></p><p id="chanceError" role="alert"></p><button class="btn" type="submit">${t('saved')==='Saved'?'Save':tri('Сақтау','Сохранить','Save')}</button></form>
- <details class="bl"><summary>${tri('Жаңа сыйлық қосу','Добавить приз','Add prize')}</summary><form id="newWheelPrize" class="form">${ml('label',tri('Атауы','Название','Name'),{})}<label class="field">${tri('Түрі','Тип','Type')}<select name="kind"><option value="tickets">Tickets</option><option value="tokens">Tokens</option><option value="diamonds">Diamonds</option><option value="coupon">Coupon %</option></select></label><label class="field">${tri('Мөлшері','Количество','Amount')}<input name="val" type="number" min="1" max="1000000" required></label><label class="field">Rarity<select name="rarity"><option>Common</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label><p class="mute">${tri('0% шансымен қосылады. Содан кейін шанстарды реттеп сақтаңыз.','Добавляется с шансом 0%. Затем настройте и сохраните шансы.','Added at 0%. Then adjust and save the probabilities.')}</p><button class="btn" type="submit">${tri('Қосу','Добавить','Add')}</button></form></details></section>`;
+ <form id="chanceForm">${D.prizes.map(p=>`<div class="chance-row" data-chance-id="${esc(p.id)}"><label for="chance-${esc(p.id)}">${esc(L(p.label))}</label><input id="chance-${esc(p.id)}" aria-label="${esc(L(p.label))} %" type="number" min="0" max="100" step="0.01" required value="${p.chanceBps/100}"><select aria-label="Rarity">${['Common','Rare','Epic','Legendary','Mythic'].map(r=>`<option ${r===p.rarity?'selected':''}>${r}</option>`).join('')}</select></div>`).join('')}<p id="chancesTotal" role="status"></p><p id="chanceError" role="alert"></p><button class="btn" type="submit">${t('saved')==='Saved'?'Save':tri('Сақтау','Сохранить','Save')}</button></form>
+ <details class="bl"><summary>${tri('Жаңа сыйлық қосу','Добавить приз','Add prize')}</summary><form id="newWheelPrize" class="form">${ml('label',tri('Атауы','Название','Name'),{})}<label class="field">${tri('Түрі','Тип','Type')}<select name="kind"><option value="tickets">Tickets</option><option value="tokens">Tokens</option><option value="diamonds">Diamonds</option><option value="coupon">Coupon %</option></select></label><label class="field">${tri('Мөлшері','Количество','Amount')}<input name="val" type="number" min="1" max="1000000" required></label><label class="field">Rarity<select name="rarity"><option>Common</option><option>Rare</option><option>Epic</option><option>Legendary</option><option>Mythic</option></select></label><p class="mute">${tri('0% шансымен қосылады. Содан кейін шанстарды реттеп сақтаңыз.','Добавляется с шансом 0%. Затем настройте и сохраните шансы.','Added at 0%. Then adjust and save the probabilities.')}</p><button class="btn" type="submit">${tri('Қосу','Добавить','Add')}</button></form></details></section>`;
 }
 function updateChanceTotal(){
  const el=document.getElementById('chancesTotal'); if(!el)return;
@@ -1606,16 +1629,15 @@ function pGw(){
     <div class="reel-head"><div><span class="reel-kicker">✦ A782 WINTER REWARDS</span><h2>${tri('Сыйлықтар лентасы','Лента наград','Prize reel')}</h2><p>${t('wlead')}</p></div><div class="reel-counter">${ic('gift')} <span>${t('tickets')}</span><strong id="reelTicketCount">${fmt(ME?.tickets??0)}</strong></div></div>
     <div class="reel-machine" id="winterReel">
       <div class="reel-upper-rail"></div>
-      <div class="reel-marker reel-marker-top" aria-hidden="true"></div>
+      <div class="frost-window" aria-hidden="true"><i>❄</i></div>
       <div class="reel-viewport" id="reelViewport"><div class="reel-track" id="reelTrack">${reelCards()}</div></div>
-      <div class="reel-marker reel-marker-bottom" aria-hidden="true"></div>
       <div class="reel-lower-rail"></div>
     </div>
     <div class="reel-controls"><div class="reel-price-note">${ic('gift')} <span>${price} ${t('tickets').toLowerCase()} / ${tri('айналдыру','вращение','spin')}</span></div>
-      <button class="btn reel-spin-btn" id="spinBtn" ${SPIN||!D.prizes?.length?'disabled':''}>${ic('play')} <span>${t('spin')}</span> <span class="reel-spin-arrow">→</span></button>
+      <button class="btn reel-spin-btn" id="spinBtn" ${SPIN||!D.prizes?.length?'disabled':''}>${ic('play')} <span class="reel-spin-label">${t('spin')}</span> <span class="reel-spin-arrow">→</span></button>
       ${ME?`<button class="btn ghost reel-daily-btn" id="daily">${ic('plus')} ${t('daily')}</button>`:`<a href="#me" class="btn ghost reel-daily-btn">${ic('user')} ${t('login_b')}</a>`}
     </div>
-    <div class="reel-rules"><span class="mute">Common · Rare · Epic · Legendary</span><button class="btn ghost sm" type="button" onclick="showOdds()">${tri('Ұтыс ережелері','Правила розыгрыша','Draw rules')}</button></div><div id="reelAnnouncement" role="status" aria-live="polite" class="reel-announcement">${REEL_LAST_WIN?`${ic('check')} ${tri('Соңғы ұтыс','Последний приз','Last reward')}: <b>${esc(L(REEL_LAST_WIN.label))}</b>`:tri('Ортасындағы белгі тоқтаған жүлдені көрсетеді.','Маркер в центре укажет на приз.','The center marker indicates your reward.')}</div>
+    <div class="reel-rules"><span class="mute">Common · Rare · Epic · Legendary · Mythic</span><button class="btn ghost sm" type="button" onclick="showOdds()">${tri('Ұтыс ережелері','Правила розыгрыша','Draw rules')}</button></div><div id="reelAnnouncement" role="status" aria-live="polite" class="reel-announcement">${REEL_LAST_WIN?`${ic('check')} ${tri('Соңғы ұтыс','Последний приз','Last reward')}: <b>${esc(L(REEL_LAST_WIN.label))}</b>`:tri('Ортасындағы белгі тоқтаған жүлдені көрсетеді.','Маркер в центре укажет на приз.','The center marker indicates your reward.')}</div>
   </section>
   ${ME?`<div class="row rv winter-wallet"><span class="tag">${t('tokens')} <b>${fmt(ME.tokens)}</b></span><span class="tag">${t('diamonds')} <b>${fmt(ME.diamonds)}</b></span></div>`:`<p class="notice rv">${t('login')}</p>`}
   <section class="bl"><h3 class="rv">${t('exch')}</h3>
@@ -2032,7 +2054,7 @@ function render(keep){
 }
 function bindPage(key){
   if(key==="home") setTimeout(countUp,300);
-  if(key==="gw") requestAnimationFrame(initPrizeReel);
+  if(key==="gw"){syncSpinButton();requestAnimationFrame(initPrizeReel);}
   if(key==="streams"||key==="home") startCd();
   if(key==="mc"&&MC.hits===null) searchMC();
   if(key==="store"||(key==="me"&&ME)) loadOrders();
@@ -2070,6 +2092,18 @@ function startCd(){
 
 /* ===================== HORIZONTAL PRIZE REEL ===================== */
 let REEL_LAST_WIN=null;
+let reelReadyAt=0;
+let reelCooldownTimer;
+function syncSpinButton(){
+  clearTimeout(reelCooldownTimer);
+  const button=document.getElementById("spinBtn");
+  if(!button)return;
+  const wait=Math.max(0,reelReadyAt-Date.now());
+  button.disabled=SPIN||wait>0||!D?.prizes?.length;
+  button.classList.toggle("is-busy",SPIN);
+  button.querySelector(".reel-spin-label").textContent=wait&&!SPIN ? t("spin")+" · "+Math.ceil(wait/1000)+"s" : t("spin");
+  if(wait&&!SPIN)reelCooldownTimer=setTimeout(syncSpinButton,Math.min(1000,wait));
+}
 let REEL_LAST_IDX=null;
 let reelAnchor=0;
 let reelRunId=0;
@@ -2139,9 +2173,8 @@ async function performSpin(){
   if(!TOKEN){toast(t('login'),true);location.hash='#me';return}
   if(!Array.isArray(D?.prizes)||!D.prizes.length){toast(t('nores'),true);return}
   SPIN=true;
-  const btn=document.getElementById('spinBtn');
   const announcement=document.getElementById('reelAnnouncement');
-  if(btn){btn.disabled=true;btn.classList.add('is-busy')}
+  syncSpinButton();
   if(announcement)announcement.textContent=tri('Жүлде анықталып жатыр…','Выбираем приз…','Selecting reward…');
   try{
     const pendingKey='a782-spin-pending:'+ME.id;
@@ -2149,6 +2182,7 @@ async function performSpin(){
     if(!requestId){requestId=crypto.randomUUID();localStorage.setItem(pendingKey,requestId)}
     const r=await api('POST','/api/wheel/spin',{requestId});
     ME=r.user;
+    reelReadyAt=Date.now()+(r.cooldownMs||0);
     localStorage.removeItem(pendingKey);
     REEL_LAST_WIN=r.prize;
     REEL_LAST_IDX=r.index;
@@ -2158,7 +2192,7 @@ async function performSpin(){
 
     render(true);
   }catch(e){if(e.status && e.status<500 && e.code!=='spin_busy')localStorage.removeItem('a782-spin-pending:'+ME.id);toast(errMsg(e),true);if(announcement)announcement.textContent=errMsg(e)}
-  finally{SPIN=false;if(btn&&btn.isConnected){btn.disabled=false;btn.classList.remove('is-busy')}}
+  finally{SPIN=false;syncSpinButton()}
 }
 
 /* ===================== ӘРЕКЕТТЕР ===================== */
