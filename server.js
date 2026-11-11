@@ -1,815 +1,2693 @@
-// A782 DIGITAL — backend v3. Node.js 18+, басқа пакет қажет емес.
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c131a">
+<title>A782 DIGITAL · WINTER EDITION</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07080c;--bg2:#0f1119;--ink:#eef0f6;--mute:#8b92a5;--line:rgba(255,255,255,.09);--glass:rgba(255,255,255,.045);--acc:#f5b041;--acc2:#7dd3fc;--acc3:#a78bfa;--ok:#34d399;--bad:#f87171;--e:cubic-bezier(.2,.8,.2,1);--fh:"Space Grotesk",Inter,sans-serif}
+[data-theme=light]{--bg:#f5f2ec;--bg2:#fff;--ink:#14161e;--mute:#646b7a;--line:rgba(20,22,30,.1);--glass:rgba(255,255,255,.78)}
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+body{font:15px/1.6 Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;transition:background .6s var(--e),color .6s}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit;color:inherit}
+.ic{width:20px;height:20px;flex:0 0 auto}
+#splash{position:fixed;inset:0;z-index:300;display:grid;place-content:center;justify-items:center;gap:16px;background:var(--bg);transition:opacity .7s var(--e),visibility .7s}
+#splash.off{opacity:0;visibility:hidden}
+.ring{width:70px;height:70px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:spin 1s linear infinite}
+#splash b{font:700 20px var(--fh);letter-spacing:.25em}
+@keyframes spin{to{transform:rotate(360deg)}}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+.aurora{position:fixed;inset:-20%;z-index:0;pointer-events:none;filter:blur(90px);opacity:.4}
+.aurora i{position:absolute;width:44vw;height:44vw;border-radius:50%;background:var(--acc);opacity:.22;animation:drift 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){background:var(--acc2);left:55%;top:30%;animation-duration:28s}
+.aurora i:nth-child(3){background:var(--acc3);left:8%;top:60%;animation-duration:30s}
+@keyframes drift{to{transform:translate(8vw,6vh) scale(1.2)}}
+.top{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font:700 18px var(--fh)}
+.mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--acc),var(--acc3));color:#0a0b10;font-weight:700;transition:transform .5s var(--e)}
+.brand:hover .mark{transform:rotate(-12deg) scale(1.08)}
+.dnav{display:flex;gap:4px}
+.dnav a{padding:8px 12px;border-radius:999px;color:var(--mute);font-weight:500;font-size:14px;transition:.3s}
+.dnav a:hover,.dnav a.on{color:var(--ink);background:var(--glass)}
+.tools{display:flex;gap:8px;align-items:center}
+.seg{display:inline-flex;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button,.pill{border:0;background:transparent;color:var(--mute);padding:7px 12px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px;transition:.3s}
+.seg button.on,.pill.on{background:var(--ink);color:var(--bg)}
+.pill{border:1px solid var(--line)}
+.icon-btn{width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer;transition:transform .3s var(--e)}
+.icon-btn:hover{transform:rotate(45deg)}
+main{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:18px 18px 40px}
+.pg{animation:pgIn .6s var(--e) both}
+@keyframes pgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.rv{opacity:0;transform:translateY(22px);filter:blur(4px);transition:opacity .8s var(--e),transform .8s var(--e),filter .8s var(--e);transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none;filter:none}
+.ph{margin:14px 0 24px}
+.eyebrow{color:var(--acc);font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;display:inline-flex;gap:8px;align-items:center}
+.ph h1,.hero h1{font:700 clamp(40px,9vw,84px)/.98 var(--fh);letter-spacing:-.04em;margin:10px 0 12px}
+.lead{color:var(--mute);font-size:clamp(16px,2vw,19px);max-width:640px}
+.mute{color:var(--mute)}
+.sm{font-size:13px}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-right:.2em}
+.w>span{display:inline-block;transform:translateY(105%);animation:up .9s var(--e) forwards;animation-delay:calc(var(--i)*90ms + 120ms)}
+@keyframes up{to{transform:none}}
+.grad{background:linear-gradient(100deg,var(--acc),var(--acc3),var(--acc2),var(--acc));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s linear infinite}
+@keyframes sheen{to{background-position:300% 0}}
+.hero{padding:30px 0 10px}
+.glass{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:24px;padding:22px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:hidden;transition:transform .45s var(--e),border-color .3s,box-shadow .45s}
+.glass::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--acc) 18%,transparent),transparent 60%)}
+.glass:hover::before{opacity:1}
+.glass>*{position:relative}
+.glass:hover{border-color:color-mix(in srgb,var(--acc) 35%,var(--line));box-shadow:0 20px 50px -25px rgba(0,0,0,.6)}
+.glow::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;background:conic-gradient(from var(--ang),var(--acc),var(--acc2),var(--acc3),var(--acc));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:ang 5s linear infinite;opacity:.75}
+@keyframes ang{to{--ang:360deg}}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border:0;border-radius:16px;background:linear-gradient(120deg,var(--acc),var(--acc3));color:#0a0b10;font-weight:600;cursor:pointer;text-decoration:none;transition:transform .3s var(--e),box-shadow .3s,opacity .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -12px color-mix(in srgb,var(--acc) 70%,transparent)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.btn.ghost{background:var(--glass);color:var(--ink);border:1px solid var(--line)}
+.btn.red{background:transparent;color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 50%,transparent)}
+.btn.sm{padding:9px 14px;font-size:13px;border-radius:12px}
+.btn.wide{width:100%}
+.btn .ic{width:17px;height:17px}
+.rip{position:absolute;width:10px;height:10px;margin:-5px;border-radius:50%;background:rgba(255,255,255,.55);pointer-events:none;animation:rip .6s var(--e) forwards}
+@keyframes rip{to{transform:scale(28);opacity:0}}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--mute);background:var(--glass)}
+.tag.a{color:var(--acc)}.tag.g{color:var(--ok)}
+.tag .ic{width:14px;height:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--mute);flex:0 0 auto}
+.dot.on{background:var(--ok);animation:ping 2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,265px),1fr));gap:16px;margin-top:14px}
+.card{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px}
+.stat b{display:block;font:700 clamp(24px,5vw,38px) var(--fh);font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:12px;color:var(--mute)}
+.bl{margin-top:34px}
+h2.bl,h3{font:700 22px var(--fh);margin-bottom:12px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--line);margin-top:auto;font-size:13px;color:var(--mute);flex-wrap:wrap}
+.win{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;border:1px solid var(--acc)}
+.win .ic{color:var(--acc)}
+.ibox{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc);flex:0 0 auto}
+.specs{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--mute);padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.wheel-wrap{display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:26px;align-items:center}
+.wheel-box{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:0 auto}
+#wheel{width:100%;height:100%;border-radius:50%;box-shadow:0 0 0 1px var(--line),0 40px 80px -30px rgba(0,0,0,.7)}
+.ptr{position:absolute;top:-12px;left:50%;translate:-50% 0;width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid var(--acc);z-index:3}
+.hub{position:absolute;left:50%;top:50%;translate:-50% -50%;width:64px;height:64px;border-radius:50%;border:1px solid var(--line);background:var(--bg2);color:var(--acc);display:grid;place-items:center;cursor:pointer;z-index:2;transition:scale .3s var(--e)}
+.hub:hover{scale:1.08}
+.ex{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;margin-top:10px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:20px;background:var(--glass);border:1px solid var(--line);margin-top:20px}
+.search input{border:0;background:transparent;flex:1;padding:10px 0;outline:none;min-width:0}
+.pills{display:flex;gap:8px;overflow-x:auto;padding:4px 0;margin:14px 0}
+.pills::-webkit-scrollbar{display:none}
+.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+select,input,textarea{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);outline:none;transition:border-color .3s,box-shadow .3s}
+select{padding:10px}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 15%,transparent)}
+input[type=checkbox]{width:auto}
+input[type=file]{padding:9px}
+.form{display:grid;gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:grid;gap:6px;font-size:13px;color:var(--mute)}
+.mr-list{display:grid;gap:10px;margin-top:14px}
+.mr{display:flex;align-items:center;gap:14px;padding:14px;cursor:pointer}
+.mr img{width:56px;height:56px;border-radius:16px;object-fit:cover;background:var(--bg2);flex:0 0 auto}
+.mr-i{flex:1;min-width:0}
+.mr-i p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:var(--mute)}
+.prof-banner{height:150px;border-radius:24px 24px 0 0;background:linear-gradient(120deg,var(--acc),var(--acc3));background-size:cover;background-position:center}
+.prof-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:-46px 22px 14px;position:relative}
+.avatar{width:92px;height:92px;border-radius:28px;border:4px solid var(--bg);background:var(--bg2);display:grid;place-items:center;overflow:hidden;color:var(--acc)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar .ic{width:38px;height:38px}
+.icons{display:flex;gap:8px;flex-wrap:wrap}
+.ibtn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer}
+.ibtn.on{border-color:var(--acc);color:var(--acc)}
+.auth{max-width:460px}
+.set{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;flex-wrap:wrap}
+.switch{position:relative;width:50px;height:28px;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;border-radius:30px;background:var(--line);cursor:pointer;transition:background .4s}
+.switch span::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .4s var(--e)}
+.switch input:checked+span{background:var(--acc)}
+.switch input:checked+span::after{transform:translateX(22px)}
+.line{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:34px;height:34px;border-radius:12px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;cursor:pointer}
+.cart-bar{position:sticky;bottom:100px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 18px;border-radius:20px;background:var(--ink);color:var(--bg);margin-top:20px}
+.sumrow{display:flex;justify-content:space-between;color:var(--mute);margin:4px 0}
+.total{display:flex;justify-content:space-between;align-items:center;margin:14px 0;font-size:18px;font-weight:700}
+.cd{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.cd div{flex:1;min-width:64px;padding:12px 8px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);text-align:center}
+.cd b{display:block;font:700 28px var(--fh);font-variant-numeric:tabular-nums}
+.cd span{font-size:11px;color:var(--mute)}
+.ipbox{font-family:"Courier New",monospace;font-size:clamp(18px,4vw,24px);font-weight:700;padding:14px 18px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);display:inline-block;margin:10px 0}
+.table{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:10px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:500;font-size:12px}
+.ex-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.empty,.notice{padding:26px;border-radius:20px;border:1px dashed var(--line);text-align:center;color:var(--mute)}
+.notice{border-style:solid;border-color:color-mix(in srgb,var(--bad) 50%,transparent)}
+.spin{width:34px;height:34px;margin:30px auto;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:spin .9s linear infinite}
+.marquee{overflow:hidden;white-space:nowrap;margin-top:50px;padding:14px 0;border-block:1px solid var(--line);color:var(--mute)}
+.marquee div{display:inline-block;animation:marq 32s linear infinite;font:italic 20px var(--fh)}
+.marquee span{padding-right:44px}
+@keyframes marq{to{transform:translateX(-50%)}}
+.sheet-wrap{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;background:rgba(3,4,8,.55);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s}
+.sheet-wrap.on{opacity:1;pointer-events:all}
+.sheet{width:min(560px,100%);max-height:88vh;overflow:auto;background:var(--bg2);border:1px solid var(--line);border-radius:28px 28px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(40px);transition:transform .5s var(--e)}
+.sheet-wrap.on .sheet{transform:none}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:110px;z-index:200;transform:translate(-50%,200%);padding:12px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;transition:transform .5s var(--e);max-width:92vw;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+.toast.bad{background:var(--bad);color:#fff}
+.tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:60;display:grid;grid-template-columns:repeat(5,1fr);padding:6px;border-radius:24px;background:color-mix(in srgb,var(--bg2) 88%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line)}
+.tabbar .ind{position:absolute;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/5);border-radius:18px;background:var(--glass);border:1px solid var(--line);transform:translateX(calc(var(--i,0)*100%));transition:transform .5s var(--e)}
+.tabbar a{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;color:var(--mute);font-size:11px;font-weight:600;transition:color .3s,transform .3s var(--e)}
+.tabbar a.on{color:var(--ink)}
+.tabbar a:active{transform:scale(.92)}
+.tabbar .ic{width:21px;height:21px}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:13px}
+.links{display:flex;gap:16px;flex-wrap:wrap}
+.links a{color:var(--acc);font-weight:600}
+body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition-duration:.01s!important}
+body.calm .rv{opacity:1;transform:none;filter:none}
+body.calm .w>span{transform:none}
+@media(max-width:820px){
+  .dnav{display:none}
+  main{padding-bottom:124px}
+  .g2,.g3,.wheel-wrap{grid-template-columns:1fr}
+  .filters{grid-template-columns:1fr}
+  .cart-bar{bottom:96px}
+}
+@media(min-width:821px){
+  .tabbar{display:none}
+  .sheet-wrap{align-items:center}
+  .sheet{border-radius:28px}
+  .toast{bottom:24px}
+}
+/* A782 NEON EXPERIENCE — accessible subtle 3D & motion */
+:root{--vip-accent:#ffc76d}
+body{background-image:radial-gradient(ellipse at 78% -10%,rgba(125,211,252,.08),transparent 43%),radial-gradient(ellipse at 6% 38%,rgba(167,139,250,.08),transparent 50%)}
+.glass{transform-style:preserve-3d;will-change:transform}
+@media(hover:hover) and (pointer:fine){.glass.tilt-card:hover{transform:perspective(980px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-5px);box-shadow:0 24px 70px -32px rgba(136,108,255,.55)}}
+.tilt-card{transition:transform .28s ease,border-color .4s,box-shadow .4s}
+.vip-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:24px}
+.vip-card{--tier:#8be9fd;position:relative;isolation:isolate;min-height:405px;padding:25px 18px;border-color:color-mix(in srgb,var(--tier) 36%,var(--line));background:linear-gradient(155deg,color-mix(in srgb,var(--tier) 11%,var(--glass)),var(--glass) 45%,var(--glass))}
+.vip-card:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(110deg,transparent 12%,color-mix(in srgb,var(--tier) 16%,transparent) 48%,transparent 72%);transform:translateX(-130%);animation:vipSweep 8s ease-in-out infinite}
+.vip-card:nth-child(2):after{animation-delay:1s}.vip-card:nth-child(3):after{animation-delay:2s}.vip-card:nth-child(4):after{animation-delay:3s}
+@keyframes vipSweep{0%,60%{transform:translateX(-130%)}86%,100%{transform:translateX(130%)}}
+.vip-card .vip-crest{width:59px;height:59px;border-radius:20px;display:grid;place-items:center;margin-bottom:10px;background:color-mix(in srgb,var(--tier) 16%,transparent);color:var(--tier);border:1px solid color-mix(in srgb,var(--tier) 45%,transparent);box-shadow:0 0 25px color-mix(in srgb,var(--tier) 16%,transparent)}
+.vip-crest .ic{width:30px;height:30px}.vip-card h3{font-size:25px;margin:6px 0}
+.vip-card .vip-price{font:700 30px var(--fh);letter-spacing:-.05em;color:var(--tier)}
+.vip-perks{list-style:none;display:grid;gap:9px;margin:14px 0 22px}.vip-perks li{display:flex;gap:8px;font-size:12px;line-height:1.5}.vip-perks .ic{width:16px;height:16px;color:var(--tier)}
+.vip-card .btn{margin-top:auto;width:100%;background:linear-gradient(120deg,var(--tier),var(--acc3));color:#0a0b10}
+.vip-card[data-tier="VIP-ULTRA"]{box-shadow:0 10px 65px -35px rgba(255,199,109,.45)}
+.vip-card[data-tier="VIP-PRO"]{box-shadow:0 10px 55px -35px rgba(177,140,255,.4)}
+.vip-status{--tier:#ffc76d;border:1px solid color-mix(in srgb,var(--tier) 45%,var(--line));background:linear-gradient(125deg,color-mix(in srgb,var(--tier) 13%,var(--bg2)),var(--glass));padding:20px;border-radius:23px;position:relative;overflow:hidden}
+.vip-status:after{content:"";position:absolute;right:-25px;top:-55px;width:200px;height:200px;border:1px solid color-mix(in srgb,var(--tier) 32%,transparent);border-radius:50%;box-shadow:0 0 0 24px color-mix(in srgb,var(--tier) 4%,transparent),0 0 0 56px color-mix(in srgb,var(--tier) 3%,transparent);pointer-events:none;animation:halo 6s ease-in-out infinite alternate}
+@keyframes halo{to{transform:scale(1.17) rotate(15deg)}}
+.vip-identity .avatar{border-color:var(--vip-accent);box-shadow:0 0 20px color-mix(in srgb,var(--vip-accent) 55%,transparent)}
+.vip-identity[data-vip="VIP-PRO"] .avatar,.vip-identity[data-vip="VIP-ULTRA"] .avatar{animation:avatarPulse 3s ease-in-out infinite alternate}
+@keyframes avatarPulse{to{box-shadow:0 0 15px 5px color-mix(in srgb,var(--vip-accent) 38%,transparent),0 0 38px color-mix(in srgb,var(--vip-accent) 35%,transparent)}}
+.vip-identity .prof-banner{background-image:linear-gradient(125deg,color-mix(in srgb,var(--vip-accent) 82%,#373d88),#141724 66%,var(--vip-accent));background-size:230% 230%;animation:profileWave 9s ease-in-out infinite alternate}
+@keyframes profileWave{to{background-position:100% 60%}}
+body.vip-view .aurora i:first-child{background:var(--vip-accent)}
+.toast{border:1px solid var(--line);box-shadow:0 15px 40px rgba(0,0,0,.35);transition:transform .55s cubic-bezier(.17,.89,.32,1.35),opacity .35s;opacity:0;backdrop-filter:blur(18px)}
+.toast.on{opacity:1;animation:toastBounce .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes toastBounce{0%{filter:blur(5px);scale:.86}75%{filter:blur(0);scale:1.035}100%{scale:1}}
+.notice{animation:noticeFloat .55s var(--e)}@keyframes noticeFloat{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@media(max-width:1000px){.vip-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.vip-cards{grid-template-columns:1fr}.vip-card{min-height:0}.vip-card h3{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.vip-card:after,.vip-status:after,.vip-identity .avatar,.vip-identity .prof-banner,.toast.on{animation:none!important}.glass.tilt-card:hover{transform:none!important}}
+body.calm .vip-card:after,body.calm .vip-status:after,body.calm .vip-identity .avatar,body.calm .vip-identity .prof-banner{animation:none!important}
 
-const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, "data.json");
-const PUBLIC_DIR = path.join(__dirname, "public");
-const ADMIN_PIN = process.env.ADMIN_PIN || crypto.randomBytes(3).toString("hex");
-// Configure ONLY in Render Environment. Fail closed when no owner email is configured.
-const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
-const isOwnerAccount = u => !!(u && ADMIN_EMAIL && /^[^\s@]+@gmail\.com$/.test(ADMIN_EMAIL) && String(u.email || "").trim().toLowerCase() === ADMIN_EMAIL);
-const DEMO_PAY = process.env.DEMO_PAY !== "0";
-const JB_ID = process.env.JSONBIN_ID, JB_KEY = process.env.JSONBIN_KEY;
-const REMOTE = !!(JB_ID && JB_KEY);
-const UA = "A782DIGITAL/3.0 (+https://t.me/Asxm_A782)";
-const ICONS = ["gift", "users", "gem", "bolt", "trophy", "shield", "star", "swords", "cube", "flame", "gamepad"];
-const AVATARS = ["user", "gem", "bolt", "cube", "trophy", "shield", "star", "swords"];
-const P_CATS = ["pack", "over", "design", "guide"];
-const M_CATS = ["rpg", "pvp", "tech", "anime", "surv"];
+/* A782 ELITE — a genuinely distinct active membership experience */
+:root{--ultra-gold:#ffdb88;--ultra-violet:#9175ff}
+.nav-vip-marker{display:inline-flex;align-items:center;gap:5px;padding:8px 11px;border-radius:999px;white-space:nowrap;border:1px solid color-mix(in srgb,var(--vip-accent) 60%,transparent);font:800 11px var(--fh);letter-spacing:.07em;color:var(--vip-accent);background:color-mix(in srgb,var(--vip-accent) 13%,var(--bg2));box-shadow:0 0 24px color-mix(in srgb,var(--vip-accent) 15%,transparent)}
+.nav-vip-marker .ic{width:15px;height:15px}
+body.vip-view .mark{background:linear-gradient(130deg,var(--vip-accent),#9972fe,#f6bc5d);box-shadow:0 0 22px color-mix(in srgb,var(--vip-accent) 26%,transparent)}
+body.vip-view .top{border-bottom-color:color-mix(in srgb,var(--vip-accent) 28%,var(--line))}
+.profile-heading{display:flex;align-items:center;flex-wrap:wrap;gap:10px 20px}
+.profile-heading .eyebrow{width:100%}
+.profile-heading h1{margin:0}
+.profile-rank{display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb,var(--rank) 55%,transparent);padding:9px 13px;border-radius:99px;color:var(--rank);font-weight:800;letter-spacing:.065em;background:color-mix(in srgb,var(--rank) 12%,transparent)}
+.profile-rank .ic{width:18px;height:18px}
+.membership-hero{--m:#ffd67c;--m2:#a37aff;position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(255,213,125,.57);border-radius:30px;min-height:385px;color:#fff;padding:24px 28px 15px;margin:12px 0 24px;background:radial-gradient(ellipse 75% 100% at 88% 46%,rgba(255,196,68,.2),transparent 67%),radial-gradient(ellipse 65% 100% at 12% 15%,rgba(136,88,232,.33),transparent 68%),linear-gradient(125deg,#100c1c 0%,#1b1231 44%,#120b16 100%);box-shadow:0 28px 75px -29px rgba(169,105,255,.35),inset 0 1px rgba(255,237,197,.24)}
+.membership-hero[data-tier="VIP-PLUS"]{--m:#4be0ff;--m2:#2171e9;border-color:rgba(75,224,255,.52);background:radial-gradient(ellipse at 88% 54%,rgba(37,172,218,.26),transparent 62%),linear-gradient(130deg,#081423,#071c2a 63%,#111b39);box-shadow:0 28px 75px -29px rgba(75,224,255,.25)}
+.membership-hero[data-tier="VIP-PRO"]{--m:#cb93ff;--m2:#706aff;border-color:rgba(191,143,255,.52);background:radial-gradient(ellipse at 88% 54%,rgba(136,73,243,.3),transparent 62%),linear-gradient(130deg,#120b2d,#1c1141 64%,#160b29);box-shadow:0 28px 75px -29px rgba(155,102,255,.35)}
+.membership-hero:before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.08) 44%,transparent 58%);background-size:220% 100%;animation:memberFoil 8s linear infinite}
+.membership-grid{position:absolute;inset:0;z-index:-1;opacity:.32;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to right,transparent 17%,#000 100%)}
+.membership-sheen{position:absolute;inset:-2px;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 80% 32%,color-mix(in srgb,var(--m) 14%,transparent),transparent 47%)}
+@keyframes memberFoil{to{background-position:-220% 0}}
+.membership-topline,.membership-bottomline{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font:700 11px var(--fh);letter-spacing:.14em;color:rgba(255,255,255,.72)}
+.member-live{display:inline-flex;align-items:center;gap:9px;color:var(--m)}
+.member-live i{width:9px;height:9px;background:#54efa9;box-shadow:0 0 0 5px rgba(66,233,153,.1),0 0 16px #54efa9;border-radius:50%}
+.member-serial{opacity:.64}
+.membership-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(230px,.8fr);align-items:center;gap:5px;padding:18px 0 8px}
+.membership-copy{position:relative;z-index:1;min-width:0}
+.membership-pretitle{display:flex;align-items:center;gap:7px;font:800 11px var(--fh);letter-spacing:.19em;color:var(--m);margin-bottom:10px}
+.membership-pretitle .ic{width:17px;height:17px}
+.membership-title{font:800 clamp(38px,5.8vw,70px)/.99 var(--fh);letter-spacing:-.07em;margin:0;text-transform:uppercase;max-width:740px;background:linear-gradient(125deg,#fff4d0 4%,var(--m) 36%,#fff 50%,var(--m2) 86%);background-clip:text;-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 10px 22px rgba(0,0,0,.2))}
+.membership-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:600 20px var(--fh);margin:13px 0;color:#fff}
+.member-verified{display:inline-flex;gap:4px;align-items:center;border-radius:99px;border:1px solid color-mix(in srgb,var(--m) 50%,transparent);color:var(--m);padding:4px 9px;font-size:10px;letter-spacing:.12em}
+.member-verified .ic{width:13px;height:13px}
+.membership-intro{max-width:530px;color:rgba(255,255,255,.75);font-size:14px;line-height:1.65}
+.membership-pills{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}
+.membership-pills span{display:inline-flex;align-items:center;gap:5px;border:1px solid color-mix(in srgb,var(--m) 32%,transparent);padding:6px 9px;background:rgba(255,255,255,.055);border-radius:999px;color:#f5edff;font-size:11px;font-weight:600}
+.membership-pills .ic{color:var(--m);width:13px;height:13px}
+.membership-expiry{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:var(--m);font-weight:700;font-size:13px}
+.membership-expiry .ic{width:16px;height:16px}
+.membership-expiry small{color:rgba(255,255,255,.58)}
+.membership-orbit{width:min(280px,100%);aspect-ratio:1;position:relative;margin:auto;display:grid;place-items:center;filter:drop-shadow(0 22px 22px rgba(0,0,0,.33));transform:translateZ(0)}
+.membership-orbit:before,.membership-orbit:after{content:"";position:absolute;inset:6%;border-radius:50%;background:conic-gradient(from var(--ang),transparent,var(--m),transparent,var(--m2),transparent);opacity:.6;filter:blur(18px);animation:orbitTurn 16s linear infinite}
+.membership-orbit:after{inset:21%;filter:blur(40px);opacity:.65;animation-direction:reverse}
+.membership-orbit-a,.membership-orbit-b,.membership-orbit-c{position:absolute;border-radius:50%;border:1px solid color-mix(in srgb,var(--m) 50%,transparent);box-shadow:inset 0 0 22px color-mix(in srgb,var(--m) 8%,transparent)}
+.membership-orbit-a{inset:5%;border-style:dashed;animation:orbitTurn 30s linear infinite}
+.membership-orbit-b{inset:15%;border:2px solid color-mix(in srgb,var(--m) 38%,transparent);border-top-color:var(--m);border-bottom-color:var(--m2);animation:orbitTurn 11s linear infinite reverse}
+.membership-orbit-c{inset:27%;background:radial-gradient(circle at 35% 25%,color-mix(in srgb,var(--m) 35%,transparent),#1a1531 75%);box-shadow:0 0 40px color-mix(in srgb,var(--m) 32%,transparent),inset 0 0 35px color-mix(in srgb,var(--m) 15%,transparent)}
+.membership-core{z-index:1;display:grid;justify-items:center;gap:2px;color:var(--m);text-shadow:0 1px 10px rgba(0,0,0,.3)}
+.membership-core .ic{width:78px;height:78px;stroke-width:1.25;filter:drop-shadow(0 0 17px color-mix(in srgb,var(--m) 72%,transparent));animation:crestFloat 4s ease-in-out infinite alternate}
+.membership-core span{font:800 19px var(--fh);letter-spacing:.23em}
+.orbit-star{position:absolute;width:7px;height:7px;background:#fff6cf;box-shadow:0 0 20px 7px color-mix(in srgb,var(--m) 55%,transparent);border-radius:50%;animation:starTwinkle 2.7s ease-in-out infinite alternate}
+.orbit-star-1{left:11%;top:25%}.orbit-star-2{right:4%;bottom:31%;animation-delay:-.9s}.orbit-star-3{right:22%;top:2%;animation-delay:-2.1s}
+@keyframes orbitTurn{to{transform:rotate(360deg)}}
+@keyframes crestFloat{to{transform:translateY(-9px) scale(1.075)}}
+@keyframes starTwinkle{to{opacity:.15;transform:scale(.5)}}
+.membership-bottomline{padding-top:13px;border-top:1px solid rgba(255,255,255,.16);font-size:10px}
+/* Secondary identity card receives a real tier design, not only a thin border. */
+.vip-identity{border:1px solid color-mix(in srgb,var(--vip-accent) 40%,transparent);box-shadow:0 20px 56px -28px color-mix(in srgb,var(--vip-accent) 35%,transparent)}
+.vip-identity .prof-banner{height:190px;position:relative;background-image:radial-gradient(ellipse at 75% 30%,color-mix(in srgb,var(--vip-accent) 48%,transparent),transparent 55%),linear-gradient(110deg,#101021,#33204b,#0e1027)!important;overflow:hidden}
+.vip-identity .prof-banner:before{content:"";position:absolute;inset:0;background-image:var(--profile-art);background-position:center;background-size:cover;opacity:.37;filter:saturate(.8)}
+.vip-identity .prof-banner:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(110deg,transparent 0 26px,rgba(255,255,255,.04) 26px 27px);mask-image:linear-gradient(90deg,transparent,#000)}
+.prof-banner-vip-top{position:relative;z-index:1;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:20px;color:#f9eaff;font-size:11px;letter-spacing:.15em;font-weight:800}
+.prof-banner-vip-top span{display:inline-flex;align-items:center;gap:5px}
+.prof-banner-vip-top .ic{width:15px;height:15px;color:var(--vip-accent)}
+.prof-banner-huge{position:absolute;right:18px;bottom:-25px;opacity:.16;color:white;font:900 clamp(80px,16vw,170px)/1 var(--fh);letter-spacing:-.075em;pointer-events:none}
+.avatar-shell{position:relative;flex:0 0 auto;display:inline-flex}
+.avatar-shell-vip{border-radius:34px;padding:4px;background:conic-gradient(from var(--ang),var(--vip-accent),#fff, #8971fa,var(--vip-accent));box-shadow:0 0 24px color-mix(in srgb,var(--vip-accent) 45%,transparent);animation:ang 5s linear infinite}
+.avatar-shell-vip .avatar{border:3px solid var(--bg2);width:95px;height:95px;border-radius:29px;position:relative;z-index:1;box-shadow:none}
+.avatar-crown{position:absolute;z-index:3;top:-15px;right:-13px;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:var(--vip-accent);color:#18101c;box-shadow:0 7px 25px color-mix(in srgb,var(--vip-accent) 55%,transparent);transform:rotate(12deg)}
+.avatar-crown .ic{width:22px;height:22px}
+.vip-identity-title{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;padding:0 22px 16px;color:var(--vip-accent);font:800 14px var(--fh);letter-spacing:.03em}
+.vip-identity-title>span{display:flex;align-items:center;gap:6px}
+.vip-identity-title small{font-size:10px;letter-spacing:.12em;color:var(--mute)}
+/* Premium tiers have visibly different preview cards even before purchase. */
+.vip-mini-preview{margin:13px 0 5px;border:1px solid color-mix(in srgb,var(--tier) 40%,transparent);border-radius:16px;padding:11px;display:flex;align-items:center;gap:9px;background:linear-gradient(125deg,color-mix(in srgb,var(--tier) 17%,#10111b),#10111b 72%);color:var(--tier);transform:perspective(600px) rotateX(5deg);box-shadow:0 10px 22px -15px var(--tier)}
+.vip-mini-ring{width:39px;height:39px;flex:0 0 39px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--tier) 17%,transparent);border:1px solid color-mix(in srgb,var(--tier) 45%,transparent)}
+.vip-mini-ring .ic{width:23px;height:23px}
+.vip-mini-preview small,.vip-mini-preview b{display:block;font:700 9px var(--fh);letter-spacing:.15em}
+.vip-mini-preview b{font-size:14px;letter-spacing:.04em;margin-top:2px}
+.vip-mini-preview>span{margin-left:auto;font-size:22px;animation:starTwinkle 3s ease-in-out infinite alternate}
+.vip-card[data-tier="VIP-ULTRA"]{background:radial-gradient(ellipse at 80% 2%,rgba(255,205,100,.22),transparent 62%),linear-gradient(150deg,#261a26,#130f20 70%);box-shadow:0 16px 48px -29px rgba(255,202,108,.65)}
+.vip-card[data-tier="VIP-PRO"]{background:radial-gradient(ellipse at 80% 2%,rgba(177,140,255,.21),transparent 62%),linear-gradient(150deg,#1b1436,#0f1121 70%)}
+.vip-card[data-tier="VIP-PLUS"]{background:radial-gradient(ellipse at 80% 2%,rgba(80,224,255,.18),transparent 62%),linear-gradient(150deg,#0a2333,#0e1421 70%)}
+.vip-card[data-tier="VIP-FREE"]{background:radial-gradient(ellipse at 80% 2%,rgba(130,236,255,.2),transparent 62%),linear-gradient(150deg,#122637,#0e1221 70%)}
+/* Toast has a readable icon and a timed progress indicator. */
+.toast{display:flex;align-items:center;gap:10px;min-width:min(325px,92vw);text-align:left;border:1px solid color-mix(in srgb,var(--ok) 45%,transparent);background:color-mix(in srgb,var(--bg2) 90%,#17152e);color:var(--ink);padding:13px 19px 16px;border-radius:18px;box-shadow:0 15px 50px rgba(0,0,0,.45);overflow:hidden}
+.toast.bad{background:color-mix(in srgb,var(--bg2) 90%,#2d1021);border-color:rgba(248,113,113,.4);color:var(--ink)}
+.toast-emblem{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;border-radius:11px;background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.toast.bad .toast-emblem{background:rgba(248,113,113,.15);color:var(--bad)}
+.toast-emblem .ic{width:19px;height:19px}
+.toast-message{font-size:13px;font-weight:650;line-height:1.5}
+.toast-timer{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--ok);transform-origin:left;animation:toastTime 3.3s linear forwards}
+.toast.bad .toast-timer{background:var(--bad)}
+@keyframes toastTime{to{transform:scaleX(0)}}
+/* One-time celebratory activation screen (shown only for active server VIP). */
+.vip-reveal{--m:#ffd882;position:fixed;inset:0;z-index:210;display:grid;place-items:center;padding:20px;background:rgba(3,3,11,.79);backdrop-filter:blur(12px);opacity:0;transition:opacity .55s}
+.vip-reveal[data-tier="VIP-PRO"]{--m:#c59bff}.vip-reveal[data-tier="VIP-PLUS"]{--m:#55dcff}
+.vip-reveal.show{opacity:1}
+.vip-reveal-card{position:relative;isolation:isolate;display:grid;justify-items:center;text-align:center;gap:10px;width:min(500px,100%);padding:35px 20px 30px;border:1px solid color-mix(in srgb,var(--m) 48%,transparent);border-radius:30px;background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,var(--m) 22%,transparent),transparent 60%),#13111e;box-shadow:0 0 90px color-mix(in srgb,var(--m) 22%,transparent);transform:scale(.65) translateY(30px);transition:transform .75s cubic-bezier(.17,.89,.32,1.3);overflow:hidden;color:#fff}
+.vip-reveal.show .vip-reveal-card{transform:scale(1) translateY(0)}
+.vip-reveal-card:before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 45%,transparent 0 15deg,color-mix(in srgb,var(--m) 8%,transparent) 15deg 18deg);z-index:-1;animation:orbitTurn 35s linear infinite}
+.vip-reveal-crown{height:122px;width:122px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--m) 50%,transparent);border-radius:50%;color:var(--m);box-shadow:0 0 38px color-mix(in srgb,var(--m) 23%,transparent),inset 0 0 30px color-mix(in srgb,var(--m) 17%,transparent)}
+.vip-reveal-crown .ic{width:68px;height:68px;animation:crestFloat 2s ease-in-out infinite alternate}
+.vip-reveal-card>p{color:var(--m);font-size:11px;font-weight:800;letter-spacing:.24em;margin-top:8px}
+.vip-reveal-card>strong{font:900 clamp(34px,8vw,56px)/1 var(--fh);letter-spacing:-.06em;color:#fff3df;text-shadow:0 0 20px color-mix(in srgb,var(--m) 39%,transparent)}
+.vip-reveal-card>span{color:rgba(255,255,255,.75);font-size:14px}
+.vip-reveal-card .btn{margin-top:12px}
+@media(max-width:760px){.membership-hero{padding:18px 17px 14px;min-height:0;border-radius:24px}.membership-layout{grid-template-columns:minmax(0,1fr);gap:0}.membership-orbit{width:min(195px,58vw);margin:-5px auto -10px}.membership-title{font-size:clamp(36px,10vw,53px)}.membership-name{font-size:17px}.membership-intro{font-size:12px}.membership-pretitle{font-size:10px}.membership-bottomline>span:last-child{display:none}.membership-pills span{font-size:10px}.prof-banner-huge{font-size:clamp(85px,22vw,130px)}.vip-mini-preview{min-height:64px}}
+@media(max-width:400px){.membership-topline{font-size:9px;letter-spacing:.07em}.member-serial{display:none}.membership-hero{padding:16px}.membership-orbit{width:178px}}
+@media(prefers-reduced-motion:reduce){.membership-hero:before,.membership-orbit-a,.membership-orbit-b,.membership-orbit:before,.membership-orbit:after,.membership-core .ic,.orbit-star,.vip-mini-preview>span,.avatar-shell-vip,.toast-timer,.vip-reveal-card:before,.vip-reveal-crown .ic{animation:none!important}}
+body.calm .membership-hero:before,body.calm .membership-orbit-a,body.calm .membership-orbit-b,body.calm .membership-orbit:before,body.calm .membership-orbit:after,body.calm .membership-core .ic,body.calm .orbit-star,body.calm .vip-mini-preview>span,body.calm .avatar-shell-vip,body.calm .toast-timer{animation:none!important}
 
-console.log("Деректер:", REMOTE ? "JSONBin" : "data.json");
+/* VIP feels different throughout the whole site, not only on #me. */
+body.vip-view[data-active-tier="VIP-PLUS"]{--acc:#42dfff;--acc2:#87e8ff;--acc3:#6c95ff}
+body.vip-view[data-active-tier="VIP-PRO"]{--acc:#c18cff;--acc2:#e1b0ff;--acc3:#846fff}
+body.vip-view[data-active-tier="VIP-ULTRA"]{--acc:#ffce70;--acc2:#c2a0ff;--acc3:#f7a76a}
+.home-vip-beacon{--vb:var(--vip-accent);display:flex;align-items:center;gap:14px;margin:17px 0 22px;padding:15px 19px;border:1px solid color-mix(in srgb,var(--vb) 52%,transparent);border-radius:22px;background:radial-gradient(ellipse at 83% -30%,color-mix(in srgb,var(--vb) 22%,transparent),transparent 64%),linear-gradient(110deg,#161321,#0e111a);box-shadow:0 15px 45px -30px color-mix(in srgb,var(--vb) 70%,transparent);position:relative;overflow:hidden}
+.home-vip-beacon:after{content:"";height:160%;width:90px;transform:translateX(-200px) rotate(24deg);position:absolute;background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);animation:homeVipGlint 7s linear infinite;pointer-events:none}
+@keyframes homeVipGlint{to{transform:translateX(1400px) rotate(24deg)}}
+.home-vip-emblem{width:56px;height:56px;flex:0 0 56px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--vb) 60%,transparent);border-radius:18px;color:var(--vb);background:color-mix(in srgb,var(--vb) 13%,transparent);box-shadow:0 0 25px color-mix(in srgb,var(--vb) 20%,transparent)}
+.home-vip-emblem .ic{width:28px;height:28px}
+.home-vip-beacon .home-vip-title{display:block;color:var(--vb);font:900 21px var(--fh);line-height:1.2}
+.home-vip-beacon .home-vip-sub{display:block;color:#d9d5e6;font-size:12px;margin-top:3px}
+.home-vip-beacon .home-vip-arr{color:var(--vb);margin-left:auto}
+.home-vip-beacon .home-vip-arr .ic{width:22px;height:22px}
+.vip-order-note{font-size:11px;line-height:1.45;color:var(--mute);max-width:260px}
+@media(max-width:550px){
+ .top{padding:9px 10px;gap:6px}
+ .brand{gap:7px;font-size:14px;letter-spacing:-.025em}
+ .mark{width:31px;height:31px;border-radius:10px}
+ .tools{gap:5px;flex-wrap:nowrap}
+ .tools>.seg{gap:1px;flex-wrap:nowrap;padding:2px}
+ .tools>.seg button{padding:6px 8px;font-size:12px}
+ .nav-vip-marker{padding:8px;width:33px;height:33px;display:grid;place-items:center}
+ .nav-vip-marker span{display:none}
+ .tools .icon-btn{width:33px;height:33px;border-radius:11px}
+ .tools .icon-btn .ic{width:17px;height:17px}
+ .home-vip-beacon{padding:12px;gap:10px;border-radius:17px}
+ .home-vip-emblem{width:47px;height:47px;flex-basis:47px}
+ .home-vip-beacon .home-vip-title{font-size:17px}
+ .home-vip-beacon .home-vip-sub{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.home-vip-beacon:after{animation:none!important}}
+body.calm .home-vip-beacon:after{animation:none!important}
 
-const L3 = (kk, ru, en) => ({ kk, ru, en });
-const VIP_TIERS = ["VIP-FREE", "VIP-PLUS", "VIP-PRO", "VIP-ULTRA"];
-const VIP_META = {
- "VIP-FREE": { icon:"sparkles", color:"#8be9fd", perks: L3("7 күн ULTRA Studio|500 таңдаулы файл/ойын|9 профиль түсі және 5 жылдам сілтеме", "7 дней ULTRA Studio|До 500 избранных|9 тем и 5 быстрых ссылок", "7 days ULTRA Studio|500 saved items|9 themes and 5 shortcuts") },
- "VIP-PLUS": { icon:"star", color:"#48d5ff", perks: L3("60 таңдаулы сақта|3 профиль түсі және статус|1 жылдам сілтеме", "60 сохранённых|3 темы и статус|1 быстрый переход", "60 saved items|3 themes and status|1 quick link") },
- "VIP-PRO": { icon:"gem", color:"#b18cff", perks: L3("160 таңдаулы сақта|6 түс және профиль ұраны|3 жылдам сілтеме", "160 сохранённых|6 тем и подпись профиля|3 быстрых перехода", "160 saved items|6 themes and headline|3 shortcuts") },
- "VIP-ULTRA": { icon:"crown", color:"#ffc76d", perks: L3("500 таңдаулы сақта|9 эксклюзив түс және статус|5 жылдам сілтеме, ULTRA дизайн", "500 сохранённых|9 эксклюзивных тем и статус|5 быстрых ссылок, ULTRA стиль", "500 saved items|9 exclusive themes and status|5 shortcuts, ULTRA style") }
+/* PREMIUM STUDIO: utility first, with strong and calm visuals. */
+.studio{border-color:color-mix(in srgb,var(--studio-color) 55%,var(--line));background:radial-gradient(ellipse at 95% 0%,color-mix(in srgb,var(--studio-color) 15%,transparent),transparent 52%),var(--glass)}
+.studio-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}.studio-head h3{font-size:26px;margin:5px 0}
+.studio-status{color:var(--studio-color);border:1px solid color-mix(in srgb,var(--studio-color) 55%,transparent);background:color-mix(in srgb,var(--studio-color) 10%,transparent);padding:7px 11px;border-radius:40px;font-weight:700;font-size:12px}
+.studio-colors{display:grid;grid-template-columns:repeat(auto-fit,minmax(65px,1fr));gap:9px;margin-top:5px}.studio-colors label{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:9px 5px;border:1px solid var(--line);border-radius:14px;min-width:0;transition:transform .22s,border-color .22s;background:var(--glass)}
+.studio-colors input{position:absolute;opacity:0;width:1px;height:1px}.studio-colors label:has(input:checked){border-color:var(--studio-color);box-shadow:0 0 0 1px var(--studio-color) inset}.studio-colors label:hover{transform:translateY(-3px)}.studio-colors label:focus-within{outline:2px solid var(--studio-color);outline-offset:2px}
+.studio-colors small{color:var(--mute);font-size:10px}.color-dot{display:block;width:34px;height:34px;border-radius:12px;background:linear-gradient(145deg,var(--c1),var(--c2));box-shadow:0 3px 13px color-mix(in srgb,var(--c1) 32%,transparent)}
+.studio-links{border:1px solid var(--line);padding:11px 12px;border-radius:17px;display:flex;gap:8px;flex-wrap:wrap}.studio-links legend{color:var(--mute);font-size:12px;padding:0 7px}.studio-links label{display:inline-flex;gap:5px;align-items:center;border:1px solid var(--line);padding:8px 10px;border-radius:25px;cursor:pointer;font-size:12px}.studio-links label:has(input:checked){color:var(--acc);border-color:var(--acc)}.studio-links input{accent-color:var(--acc)}
+.my-library .library-list{display:grid;gap:8px}.library-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:15px;background:var(--glass)}.library-item>div:nth-child(2){flex:1;min-width:0}.library-item b{font-size:13px;display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.library-item small{display:block;font-size:11px;color:var(--mute)}.library-icon{display:grid;place-items:center;color:var(--acc);background:var(--glass);width:38px;height:38px;border-radius:12px;flex:0 0 auto}.library-item .btn{padding:7px 9px}.library-item .btn .ic{width:14px;height:14px}
+.lib-toggle{white-space:nowrap}.lib-toggle.is-saved{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.vip-desk{margin:10px 0 23px;border-color:color-mix(in srgb,var(--vip-accent) 36%,var(--line));background:radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--vip-accent) 14%,transparent),transparent 50%),var(--glass)}.vip-desk h3{margin:0 0 3px}.vip-desk-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.vip-desk-links a{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line));border-radius:14px;background:var(--glass);transition:transform .2s,border-color .2s}.vip-desk-links a:hover{transform:translateY(-2px);border-color:var(--acc)}.vip-desk-links .ic{width:17px;height:17px;color:var(--acc)}.profile-custom-status{margin:7px 0}
+@media(max-width:550px){.studio{padding:16px}.studio-colors{grid-template-columns:repeat(3,minmax(0,1fr))}.library-item{gap:6px}.library-item .btn{font-size:11px;padding:6px}.library-item .library-icon{display:none}}
+@media(prefers-reduced-motion:reduce){.studio-colors label,.vip-desk-links a{transition:none!important;transform:none!important}}
+.mr-save{flex-shrink:0}.mr-save .lib-toggle{font-size:11px;padding:7px 10px}.mr-save .lib-toggle .ic{width:14px;height:14px}@media(max-width:550px){.mr-save .lib-toggle{font-size:0;padding:8px}.mr-save .lib-toggle .ic{width:17px;height:17px}}
+
+/* A782 NEXUS V4: premium visual system. All tiers still use existing server entitlements. */
+:root{--nx-ink:#f6f2ff;--nx-gold:#ffd281;--nx-violet:#b49aff}
+.nexus-kicker{display:inline-flex;align-items:center;gap:8px;color:#ccb8fd;font:800 10px/1.5 var(--fh);letter-spacing:.21em;text-transform:uppercase}.nexus-kicker .ic{width:15px;height:15px}
+.nexus-landing,.nexus-member,.nexus-studio,.nexus-desk{font-family:Inter,system-ui,sans-serif}
+.nexus-landing{position:relative;isolation:isolate;display:grid;grid-template-columns:1.03fr .97fr;gap:14px;min-height:550px;overflow:hidden;border:1px solid rgba(168,139,250,.28);border-radius:32px;margin:5px 0 58px;background:radial-gradient(ellipse at 64% 24%,rgba(119,82,208,.29),transparent 48%),radial-gradient(ellipse at 0 90%,rgba(42,106,182,.18),transparent 52%),linear-gradient(130deg,#0e0d1a,#090b17 70%,#141025);box-shadow:0 36px 95px -65px rgba(139,100,255,.56);color:var(--nx-ink)}
+.nexus-landing:before{position:absolute;inset:0;z-index:-1;content:"";opacity:.38;background:radial-gradient(circle,rgba(255,255,255,.32) .65px,transparent 1px) 0 0/29px 29px;mask-image:linear-gradient(100deg,transparent 20%,#000 100%)}
+.nexus-landing:after{position:absolute;inset:-1px;z-index:-1;content:"";background:linear-gradient(110deg,transparent 22%,rgba(190,158,255,.06) 45%,transparent 65%);background-size:240% 100%;animation:nx-foil 13s ease-in-out infinite}
+.nexus-landing-lines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 48px,rgba(156,123,234,.025) 48px 49px)}
+.nexus-landing-copy{position:relative;z-index:2;padding:69px 0 39px 46px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.nexus-landing h1{font:900 clamp(47px,5.5vw,87px)/.96 var(--fh);letter-spacing:-.074em;margin:28px 0 22px;white-space:nowrap;color:#fcfaff}
+.nexus-landing h1 em{font-style:normal;background:linear-gradient(115deg,#eee1ff,#b59eff 31%,#fff4d3 70%,#ffaedb);background-size:180% 180%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:nx-holo 9s ease-in-out infinite}
+.nexus-landing-copy>p{font-size:15px;color:#c1bcce;max-width:445px;line-height:1.85}
+.nexus-landing-actions{display:flex;gap:13px;align-items:center;flex-wrap:wrap;margin-top:29px}.nexus-landing-actions .btn{background:linear-gradient(115deg,#e6d6ff,#c3a1ff);border-radius:13px;color:#161020;padding:13px 18px;box-shadow:0 11px 40px -16px #c3a1ff}
+.nexus-simple-link{display:inline-flex;gap:7px;align-items:center;color:#ddd8ea;font-size:13px;font-weight:700;padding:12px}.nexus-simple-link .ic{width:16px;height:16px}
+.nexus-landing-foot{display:flex;gap:11px;align-items:center;margin-top:46px;color:#847b9f;font-size:9px;letter-spacing:.14em;font-weight:800}.nexus-landing-foot i{width:3px;height:3px;border-radius:50%;background:#83719d}
+.nexus-landing-stage{position:relative;min-width:0;display:flex;align-items:center;justify-content:center;perspective:1300px}.nexus-stage-halo{position:absolute;width:430px;height:430px;max-width:100%;border-radius:50%;background:conic-gradient(from 35deg,rgba(255,214,136,.01),rgba(179,132,255,.5),rgba(126,196,255,.03),rgba(255,226,172,.31),rgba(255,214,136,.01));filter:blur(52px);animation:nx-breathe 8s ease-in-out infinite alternate}
+.nexus-stage-rings{position:absolute;width:470px;max-width:98%;aspect-ratio:1;border:1px solid rgba(210,188,255,.18);border-radius:50%;box-shadow:0 0 0 44px rgba(159,120,249,.022),0 0 0 85px rgba(159,120,249,.021);transform:rotateX(65deg);animation:nx-ring 16s linear infinite}
+.nexus-stage-card,.nexus-pass,.nexus-tier-pass,.nexus-preview-card{position:relative;isolation:isolate;overflow:hidden;border-radius:26px;box-shadow:0 36px 45px -29px rgba(0,0,0,.83),0 8px 34px -12px rgba(171,113,244,.3),inset 0 1px rgba(255,255,255,.31)}
+.nexus-stage-card{width:min(310px,76%);aspect-ratio:.71;padding:27px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,219,157,.62);background:radial-gradient(ellipse at 95% -5%,rgba(255,230,181,.67),transparent 35%),radial-gradient(ellipse at 0 89%,rgba(171,110,240,.63),transparent 57%),linear-gradient(145deg,#2d203b,#221a2e 50%,#0c0d20);transform:rotate(-12deg) rotateY(-13deg);animation:nx-float 6s ease-in-out infinite alternate}
+.nexus-stage-card:before,.nexus-pass:before,.nexus-tier-pass:before,.nexus-preview-card:before{content:"";position:absolute;inset:-90%;pointer-events:none;background:linear-gradient(106deg,transparent 44%,rgba(255,255,255,.24) 49%,transparent 54%);transform:translateX(-40%) rotate(7deg);animation:nx-foil 7s ease-in-out infinite}
+.nexus-stage-card:after,.nexus-pass:after,.nexus-tier-pass:after{content:"";position:absolute;inset:0;z-index:-1;background:repeating-linear-gradient(110deg,transparent 0 20px,rgba(255,255,255,.035) 20px 21px)}
+.nexus-stage-head,.nexus-pass-top{display:flex;justify-content:space-between;align-items:center;font:800 13px var(--fh);letter-spacing:.14em;color:#fdf4e7}.nexus-stage-head span:last-child{font-size:10px;color:#fce0ad}
+.nexus-stage-emblem{width:145px;height:145px;display:grid;place-items:center;align-self:center;border:1px solid rgba(255,226,189,.6);border-radius:50%;color:#ffdda7;box-shadow:0 0 0 16px rgba(255,218,158,.055),0 0 0 34px rgba(255,218,158,.035),inset 0 0 37px rgba(255,218,158,.19);animation:nx-emblem 5s ease-in-out infinite alternate}.nexus-stage-emblem .ic{width:74px;height:74px;filter:drop-shadow(0 0 19px #f7ce89)}
+.nexus-stage-caption span{display:block;color:#e4d6e9;letter-spacing:.16em;font-size:9px;font-weight:800}.nexus-stage-caption strong{display:block;font:900 47px/1.1 var(--fh);letter-spacing:-.04em;color:#fff0c9}
+.nexus-stage-sticker{position:absolute;right:20px;bottom:50px;z-index:3;transform:rotate(7deg);border:1px solid rgba(255,244,221,.5);border-radius:30px;padding:10px 13px;background:#fcdfa9;color:#241827;font:900 10px var(--fh);letter-spacing:.09em;box-shadow:0 15px 25px rgba(0,0,0,.2);animation:nx-sticker 5s ease-in-out infinite alternate}
+@keyframes nx-float{to{transform:translateY(-15px) rotate(-8deg) rotateY(-6deg)}}@keyframes nx-foil{to{background-position:-240% 0;transform:translateX(45%) rotate(7deg)}}@keyframes nx-holo{to{background-position:100% 100%}}@keyframes nx-ring{to{transform:rotateX(65deg) rotate(360deg)}}@keyframes nx-breathe{to{transform:scale(1.17);opacity:.67}}@keyframes nx-emblem{to{transform:scale(1.06);box-shadow:0 0 0 24px rgba(255,218,158,.055),0 0 0 46px rgba(255,218,158,.035),inset 0 0 45px rgba(255,218,158,.26)}}@keyframes nx-sticker{to{transform:rotate(2deg) translateY(-9px)}}
+/* Four actual plans: metallic passes have independent visual hierarchy. */
+.nexus-levels{scroll-margin-top:86px;margin-top:35px}.nexus-section-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:24px}.nexus-section-heading h2,.nexus-why h2,.nexus-studio-intro h2{font:850 clamp(29px,4.5vw,47px)/1.1 var(--fh);letter-spacing:-.055em;margin-top:9px}.nexus-section-heading>p{font-size:13px;max-width:350px;color:var(--mute)}
+.nexus-tier-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.nexus-tier{--nexus-tier:#aed7ff;min-width:0;position:relative;isolation:isolate;display:flex;flex-direction:column;padding:14px 14px 16px;border:1px solid color-mix(in srgb,var(--nexus-tier) 27%,var(--line));border-radius:24px;background:radial-gradient(ellipse at 50% -10%,color-mix(in srgb,var(--nexus-tier) 15%,transparent),transparent 60%),linear-gradient(150deg,#171725,#0e111b 75%);box-shadow:0 22px 35px -38px var(--nexus-tier);transition:transform .25s,box-shadow .35s,border-color .3s;transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.nexus-tier:hover{border-color:color-mix(in srgb,var(--nexus-tier) 65%,transparent);box-shadow:0 35px 60px -40px color-mix(in srgb,var(--nexus-tier) 64%,transparent);transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-7px)}
+.nexus-tier[data-tier="VIP-ULTRA"]{background:radial-gradient(ellipse at 50% -10%,rgba(255,213,142,.18),transparent 60%),linear-gradient(160deg,#292027,#121018 75%)}
+.nexus-tier-top{display:flex;justify-content:space-between;gap:5px;min-height:26px;color:var(--nexus-tier);font:850 9px var(--fh);letter-spacing:.1em}.nexus-tier-top span:last-child{text-align:right;font-size:8px;opacity:.83}.nexus-tier-best{border-radius:30px;padding:2px 6px;background:rgba(255,214,134,.15)}
+.nexus-tier-pass{--t:var(--nexus-tier);height:188px;padding:14px 14px 11px;margin:3px 0 15px;border:1px solid color-mix(in srgb,var(--t) 64%,transparent);border-radius:17px;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(ellipse at 85% 0%,color-mix(in srgb,var(--t) 42%,transparent),transparent 55%),radial-gradient(ellipse at 0% 90%,color-mix(in srgb,var(--t) 18%,transparent),transparent 60%),linear-gradient(135deg,#1a1f33,#0b101c);color:#f9f5ff;transform:rotate(-3deg);transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s}.nexus-tier:hover .nexus-tier-pass{transform:rotate(0deg) translateY(-5px);box-shadow:0 22px 30px -25px var(--t)}
+.nexus-tier[data-tier="VIP-ULTRA"] .nexus-tier-pass{background:radial-gradient(ellipse at 85% 0%,rgba(255,219,144,.5),transparent 52%),radial-gradient(ellipse at 0% 90%,rgba(196,135,255,.34),transparent 65%),linear-gradient(135deg,#513d44,#1d1a2a)}
+.nexus-tier[data-tier="VIP-PRO"] .nexus-tier-pass{background:radial-gradient(ellipse at 85% 0%,rgba(190,146,255,.38),transparent 58%),linear-gradient(130deg,#342447,#13192a)}
+.nexus-tier[data-tier="VIP-PLUS"] .nexus-tier-pass{background:radial-gradient(ellipse at 85% 0%,rgba(70,213,255,.4),transparent 58%),linear-gradient(130deg,#183c50,#0c1728)}
+.nexus-tier-pass-a{font:800 10px var(--fh);letter-spacing:.15em}.nexus-tier-pass-a b{color:var(--t)}
+.nexus-tier-pass-icon{align-self:center;display:grid;place-items:center;color:var(--t);width:69px;height:69px;border-radius:50%;border:1px solid color-mix(in srgb,var(--t) 52%,transparent);box-shadow:0 0 0 13px color-mix(in srgb,var(--t) 6%,transparent),0 0 31px color-mix(in srgb,var(--t) 24%,transparent);animation:nx-pass-pulse 5s ease-in-out infinite alternate}.nexus-tier-pass-icon .ic{width:36px;height:36px;filter:drop-shadow(0 0 10px var(--t))}
+.nexus-tier-pass-name{position:absolute;right:13px;bottom:32px;color:rgba(255,255,255,.15);font:900 37px/1 var(--fh);letter-spacing:-.08em;pointer-events:none}
+.nexus-tier-pass-bottom{display:flex;justify-content:space-between;gap:4px;font:700 8px var(--fh);letter-spacing:.09em;color:rgba(255,255,255,.69)}.nexus-tier-pass-bottom b{color:var(--t)}
+@keyframes nx-pass-pulse{to{transform:scale(1.06);box-shadow:0 0 0 19px color-mix(in srgb,var(--t) 8%,transparent),0 0 44px color-mix(in srgb,var(--t) 31%,transparent)}}
+.nexus-tier-body{display:flex;flex-direction:column;flex:1}.nexus-tier-name{display:flex;align-items:center;justify-content:space-between;color:var(--nexus-tier)}.nexus-tier-name small{font:850 10px var(--fh);letter-spacing:.15em}.nexus-tier-name h3{font:850 21px var(--fh);letter-spacing:-.045em;color:#f4f0ff;margin:3px 0}.nexus-tier-name>span .ic{width:19px;height:19px}
+.nexus-tier-description{min-height:55px;color:#afafc2;font-size:12px;line-height:1.65}.nexus-tier-price{font:900 24px var(--fh);letter-spacing:-.045em;color:var(--nexus-tier);margin:7px 0 13px;word-break:break-word}.nexus-tier-price small{display:block;color:#a4a4b6;font:600 11px Inter;letter-spacing:0;margin-top:3px}
+.nexus-tier-features{display:grid;gap:9px;padding:14px 0 18px;border-top:1px solid rgba(255,255,255,.1);margin-top:auto}.nexus-tier-features span{display:flex;gap:8px;align-items:center;color:#dedbe8;font-size:11px;line-height:1.35}.nexus-tier-features .ic{width:15px;height:15px;color:var(--nexus-tier)}
+.nexus-tier-buttons{display:grid;gap:7px}.nexus-tier-buy{width:100%;padding:12px 7px;border-radius:12px;background:linear-gradient(125deg,var(--nexus-tier),#e8d8ff);color:#12131a;font-size:12px}.nexus-tier-buy .ic{width:14px;height:14px}.nexus-tier-preview{cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;color:#b5b2c8;background:none;border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:9px 6px;font:700 11px Inter;transition:border-color .25s,color .25s}.nexus-tier-preview .ic{width:14px;height:14px}.nexus-tier-preview:hover{border-color:var(--nexus-tier);color:var(--nexus-tier)}
+.nexus-levels-footnote{display:flex;align-items:flex-start;gap:9px;margin:20px 0;color:var(--mute);font-size:12px}.nexus-levels-footnote .ic{width:17px;height:17px;flex-shrink:0;color:#baa3ff}
+.nexus-why{display:grid;grid-template-columns:.8fr 1.2fr;gap:30px;align-items:center;margin:55px 0 28px;padding:29px 33px;border:1px solid var(--line);border-radius:26px;background:radial-gradient(ellipse at 2% 0%,rgba(153,113,241,.13),transparent 60%),var(--glass)}.nexus-why-items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.nexus-why-items>div{display:grid;gap:6px;align-content:start;padding:14px 11px;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(255,255,255,.028)}.nexus-why-items .ic{width:25px;height:25px;color:#bea4ff}.nexus-why-items b{font:800 11px var(--fh);letter-spacing:.04em}.nexus-why-items small{color:var(--mute);font-size:10px;line-height:1.55}
+/* Server-active account identity, radically different from the default profile. */
+.nexus-member{--nexus-tier:#ffd281;position:relative;overflow:hidden;isolation:isolate;color:#f9f5ff;border:1px solid color-mix(in srgb,var(--nexus-tier) 45%,transparent);border-radius:28px;margin:15px 0 25px;background:radial-gradient(ellipse at 92% 0%,color-mix(in srgb,var(--nexus-tier) 21%,transparent),transparent 52%),radial-gradient(ellipse at 0 100%,rgba(118,83,210,.2),transparent 65%),linear-gradient(135deg,#181522,#090c17 75%);box-shadow:0 30px 70px -48px color-mix(in srgb,var(--nexus-tier) 72%,transparent)}
+.nexus-member[data-tier="VIP-PLUS"]{--nexus-tier:#56dfff}.nexus-member[data-tier="VIP-PRO"]{--nexus-tier:#c29aff}.nexus-member[data-tier="VIP-ULTRA"]{--nexus-tier:#ffd281}
+.nexus-member-noise{position:absolute;inset:0;pointer-events:none;opacity:.3;background:radial-gradient(circle,rgba(255,255,255,.25) .7px,transparent .9px) 0 0/23px 23px;mask-image:linear-gradient(90deg,transparent 30%,#000)}
+.nexus-member-header,.nexus-member-footer{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 24px;font:800 10px var(--fh);letter-spacing:.13em;color:rgba(255,255,255,.58)}.nexus-member-header{border-bottom:1px solid rgba(255,255,255,.1)}.nexus-member-footer{border-top:1px solid rgba(255,255,255,.1)}.nexus-live{display:inline-flex;gap:7px;align-items:center;color:var(--nexus-tier)}.nexus-live .ic{width:15px;height:15px}
+.nexus-member-body{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.13fr) minmax(250px,.87fr);min-height:420px;gap:20px;align-items:center;padding:22px 34px 29px}
+.nexus-micro{font:700 10px var(--fh);color:#9d91b6;letter-spacing:.18em}.nexus-micro b{color:var(--nexus-tier)}.nexus-member-title{font:900 clamp(65px,8.3vw,114px)/.98 var(--fh);letter-spacing:-.075em;color:var(--nexus-tier);margin:15px 0 7px}.nexus-member-title span{display:block;font:850 11px var(--fh);letter-spacing:.18em;color:#ded9eb;margin-top:8px}.nexus-member-user{display:flex;align-items:center;gap:6px;font:700 18px var(--fh);color:#faf8ff;margin:14px 0}.nexus-member-user .ic{width:18px;height:18px;color:var(--nexus-tier)}.nexus-verified{border:1px solid color-mix(in srgb,var(--nexus-tier) 40%,transparent);border-radius:30px;padding:4px 7px;font:800 9px var(--fh);letter-spacing:.1em;color:var(--nexus-tier)}.nexus-member-description{max-width:500px;font-size:13px;line-height:1.75;color:#bfb9cf}
+.nexus-member-stats{display:flex;gap:24px;margin:20px 0 14px}.nexus-member-stats>span{display:grid;gap:2px}.nexus-member-stats strong{font:850 27px var(--fh);color:#fdf9ff}.nexus-member-stats small{color:#a6a0b6;font-size:10px}.nexus-member-expiry{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;font-weight:650;color:var(--nexus-tier)}.nexus-member-expiry .ic{width:16px;height:16px}.nexus-member-open{display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb,var(--nexus-tier) 46%,transparent);color:var(--nexus-tier);padding:11px 13px;border-radius:12px;margin-top:19px;background:color-mix(in srgb,var(--nexus-tier) 8%,transparent);font-size:12px;font-weight:750;transition:transform .2s,background .2s}.nexus-member-open:hover{transform:translateY(-2px);background:color-mix(in srgb,var(--nexus-tier) 15%,transparent)}.nexus-member-open .ic{width:15px;height:15px}
+.nexus-member-art{position:relative;min-height:338px;display:grid;place-items:center;perspective:1100px}.nexus-member-aura{position:absolute;width:95%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--nexus-tier) 27%,transparent),transparent 60%);filter:blur(24px);animation:nx-breathe 6s ease-in-out infinite alternate}.nexus-pass{width:min(258px,80%);aspect-ratio:.73;display:flex;flex-direction:column;justify-content:space-between;padding:21px;border:1px solid color-mix(in srgb,var(--nexus-tier) 75%,transparent);background:radial-gradient(ellipse at 90% 3%,color-mix(in srgb,var(--nexus-tier) 52%,transparent),transparent 49%),linear-gradient(140deg,#35263a,#151424 72%);transform:rotate(-10deg) rotateY(-14deg);animation:nx-pass-float 6s ease-in-out infinite alternate}
+.nexus-pass-top .ic{color:var(--nexus-tier);width:18px;height:18px}.nexus-pass-symbol{align-self:center;display:grid;place-items:center;width:130px;height:130px;border:1px solid color-mix(in srgb,var(--nexus-tier) 66%,transparent);border-radius:50%;box-shadow:0 0 0 17px color-mix(in srgb,var(--nexus-tier) 7%,transparent),inset 0 0 37px color-mix(in srgb,var(--nexus-tier) 24%,transparent)}.nexus-pass-symbol-inner .ic{width:68px;height:68px;color:var(--nexus-tier);filter:drop-shadow(0 0 17px var(--nexus-tier))}.nexus-pass-bottom{display:flex;justify-content:space-between;align-items:end;gap:10px;font-size:9px;line-height:1.7;letter-spacing:.12em;color:#dfd6e5}.nexus-pass-bottom b{font:900 32px/1 var(--fh);letter-spacing:-.05em;color:var(--nexus-tier)}.nexus-pass-bottom small{font-size:9px;text-align:right}.nexus-pass-shadow{position:absolute;bottom:13px;left:22%;width:62%;height:17px;border-radius:50%;background:#000;filter:blur(14px);opacity:.5}
+@keyframes nx-pass-float{to{transform:rotate(-5deg) rotateY(-8deg) translateY(-16px)}}
+/* The home page command center uses actual saved data and shortcuts. */
+.nexus-desk{position:relative;overflow:hidden;margin:18px 0 25px;padding:24px;border-radius:25px;border:1px solid rgba(162,134,246,.33);background:radial-gradient(ellipse at 90% 0%,rgba(161,119,243,.15),transparent 65%),linear-gradient(115deg,#151525,#0c1019);color:#f6f2ff}
+.nexus-desk-head{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.nexus-desk-head h2{font:850 clamp(24px,3.6vw,35px) var(--fh);letter-spacing:-.05em;margin:7px 0}.nexus-desk-head p{font-size:12px;color:#a8a5b8;max-width:530px}.nexus-desk-edit{display:inline-flex;gap:6px;align-items:center;align-self:start;border:1px solid rgba(189,158,255,.45);padding:9px 12px;border-radius:11px;font-size:12px;font-weight:700;color:#c4a8ff}.nexus-desk-edit .ic{width:15px;height:15px}
+.nexus-desk-grid{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;margin-top:21px}.nexus-desk-saved{display:grid;gap:9px;padding:15px;border:1px solid rgba(191,155,255,.19);border-radius:15px;background:rgba(188,145,255,.07)}.nexus-desk-saved>span{display:flex;gap:6px;align-items:center;font:700 10px var(--fh);letter-spacing:.08em;color:#b99dff}.nexus-desk-saved .ic{width:14px;height:14px}.nexus-desk-saved strong{font:900 41px var(--fh);letter-spacing:-.07em}.nexus-desk-saved strong small{font:600 12px Inter;color:#aaa2be}.nexus-desk-saved>a{font-size:10px;color:#ddd3ff;font-weight:700}.nexus-desk-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-content:stretch}.nexus-desk-links a{display:flex;align-items:center;gap:9px;min-width:0;padding:15px 11px;border:1px solid rgba(255,255,255,.105);border-radius:13px;background:rgba(255,255,255,.035);transition:background .2s,transform .2s,border-color .2s}.nexus-desk-links a:hover{background:rgba(188,149,255,.1);border-color:#a98eff;transform:translateY(-3px)}.nexus-desk-links a>.ic:first-child{color:#c5a8ff;width:20px;height:20px;flex:0 0 auto}.nexus-desk-links a>.ic:last-child{margin-left:auto;width:14px;height:14px;color:#82758f;flex:0 0 auto}.nexus-desk-links a>span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;font-weight:750}
+/* Studio: live avatar preview, with no changes persisted until Save. */
+.nexus-studio{margin:30px 0 0;border:1px solid rgba(151,128,233,.26);background:linear-gradient(135deg,#141321,#0b0e18);border-radius:26px;padding:28px;overflow:hidden;color:#f6f2ff}.nexus-studio-intro h2{margin:9px 0 10px}.nexus-studio-intro p{color:#a9a8b7;font-size:13px;max-width:710px;line-height:1.75}.nexus-studio-grid{display:grid;grid-template-columns:minmax(260px,.75fr) minmax(0,1fr);gap:28px;margin-top:27px;align-items:stretch}.nexus-studio-preview{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;border-radius:24px;background:radial-gradient(ellipse at 50% 10%,color-mix(in srgb,var(--preview-color) 26%,transparent),transparent 65%),#0d1020;border:1px solid color-mix(in srgb,var(--preview-color) 29%,transparent)}
+.nexus-studio-orb{position:absolute;top:2%;left:50%;width:250px;height:250px;transform:translateX(-50%);border:1px solid color-mix(in srgb,var(--preview-color) 30%,transparent);border-radius:50%;box-shadow:0 0 0 26px color-mix(in srgb,var(--preview-color) 4%,transparent),0 0 0 54px color-mix(in srgb,var(--preview-color) 3%,transparent);animation:nx-orbit-bob 8s ease-in-out infinite alternate}.nexus-preview-label{z-index:1;align-self:flex-start;display:flex;gap:6px;align-items:center;color:#dbd2ec;font:800 10px var(--fh);letter-spacing:.12em}.nexus-preview-label .ic{width:14px;height:14px}.nexus-preview-label i{width:7px;height:7px;border-radius:50%;background:#7df3be;box-shadow:0 0 10px #7df3be}
+.nexus-preview-card{display:flex;align-items:center;flex-direction:column;gap:6px;width:min(270px,100%);margin:30px 0;padding:18px;border:1px solid color-mix(in srgb,var(--preview-color) 65%,transparent);background:radial-gradient(ellipse at 95% 0%,color-mix(in srgb,var(--preview-color) 39%,transparent),transparent 51%),linear-gradient(155deg,#272239,#111325 75%);transform:rotate(-4deg);transition:border-color .3s,background .3s;color:#f8f2ff}
+.nexus-preview-card .nexus-preview-top{display:flex;justify-content:space-between;align-self:stretch;font:900 10px var(--fh);letter-spacing:.11em;margin-bottom:12px}.nexus-preview-top span{color:var(--preview-color);font-size:9px}.nexus-preview-avatar{width:70px;height:70px;border:2px solid var(--preview-color);border-radius:20px;display:grid;place-items:center;overflow:hidden;background:color-mix(in srgb,var(--preview-color) 13%,#121423);box-shadow:0 0 20px color-mix(in srgb,var(--preview-color) 24%,transparent)}.nexus-preview-avatar .ic{width:35px;height:35px;color:var(--preview-color)}.nexus-preview-avatar img{width:100%;height:100%;object-fit:cover}.nexus-preview-card>b{font:850 23px var(--fh);letter-spacing:-.04em;margin-top:5px}.nexus-preview-status{border-radius:40px;padding:6px 11px;background:color-mix(in srgb,var(--preview-color) 13%,transparent);border:1px solid color-mix(in srgb,var(--preview-color) 30%,transparent);color:var(--preview-color);font-size:11px;font-weight:700;text-align:center;overflow-wrap:anywhere}.nexus-preview-card>p{text-align:center;color:#b8b0c8;font-size:11px;min-height:17px;overflow-wrap:anywhere}.nexus-preview-bottom{display:flex;justify-content:space-between;gap:6px;align-self:stretch;width:100%;margin-top:23px;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;color:#aba2bd;font:700 9px var(--fh);letter-spacing:.08em}.nexus-preview-bottom>span:last-child{color:var(--preview-color)}.nexus-preview-tip{display:flex;align-items:center;gap:6px;color:#a9a4b8;font-size:10px;text-align:center}.nexus-preview-tip .ic{width:14px;height:14px}
+.nexus-studio-form{min-width:0;align-content:start}.nexus-field-title{display:flex;align-items:center;gap:9px;margin:5px 0 11px}.nexus-field-title>span{display:grid;place-items:center;width:27px;height:27px;border-radius:9px;border:1px solid color-mix(in srgb,var(--preview-color) 37%,transparent);background:color-mix(in srgb,var(--preview-color) 13%,transparent);color:var(--preview-color);font:900 11px var(--fh)}.nexus-field-title strong{font:750 13px Inter}.nexus-field-title small{color:#a9a1b8;font-size:10px;margin-left:auto}
+.nexus-studio .studio-colors{grid-template-columns:repeat(auto-fit,minmax(58px,1fr));margin:0 0 12px}.nexus-studio .studio-colors label{border-color:rgba(255,255,255,.105);background:rgba(255,255,255,.035)}.nexus-studio .studio-colors label:has(input:checked){border-color:var(--preview-color);box-shadow:0 0 0 1px var(--preview-color) inset}.nexus-studio .studio-links{margin-top:2px;border-color:rgba(255,255,255,.13);background:rgba(255,255,255,.02)}.nexus-studio .studio-links label{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.12)}.nexus-studio .studio-links label:has(input:checked){color:var(--preview-color);border-color:var(--preview-color)}.nexus-studio .field{color:#c0bcca}.nexus-studio input,.nexus-studio select{background:#141624;border:1px solid rgba(255,255,255,.13);color:#f7f4ff;min-width:0}
+.nexus-save{width:100%;margin-top:7px;border-radius:14px;background:linear-gradient(110deg,var(--preview-color),#e6d1ff);color:#12101b}.nexus-studio-note{display:flex;align-items:flex-start;gap:6px;color:#9894aa;font-size:10px;line-height:1.55}.nexus-studio-note .ic{width:14px;height:14px;flex:0 0 auto}
+@keyframes nx-orbit-bob{to{transform:translateX(-50%) scale(1.13);opacity:.65}}
+.nexus-modal-preview{text-align:center;display:grid;justify-items:center;gap:12px;padding:8px 0 20px;color:var(--ink)}.nexus-modal-preview h2{font:900 38px var(--fh);letter-spacing:-.06em;color:var(--nexus-tier)}.nexus-modal-preview p{font-size:12px;color:var(--mute);max-width:390px}.nexus-modal-preview .nexus-tier-pass{--t:var(--nexus-tier);width:min(300px,100%);height:225px;margin:13px 0;transform:rotate(-4deg)}.nexus-modal-preview .nexus-tier-pass-name{font-size:43px}.nexus-modal-preview .nexus-tier-pass-icon{width:80px;height:80px}.nexus-modal-preview .nexus-tier-pass-icon .ic{width:40px;height:40px}
+/* Accessibility and mobile performance. */
+.nexus-tier-preview:focus-visible,.nexus-tier-buy:focus-visible,.nexus-studio input:focus-visible,.nexus-studio select:focus-visible,.nexus-member-open:focus-visible,.nexus-desk-links a:focus-visible{outline:2px solid #e0ccff;outline-offset:3px}
+@media(max-width:1060px){.nexus-tier-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nexus-tier-pass{height:216px}.nexus-tier-pass-name{font-size:45px}.nexus-landing-copy{padding-left:32px}.nexus-landing h1{font-size:clamp(42px,6vw,70px)}.nexus-why{grid-template-columns:1fr}.nexus-member-body{grid-template-columns:minmax(0,1fr) minmax(210px,.8fr)}}
+@media(max-width:760px){.nexus-landing{grid-template-columns:minmax(0,1fr);gap:0;margin-top:5px;min-height:0;border-radius:24px}.nexus-landing-copy{padding:33px 23px 0}.nexus-landing h1{font-size:clamp(45px,10vw,72px);margin:17px 0}.nexus-landing-copy>p{font-size:13px;line-height:1.75}.nexus-landing-actions{margin-top:19px}.nexus-landing-foot{margin-top:25px}.nexus-landing-stage{height:320px}.nexus-stage-card{width:198px;padding:17px;border-radius:21px}.nexus-stage-emblem{width:96px;height:96px}.nexus-stage-emblem .ic{width:49px;height:49px}.nexus-stage-caption strong{font-size:34px}.nexus-stage-halo{width:250px;height:250px}.nexus-stage-sticker{right:12%;bottom:30px;font-size:8px}.nexus-section-heading{align-items:start;flex-direction:column;gap:10px}.nexus-section-heading h2{font-size:32px}.nexus-levels{margin-top:25px}.nexus-member-body{grid-template-columns:minmax(0,1fr);gap:4px;padding:23px 20px 12px}.nexus-member-title{font-size:clamp(68px,17vw,94px)}.nexus-member-art{min-height:290px}.nexus-pass{width:194px;padding:16px;border-radius:20px}.nexus-pass-symbol{width:93px;height:93px}.nexus-pass-symbol-inner .ic{width:50px;height:50px}.nexus-pass-bottom b{font-size:26px}.nexus-member-header,.nexus-member-footer{padding:13px 17px;font-size:9px}.nexus-member-description{font-size:12px}.nexus-studio{padding:18px;border-radius:22px}.nexus-studio-grid{grid-template-columns:minmax(0,1fr);gap:16px}.nexus-studio-preview{min-height:355px;padding:16px}.nexus-studio-intro h2{font-size:32px}.nexus-desk-grid{grid-template-columns:minmax(0,1fr)}.nexus-desk-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.nexus-tier-grid{grid-template-columns:minmax(0,1fr);gap:14px}.nexus-tier{padding:16px}.nexus-tier-pass{height:200px;max-width:340px;width:100%;align-self:center}.nexus-tier-pass-name{font-size:44px}.nexus-tier-description{min-height:0}.nexus-tier-price{font-size:26px}.nexus-tier-features{gap:7px}.nexus-why{padding:18px}.nexus-why-items{grid-template-columns:minmax(0,1fr)}.nexus-why-items>div{grid-template-columns:28px 1fr;align-items:center}.nexus-why-items .ic{grid-row:span 2}.nexus-why-items small{grid-column:2}.nexus-desk{padding:17px}.nexus-desk-head h2{font-size:25px}.nexus-desk-saved{grid-template-columns:1fr auto;align-items:center}.nexus-desk-saved>strong{grid-column:2;grid-row:1/3;font-size:34px}.nexus-desk-saved>a{grid-column:1}.nexus-member-stats{gap:14px}.nexus-member-stats strong{font-size:23px}.nexus-member-open{font-size:11px}.nexus-serial{display:none}.nexus-tier-buy{font-size:12px}.nexus-studio .studio-colors{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.nexus-landing:after,.nexus-landing h1 em,.nexus-stage-halo,.nexus-stage-rings,.nexus-stage-card,.nexus-stage-emblem,.nexus-stage-sticker,.nexus-stage-card:before,.nexus-pass:before,.nexus-tier-pass:before,.nexus-preview-card:before,.nexus-tier-pass-icon,.nexus-pass,.nexus-member-aura,.nexus-studio-orb{animation:none!important}.nexus-tier,.nexus-tier-pass{transform:none!important;transition:none!important}}
+body.calm .nexus-landing:after,body.calm .nexus-landing h1 em,body.calm .nexus-stage-halo,body.calm .nexus-stage-rings,body.calm .nexus-stage-card,body.calm .nexus-stage-emblem,body.calm .nexus-stage-sticker,body.calm .nexus-stage-card:before,body.calm .nexus-pass:before,body.calm .nexus-tier-pass:before,body.calm .nexus-preview-card:before,body.calm .nexus-tier-pass-icon,body.calm .nexus-pass,body.calm .nexus-member-aura,body.calm .nexus-studio-orb{animation:none!important}
+body.calm .nexus-tier,body.calm .nexus-tier:hover,body.calm .nexus-tier-pass,body.calm .nexus-tier:hover .nexus-tier-pass{transform:none!important}
+
+
+/* Premium Studio open + editor experience (V4.1) */
+.nexus-member-open,.nexus-desk-edit{cursor:pointer;font-family:inherit}
+.nexus-studio{scroll-margin-top:100px;transition:box-shadow .4s ease,border-color .4s ease}
+.nexus-studio.studio-focused{border-color:#e7baff;box-shadow:0 0 0 2px rgba(193,142,255,.36),0 18px 80px rgba(125,85,232,.25)}
+.studio-feedback{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin:12px 0 4px;font-size:11px;color:#bbb1d1}
+#studioShortcutCount{padding:5px 10px;border:1px solid rgba(255,255,255,.16);border-radius:50px;color:#e3d4ff;font-weight:800}
+#studioShortcutCount.at-limit{border-color:var(--preview-color);color:var(--preview-color)}
+.studio-actions{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:9px;align-items:stretch;margin-top:12px}
+.studio-actions .nexus-save{margin:0;min-width:0}
+.studio-actions .studio-reset{padding:10px 8px;border-radius:14px;font-size:12px;min-width:0}
+.studio-actions button:disabled{opacity:.55;cursor:wait}
+@media(max-width:540px){.studio-actions{grid-template-columns:1fr}.nexus-studio{scroll-margin-top:70px}.studio-feedback{align-items:start;flex-direction:column}}
+
+/* ==================================================================
+   A782 CLASSIC DARK · SITE-WIDE VISUAL SYSTEM
+   Style-only layer: no accounts, data, buttons, forms or API changes.
+   Neutral editorial design; intentionally no moving VIP cards.
+   ================================================================== */
+:root{
+  color-scheme:dark;
+  --bg:#0b0d10;--bg2:#15191e;--ink:#f0f2f4;--mute:#a6afb9;
+  --line:#30363d;--glass:#171b20;
+  --acc:#d3d9df;--acc2:#aeb7c1;--acc3:#84909c;
+  --vip-accent:#c7ced6;--ultra-gold:#c7ced6;--ultra-violet:#aeb7c1;
+  --nx-ink:#eef1f4;--nx-gold:#d3d9df;--nx-violet:#aeb7c1;
+  --surface:#15191e;--surface2:#1c2127;--surface3:#252b32;
+  --edge:#313840;--edge-strong:#49515b;--text-soft:#c0c7cf;
+  --ok:#6fcaa5;--bad:#f08a8a;
+  --radius:16px;--e:cubic-bezier(.22,.8,.22,1);
+}
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f2f3f5;--bg2:#fff;--ink:#171b21;--mute:#58616c;
+  --line:#d3d9df;--glass:#fff;--surface:#fff;--surface2:#f7f8fa;
+  --surface3:#ebedf0;--edge:#d4d9de;--edge-strong:#aeb7c0;
+  --text-soft:#48515b;--nx-ink:#171b21;
+}
+body{
+  background:var(--bg)!important;color:var(--ink);font-size:15px;
+  line-height:1.65;letter-spacing:-.006em;
+}
+#fx,.aurora{display:none!important}
+#splash{background:var(--bg)}
+.ring,.spin{border-top-color:var(--ink)}
+.top{
+  min-height:68px;padding:12px max(18px,calc((100vw - 1160px)/2));
+  background:color-mix(in srgb,var(--bg) 96%,transparent);
+  border-bottom:1px solid var(--line);box-shadow:none;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.brand{font:750 17px var(--fh);letter-spacing:-.025em;white-space:nowrap}
+.mark{
+  width:38px;height:38px;border:1px solid var(--edge-strong);
+  border-radius:10px;background:var(--surface3);color:var(--ink);
+  font-size:19px;transition:none;box-shadow:none;
+}
+.brand:hover .mark{transform:none}
+.dnav{gap:2px}
+.dnav a{padding:9px 12px;border-radius:8px;color:var(--mute);font-size:13px;font-weight:600;transition:background .16s,color .16s}
+.dnav a:hover,.dnav a.on{background:var(--surface3);color:var(--ink)}
+.dnav a:has(+a){min-width:0}
+.seg{background:var(--surface2);border-radius:9px;padding:3px;border-color:var(--line)}
+.seg button,.pill{border-radius:7px;transition:background .15s,color .15s}
+.seg button.on,.pill.on{background:var(--ink);color:var(--bg)}
+.pill{border-color:var(--line)}
+.icon-btn,.ibtn{background:var(--surface2);border:1px solid var(--line);border-radius:10px}
+.icon-btn:hover{transform:none;background:var(--surface3)}
+main{max-width:1180px;padding:30px 20px 50px}
+.pg{animation:none!important}
+.rv,.rv.in,.w,.w>span{opacity:1!important;filter:none!important;transform:none!important;animation:none!important;transition:none!important}
+.w{display:inline;overflow:visible;vertical-align:baseline;padding:0;margin-right:.19em}
+.w>span{display:inline}
+.grad{background:none!important;-webkit-background-clip:initial;background-clip:initial;color:inherit;animation:none!important}
+.hero{position:relative;overflow:hidden;padding:53px 0 24px;border-bottom:1px solid var(--line)}
+.hero:before{content:"";position:absolute;right:0;top:34px;width:250px;height:250px;border:1px solid var(--line);border-radius:50%;opacity:.33;pointer-events:none}
+.eyebrow,.nexus-kicker{color:var(--text-soft);letter-spacing:.095em;font-size:11px;font-weight:750;text-transform:uppercase}
+.hero h1,.ph h1{
+  font:750 clamp(35px,5vw,58px)/1.09 var(--fh);letter-spacing:-.055em;
+  max-width:790px;margin:19px 0 17px;overflow-wrap:break-word;
+}
+.lead{color:var(--mute);font-size:clamp(15px,1.7vw,18px);line-height:1.75;max-width:730px}
+.hero-actions{margin:25px 0 0!important;gap:9px}
+.btn,.nexus-tier-buy,.nexus-member-open,.nexus-desk-edit{
+  border:1px solid var(--ink);background:var(--ink);color:var(--bg);
+  border-radius:10px;box-shadow:none!important;font-weight:700;
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+  transform:none!important;
+}
+.btn{padding:12px 18px;line-height:1.35}
+.btn:hover,.nexus-tier-buy:hover,.nexus-member-open:hover{background:var(--text-soft);border-color:var(--text-soft);color:var(--bg);transform:none!important}
+.btn.ghost,.btn.sm.ghost{background:var(--surface2);color:var(--ink);border-color:var(--edge)}
+.btn.ghost:hover{background:var(--surface3);border-color:var(--edge-strong)}
+.btn.red{background:transparent;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 42%,var(--line))}
+.btn.red:hover{background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.btn:disabled,.nexus-tier-buy:disabled{opacity:.42;cursor:not-allowed}
+.rip{display:none!important}
+.home-directory{
+  margin:32px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.home-directory>a{
+  position:relative;min-width:0;display:flex;flex-direction:column;align-items:flex-start;
+  gap:4px;padding:18px 16px;min-height:143px;border:1px solid var(--line);
+  background:var(--surface);border-radius:13px;
+  transition:border-color .15s ease,background .15s ease;
+}
+.home-directory>a:hover{background:var(--surface2);border-color:var(--edge-strong)}
+.directory-icon{display:grid;place-items:center;width:35px;height:35px;border:1px solid var(--line);border-radius:9px;color:var(--ink);background:var(--surface2);margin-bottom:9px}
+.home-directory>a b{font-size:14px;color:var(--ink)}
+.home-directory>a small{font-size:11px;color:var(--mute);line-height:1.45;padding-right:10px}
+.home-directory>a .directory-arrow{position:absolute;top:23px;right:16px;width:14px;height:14px;color:var(--mute)}
+.glass,.nexus-why,.nexus-desk,.nexus-studio,.vip-desk,.studio,.nexus-member,.nexus-tier{
+  background:var(--surface)!important;border:1px solid var(--line)!important;
+  border-radius:15px;backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:none!important;transform:none!important;transform-style:flat!important;
+  will-change:auto;
+}
+.glass::before,.glow::after,.nexus-landing::before,.nexus-landing::after{display:none!important}
+.glass:hover,.glass.tilt-card:hover,.nexus-tier:hover{transform:none!important;border-color:var(--edge-strong)!important;box-shadow:none!important}
+.glass{padding:21px;transition:border-color .15s,background .15s}
+.grid{gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,265px),1fr))}
+.card{gap:12px}
+.stats{gap:11px;margin:24px 0 0}
+.stat{background:var(--surface2)!important;padding:18px 20px}
+.stat b{font-size:clamp(25px,4vw,34px);font-weight:750}
+.stat span{font-size:12px}
+.bl{margin-top:38px}
+h2.bl,h3{font-weight:700;letter-spacing:-.025em}
+.tag{background:var(--surface2);color:var(--text-soft);border-color:var(--line);border-radius:7px}
+.tag.a,.tag.g,.win .ic{color:var(--ink)}
+.ibox{background:var(--surface3);color:var(--text-soft);border-radius:11px}
+.win{border-color:var(--line)}
+.home-vip-beacon{background:var(--surface)!important;border-color:var(--line)!important;box-shadow:none;border-radius:12px}
+.home-vip-beacon:after{display:none!important}
+.home-vip-emblem{box-shadow:none;border-color:var(--line);background:var(--surface2);color:var(--ink);border-radius:10px}
+.home-vip-beacon .home-vip-title,.home-vip-beacon .home-vip-arr{color:var(--ink);font-weight:750}
+.home-vip-beacon .home-vip-sub{color:var(--mute)}
+.search{background:var(--surface);border-radius:11px}
+select,input,textarea{border-color:var(--edge);background:var(--surface2);border-radius:10px;min-height:44px;color:var(--ink)}
+input::placeholder,textarea::placeholder{color:var(--mute);opacity:.78}
+input:focus,select:focus,textarea:focus{border-color:var(--edge-strong);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 12%,transparent)}
+:where(a,button,input,select,textarea,[role="button"]):focus-visible{outline:2px solid var(--ink)!important;outline-offset:3px!important}
+.field{color:var(--text-soft)}
+.cart-bar{border-radius:12px}
+.sheet-wrap{background:rgba(0,0,0,.73);backdrop-filter:blur(3px)}
+.sheet{background:var(--bg2);border-color:var(--line);border-radius:15px 15px 0 0}
+.toast,.toast.bad{border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.28)}
+.tabbar{border-color:var(--line);border-radius:13px;background:color-mix(in srgb,var(--bg2) 97%,transparent);box-shadow:0 14px 50px rgba(0,0,0,.2)}
+.tabbar .ind{border:1px solid var(--edge);border-radius:9px;background:var(--surface3)}
+.tabbar a{color:var(--mute)}.tabbar a.on{color:var(--ink)}
+.marquee div{animation:none!important}
+.links a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+footer{border-color:var(--line)}
+/* Premium: plain information architecture replaces metallic cards and orbit animations. */
+.nexus-landing{
+  display:grid;grid-template-columns:minmax(0,1.07fr) minmax(290px,.93fr);
+  align-items:stretch;gap:22px;min-height:0;margin:8px 0 42px;padding:28px;
+  background:var(--surface)!important;border:1px solid var(--line)!important;
+  border-radius:16px;box-shadow:none!important;color:var(--ink);
+}
+.nexus-landing-lines,.nexus-landing-stage,.nexus-stage-halo,.nexus-stage-rings,.nexus-stage-card,.nexus-stage-sticker{display:none!important}
+.nexus-landing-copy{padding:20px 8px;justify-content:center}
+.nexus-landing .nexus-kicker{color:var(--mute)}
+.nexus-landing h1{font:750 clamp(34px,4.4vw,55px)/1.1 var(--fh);letter-spacing:-.055em;margin:22px 0 16px;white-space:normal;color:var(--ink)}
+.nexus-landing h1 em{background:none!important;animation:none!important;-webkit-background-clip:initial;background-clip:initial;color:var(--text-soft)}
+.nexus-landing-copy>p{font-size:14px;color:var(--mute);line-height:1.75}
+.nexus-landing-actions{margin-top:24px}
+.nexus-landing-actions .btn{background:var(--ink);color:var(--bg);border-color:var(--ink);border-radius:10px;box-shadow:none!important}
+.nexus-landing-actions .btn:hover{background:var(--text-soft)}
+.nexus-simple-link{color:var(--text-soft);font-weight:650}
+.nexus-landing-foot{margin-top:26px;color:var(--mute);letter-spacing:.06em}
+.nexus-benefits{padding:21px;display:grid;gap:0;align-content:center;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.nexus-benefits-head{display:flex;align-items:center;gap:10px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.nexus-benefits-head>span{display:grid;place-items:center;border:1px solid var(--edge);border-radius:9px;width:38px;height:38px;color:var(--ink)}
+.nexus-benefits-head strong{font:750 14px var(--fh);letter-spacing:.075em}
+.nexus-benefits-head small{color:var(--mute);font-size:9px;margin-left:auto}
+.nexus-benefit{display:flex;align-items:center;gap:13px;padding:17px 2px;border-bottom:1px solid var(--line)}
+.nexus-benefit>span{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;background:var(--surface3);flex:none;color:var(--text-soft)}
+.nexus-benefit .ic{width:18px;height:18px}
+.nexus-benefit div{display:grid;gap:3px}
+.nexus-benefit b{color:var(--ink);font-size:13px}
+.nexus-benefit small{color:var(--mute);font-size:11px}
+.nexus-benefits-foot{padding:17px 2px 2px;color:var(--mute);font:600 10px/1.6 var(--fh);letter-spacing:.055em}
+.nexus-section-heading h2,.nexus-why h2,.nexus-studio-intro h2{font-weight:750;letter-spacing:-.045em}
+.nexus-tier-grid{gap:12px}
+.nexus-tier{min-height:0;padding:22px!important;--nexus-tier:var(--text-soft)!important}
+.nexus-tier[data-tier]{background:var(--surface)!important;--nexus-tier:var(--text-soft)!important}
+.nexus-tier[data-tier="VIP-ULTRA"]{border-color:var(--edge-strong)!important;background:var(--surface2)!important}
+.nexus-tier-top{color:var(--mute);font:750 10px var(--fh);letter-spacing:.08em;min-height:23px}
+.nexus-tier-best{background:var(--surface3);color:var(--ink);border-radius:5px}
+.nexus-tier>.nexus-tier-pass{display:none!important}
+.nexus-tier-name h3{font-size:24px;color:var(--ink);font-weight:750}
+.nexus-tier-name{color:var(--text-soft)}
+.nexus-tier-name small{color:var(--mute)}
+.nexus-tier-description{color:var(--mute);font-size:13px;line-height:1.7;min-height:85px;margin:12px 0 0}
+.nexus-tier-price{color:var(--ink);font-size:29px;margin:18px 0}
+.nexus-tier-price small{color:var(--mute);font-size:12px}
+.nexus-tier-features{border-color:var(--line);gap:12px;margin-top:6px;padding:17px 0 20px}
+.nexus-tier-features span{color:var(--text-soft);font-size:12px;line-height:1.6}
+.nexus-tier-features .ic{color:var(--ink)}
+.nexus-tier-buy{padding:12px 8px;font-size:12px}
+.nexus-tier-preview{background:var(--surface2);color:var(--text-soft);border-color:var(--edge);border-radius:10px}
+.nexus-tier-preview:hover{border-color:var(--edge-strong);color:var(--ink)}
+.nexus-levels-footnote .ic,.nexus-why-items .ic{color:var(--text-soft)}
+.nexus-why{padding:27px}
+.nexus-why-items>div{background:var(--surface2);border-color:var(--line)}
+.nexus-why-items b{color:var(--ink)}
+.nexus-member{color:var(--ink);background:var(--surface)!important}
+.nexus-member-noise,.nexus-member-art,.membership-orbit,.membership-orbit-a,.membership-orbit-b,.membership-orbit-c{display:none!important}
+.nexus-member-body{grid-template-columns:minmax(0,1fr)!important;min-height:0;padding:32px;gap:0}
+.nexus-member-title{font:750 clamp(45px,6vw,66px)/1.05 var(--fh);color:var(--ink);letter-spacing:-.055em}
+.nexus-member-title span{color:var(--text-soft)}
+.nexus-micro,.nexus-micro b,.nexus-live,.nexus-member-expiry{color:var(--text-soft)}
+.nexus-member-description{color:var(--mute);max-width:610px}
+.nexus-member-user,.nexus-member-stats strong{color:var(--ink)}
+.nexus-verified{color:var(--text-soft);border-color:var(--edge)}
+.nexus-member-header,.nexus-member-footer{color:var(--mute);border-color:var(--line)}
+.nexus-member-open{margin-top:22px;color:var(--bg);background:var(--ink);border-color:var(--ink);font-size:12px}
+.nexus-member-open:hover{color:var(--bg)}
+.nexus-desk{padding:24px}
+.nexus-desk-head h2{color:var(--ink);font-weight:750}
+.nexus-desk-head p{color:var(--mute)}
+.nexus-desk-edit{background:var(--surface2);color:var(--ink);border-color:var(--edge)}
+.nexus-desk-saved,.nexus-desk-links a{background:var(--surface2)!important;border-color:var(--line)!important;color:var(--ink)}
+.nexus-desk-links a:hover{transform:none;border-color:var(--edge-strong)!important}
+.nexus-desk-saved strong,.nexus-desk-saved span,.nexus-desk-saved a{color:var(--ink)}
+.nexus-studio{background:var(--surface)!important;color:var(--ink);padding:24px}
+.nexus-studio.studio-focused{border-color:var(--edge-strong)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--ink) 15%,transparent)!important}
+.nexus-studio-intro h2{color:var(--ink)}
+.nexus-studio-intro p,.studio-feedback{color:var(--mute)}
+.nexus-studio-grid{gap:22px}
+.nexus-studio-preview{background:var(--surface2)!important;border-color:var(--line)!important;border-radius:12px;min-height:0}
+.nexus-studio-orb{display:none!important}
+.nexus-preview-card{animation:none!important;transform:none!important;box-shadow:none!important;background:var(--surface)!important;border:1px solid var(--edge-strong)!important;border-radius:12px}
+.nexus-preview-card:before{display:none!important}
+.nexus-preview-label,.nexus-preview-bottom,.nexus-preview-tip{color:var(--mute)}
+.nexus-preview-status{color:var(--preview-color)}
+.nexus-preview-avatar{box-shadow:none}
+.nexus-studio input,.nexus-studio select,.nexus-studio textarea{background:var(--surface2);color:var(--ink);border-color:var(--edge)}
+.nexus-studio .studio-colors label{background:var(--surface2);border-color:var(--line);transform:none!important}
+.nexus-studio .studio-links,.nexus-studio .studio-links label{background:var(--surface2);border-color:var(--edge)}
+.nexus-studio .field{color:var(--text-soft)}
+.nexus-save{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.nexus-studio-note{color:var(--mute)}
+.nexus-modal-preview .nexus-tier-pass{display:flex;animation:none!important;transform:none!important;box-shadow:none!important;background:var(--surface2)!important;border-color:var(--edge-strong)!important}
+.nexus-modal-preview .nexus-tier-pass:before,.nexus-modal-preview .nexus-tier-pass-icon{animation:none!important}
+.vip-card,.vip-status,.membership-hero,.vip-identity{background:var(--surface)!important;border:1px solid var(--line)!important;box-shadow:none!important}
+.vip-card:after,.vip-status:after,.vip-reveal-card:before,.home-vip-beacon:after{display:none!important}
+.membership-hero:before,.vip-identity .prof-banner:after{display:none!important}
+.vip-card,.vip-card:hover,.premium-card,.tier-card,.nexus-tier,.nexus-tier:hover,.nexus-tier-pass,.nexus-tier:hover .nexus-tier-pass,
+.nexus-pass,.nexus-stage-card,.nexus-preview-card,.vip-mini-preview{transform:none!important;animation:none!important}
+.vip-card .vip-price,.vip-card .vip-perks .ic{color:var(--ink)}
+.avatar-shell-vip{animation:none!important;background:var(--surface3);box-shadow:none}
+.vip-identity .avatar,.vip-identity[data-vip="VIP-PRO"] .avatar,.vip-identity[data-vip="VIP-ULTRA"] .avatar{animation:none!important;box-shadow:none!important}
+.vip-identity .prof-banner{background:var(--surface3)!important;animation:none!important}
+.vip-mini-preview{background:var(--surface2);box-shadow:none}
+.profile-rank,.nav-vip-marker{background:var(--surface2);color:var(--text-soft);border-color:var(--edge);box-shadow:none}
+.marquee{display:none!important}
+body.vip-view .mark{background:var(--surface3)!important;color:var(--ink)!important;box-shadow:none!important}
+body.vip-view .top{border-bottom-color:var(--line)!important}
+.vip-reveal{display:none!important}
+.membership-hero{min-height:0;color:var(--ink);padding:26px!important}
+.membership-title{font:750 clamp(34px,5vw,55px)/1.1 var(--fh);letter-spacing:-.05em;color:var(--ink);background:none!important;filter:none!important}
+.membership-pretitle,.membership-expiry,.member-live,.member-verified{color:var(--text-soft)!important}
+.membership-name,.membership-intro{color:var(--ink)}
+.membership-pills span{border-color:var(--edge);color:var(--text-soft);background:var(--surface2)}
+.membership-layout{grid-template-columns:minmax(0,1fr)}
+.membership-grid,.membership-sheen{display:none!important}
+/* Disable decorative motion and dramatic transforms without disabling actual navigation/spinners. */
+.aurora *, .membership-orbit *, .orbit-star,.membership-core .ic,.nexus-stage-emblem,.nexus-stage-sticker,.nexus-tier-pass-icon,
+.nexus-member-aura,.nexus-landing:after,.nexus-pass:before,.nexus-tier-pass:before,.nexus-preview-card:before,
+.vip-reveal-crown .ic,.vip-identity .prof-banner,.vip-identity .avatar,.home-vip-beacon:after{
+  animation:none!important;
+}
+.dot.on{animation:none}
+/* Light mode uses the same neutral visual language, with readable text. */
+[data-theme="light"] .nexus-landing,[data-theme="light"] .nexus-member,[data-theme="light"] .nexus-tier,[data-theme="light"] .nexus-studio,[data-theme="light"] .nexus-desk{color:var(--ink)}
+[data-theme="light"] .nexus-tier-features span,[data-theme="light"] .nexus-member-user,[data-theme="light"] .nexus-member-stats strong{color:var(--ink)}
+[data-theme="light"] .nexus-tier-price,[data-theme="light"] .nexus-preview-card{color:var(--ink)}
+@media(max-width:1060px){.home-directory{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:820px){
+  .top{padding:10px 16px;min-height:60px}
+  main{padding:16px 16px 125px}
+  .hero{padding-top:31px}
+  .hero:before{display:none}
+  .nexus-landing{grid-template-columns:minmax(0,1fr);gap:15px;margin-bottom:30px;padding:18px}
+  .nexus-landing-copy{padding:8px 2px}
+  .nexus-benefits{padding:14px}
+  .nexus-member-body{padding:24px 20px}
+  .nexus-studio{padding:18px}
+}
+@media(max-width:560px){
+  .top{padding:9px 11px;gap:5px}
+  .brand{font-size:15px}
+  .mark{width:31px;height:31px;border-radius:9px}
+  .tools{gap:5px}
+  .hero h1,.ph h1{font-size:clamp(34px,9.5vw,45px)}
+  .hero-actions{gap:8px}
+  .hero-actions .btn{flex:1;padding:11px 12px;font-size:12px;min-width:0}
+  .home-directory{gap:9px;margin-top:24px}
+  .home-directory>a{min-height:137px;padding:12px 12px}
+  .home-directory>a b{font-size:13px}
+  .home-directory>a small{font-size:10px}
+  .home-directory>a .directory-arrow{top:19px;right:12px}
+  .stats{gap:8px}
+  .stat{padding:13px 11px}
+  .stat b{font-size:24px}
+  .stat span{font-size:10px}
+  .nexus-landing h1{font-size:clamp(34px,9.5vw,50px);white-space:normal}
+  .nexus-landing-foot{font-size:8px;letter-spacing:.04em;flex-wrap:wrap}
+  .nexus-tier{padding:19px!important}
+  .nexus-tier-description{min-height:0}
+  .nexus-studio-preview{padding:14px;min-height:0}
+  .nexus-preview-card{margin:18px 0}
+  .nexus-member-title{font-size:clamp(42px,12vw,62px)}
+  .tabbar{left:9px;right:9px;bottom:calc(8px + env(safe-area-inset-bottom));padding:5px}
+  .tabbar a{font-size:10px}
+  .tabbar .ind{left:5px;top:5px;bottom:5px;width:calc((100% - 10px)/5)}
+}
+@media(prefers-reduced-motion:reduce){.btn,.dnav a,.home-directory>a,.glass{transition:none!important}}
+
+
+/* ==================================================================
+ A782 DIGITAL — WINTER EDITION 2026–27
+ Sitewide visual refresh, one safe CSS layer. Existing APIs, admin and
+ VIP entitlements remain untouched. Animations respect reduced motion.
+ ================================================================== */
+:root{
+  color-scheme:dark;
+  --bg:#090f16;--bg2:#111b24;--ink:#f8fafb;--mute:#aab6c3;
+  --line:rgba(175,204,229,.18);--glass:#15212d;
+  --acc:#efd0a0;--acc2:#a7cbd9;--acc3:#c8cbd5;
+  --surface:#111a24;--surface2:#17232e;--surface3:#22303c;
+  --edge:rgba(175,204,229,.16);--edge-strong:rgba(228,215,184,.37);
+  --text-soft:#c0cbd3;
+  --nx-ink:#f8fafb;--nx-gold:#efd0a0;--nx-violet:#b1ceda;
+  --vip-accent:#efd0a0;--ultra-gold:#efd0a0;--ultra-violet:#b1ceda;
+  --winter-gold:#efd0a0;--winter-ice:#a9d6e8;--winter-pine:#7cb7a8;
+  --winter-night:#0b1119;--ok:#80d5b2;--bad:#ffa7a7;
+}
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef3f6;--bg2:#fff;--ink:#15212d;--mute:#526472;
+  --line:rgba(23,46,62,.15);--glass:#fff;
+  --acc:#73552c;--acc2:#456a81;--acc3:#626d7d;
+  --surface:#fff;--surface2:#f4f8fa;--surface3:#e8eff3;
+  --edge:rgba(23,46,62,.16);--edge-strong:rgba(115,85,44,.35);
+  --text-soft:#405664;--nx-ink:#15212d;--nx-gold:#73552c;--nx-violet:#456a81;
+  --vip-accent:#73552c;
+}
+html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 60% 26% at 94% -4%,rgba(209,163,95,.10),transparent 69%),
+    radial-gradient(ellipse 55% 25% at -8% 19%,rgba(114,164,190,.10),transparent 72%),
+    linear-gradient(155deg,#0b131c 0%,#091017 42%,#0b131b 100%)!important;
+  color:var(--ink);font-size:14px;line-height:1.65;letter-spacing:-.01em;
+}
+[data-theme="light"] body{
+  background:linear-gradient(160deg,#f5f8fb,#e8eff3)!important;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle at 20% 6%,rgba(255,236,199,.05) 0 1px,transparent 2px),
+    radial-gradient(circle at 66% 21%,rgba(201,231,244,.045) 0 1px,transparent 2px);
+  background-size:180px 190px,253px 289px;
+}
+.winter-sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.winter-sky i{position:absolute;display:block;width:3px;height:3px;border-radius:50%;background:#e7f5ff;opacity:.36;box-shadow:0 0 11px 2px rgba(155,209,228,.28);animation:winter-drift 21s ease-in-out infinite alternate}
+.winter-sky i:nth-child(1){left:6%;top:24%;animation-delay:-2s}
+.winter-sky i:nth-child(2){left:16%;top:62%;animation-delay:-10s;width:2px;height:2px}
+.winter-sky i:nth-child(3){left:33%;top:10%;animation-delay:-6s}
+.winter-sky i:nth-child(4){left:45%;top:77%;animation-delay:-15s;width:2px;height:2px}
+.winter-sky i:nth-child(5){left:55%;top:35%;animation-delay:-8s}
+.winter-sky i:nth-child(6){left:70%;top:15%;animation-delay:-12s;width:2px;height:2px}
+.winter-sky i:nth-child(7){left:78%;top:68%;animation-delay:-4s}
+.winter-sky i:nth-child(8){left:86%;top:30%;animation-delay:-17s;width:2px;height:2px}
+.winter-sky i:nth-child(9){left:94%;top:87%;animation-delay:-5s}
+.winter-sky i:nth-child(10){left:26%;top:92%;animation-delay:-19s;width:2px;height:2px}
+@keyframes winter-drift{0%{transform:translate3d(-4px,15px,0);opacity:.1}100%{transform:translate3d(15px,-21px,0);opacity:.65}}
+#fx,.aurora{display:none!important}
+#splash{background:#0b131b}
+#splash b{color:#f4f0e9}
+.ring{border-top-color:#efd0a0!important}
+/* Header, site navigation and mobile bar */
+.top{min-height:76px;padding:13px max(20px,calc((100vw - 1160px)/2));border-bottom:1px solid var(--line);
+  background:rgba(11,17,25,.86)!important;box-shadow:0 7px 40px rgba(0,0,0,.18);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+[data-theme="light"] .top{background:rgba(247,250,252,.89)!important}
+.brand{font:750 17px var(--fh);letter-spacing:-.045em}
+.mark{background:linear-gradient(145deg,#344550,#1c2a35)!important;color:#f4e5d1!important;border:1px solid rgba(239,208,160,.36)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.20)!important;border-radius:11px}
+.dnav a{font-size:13px;border-radius:10px}
+.dnav a.on,.dnav a:hover{background:rgba(219,226,235,.09);color:#f3e9da}
+.seg,.icon-btn,.ibtn{border-radius:10px;background:var(--surface2);border-color:var(--line)}
+.seg button.on{background:#efe5d6;color:#18212a}
+.icon-btn:hover{background:var(--surface3);border-color:var(--edge-strong)}
+main{position:relative;z-index:1;max-width:1220px;padding:30px 25px 50px}
+.pg{animation:none!important}
+.rv,.rv.in,.w,.w>span{opacity:1!important;filter:none!important;transform:none!important;animation:none!important;transition:none!important}
+.w{display:inline;padding:0;overflow:visible;vertical-align:baseline;margin-right:.16em}
+.w>span{display:inline}
+.grad{background:none!important;color:var(--ink)!important}
+/* Typography, visible page context */
+.eyebrow,.nexus-kicker{color:var(--winter-gold);letter-spacing:.12em;font-size:11px;font-weight:750}
+[data-theme="light"] .eyebrow{color:#73552c}
+.ph{position:relative;isolation:isolate;margin:15px 0 25px;padding:30px 31px 31px;
+ background:linear-gradient(120deg,rgba(28,43,56,.76),rgba(14,24,34,.55))!important;
+ border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.ph::after{content:"";position:absolute;z-index:-1;width:370px;height:370px;right:-150px;top:-210px;
+ border:1px solid rgba(239,208,160,.18);border-radius:50%;box-shadow:0 0 0 50px rgba(209,179,129,.015),0 0 0 115px rgba(209,179,129,.014)}
+[data-theme="light"] .ph{background:linear-gradient(125deg,#fff,#f0f4f8)!important}
+.ph h1{font-size:clamp(34px,5vw,56px);letter-spacing:-.055em;margin:14px 0 13px;line-height:1.09}
+.lead{color:var(--mute);line-height:1.7;max-width:720px;font-size:clamp(14px,1.65vw,17px)}
+.bl{margin-top:38px}
+h2.bl,h3{letter-spacing:-.03em;font-weight:750}
+h2.bl{display:flex;align-items:center;gap:12px}
+h2.bl::before{content:"";display:inline-block;width:6px;height:19px;background:var(--winter-gold);border-radius:6px;box-shadow:0 0 16px rgba(239,208,160,.16)}
+/* Buttons and cards */
+.btn,.nexus-tier-buy,.nexus-member-open,.nexus-desk-edit{
+  background:linear-gradient(145deg,#f7eddd,#ddc59f)!important;color:#17222b!important;
+  border:1px solid rgba(255,237,205,.5)!important;border-radius:11px;
+  box-shadow:inset 0 1px rgba(255,255,255,.55),0 7px 20px rgba(194,155,98,.07)!important;
+  transition:transform .18s ease,filter .18s ease,border-color .18s ease!important;
+  font-weight:750;transform:none!important}
+.btn:hover,.nexus-tier-buy:hover{filter:brightness(1.065);transform:translateY(-2px)!important}
+.btn:active{transform:translateY(0)!important}
+.btn.ghost{background:rgba(208,223,235,.055)!important;color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:none!important}
+.btn.ghost:hover{background:rgba(208,223,235,.12)!important;border-color:var(--edge-strong)!important}
+.btn.red{background:rgba(191,70,70,.1)!important;color:var(--bad)!important;border-color:rgba(255,167,167,.3)!important}
+.btn:disabled{opacity:.42;pointer-events:none}
+.rip{display:none!important}
+.glass,.nexus-why,.nexus-desk,.nexus-studio,.vip-desk,.studio,.nexus-member,.nexus-tier{
+ background:linear-gradient(145deg,rgba(26,39,51,.92),rgba(16,26,36,.97))!important;
+ border:1px solid var(--line)!important;border-radius:18px!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 32px rgba(0,0,0,.12)!important;
+ backdrop-filter:none;-webkit-backdrop-filter:none;will-change:auto;
+ transform:none!important;transform-style:flat!important}
+[data-theme="light"] .glass,[data-theme="light"] .nexus-tier,[data-theme="light"] .nexus-studio,[data-theme="light"] .nexus-member{
+ background:linear-gradient(145deg,#fff,#f5f8fa)!important;box-shadow:0 12px 28px rgba(37,60,77,.06)!important}
+.glass::before,.glow::after{display:none!important}
+.glass:hover,.glass.tilt-card:hover,.nexus-tier:hover{
+ border-color:var(--edge-strong)!important;box-shadow:inset 0 1px rgba(255,255,255,.05),0 17px 35px rgba(0,0,0,.17)!important;transform:translateY(-2px)!important}
+.tag{background:rgba(206,222,235,.075);border:1px solid var(--line);border-radius:8px;color:var(--text-soft)}
+.tag.a{color:var(--winter-gold)}.tag.g{color:var(--ok)}
+.ibox,.directory-icon,.library-icon{background:rgba(233,215,181,.075)!important;color:var(--winter-gold)!important;border:1px solid var(--line);border-radius:11px}
+.grid{gap:15px}
+.specs{border-color:var(--line)}
+.foot{border-color:var(--line)}
+.win{border:1px solid rgba(128,213,178,.3)}.win .ic{color:var(--ok)}
+/* Home page — editorial left column and cinematic CSS-only winter gift */
+.hero.winter-home-hero{padding:26px 0 15px;border-bottom:0;overflow:visible}
+.hero.winter-home-hero::before{display:none}
+.winter-hero-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(285px,.85fr);align-items:center;gap:28px;
+  padding:40px 40px 32px;min-height:435px;position:relative;overflow:hidden;border-radius:24px;border:1px solid rgba(190,210,226,.2);
+  background:radial-gradient(ellipse at 85% 12%,rgba(184,143,83,.16),transparent 48%),
+    radial-gradient(ellipse at 9% 96%,rgba(113,167,193,.10),transparent 50%),
+    linear-gradient(120deg,#131e29,#101922 66%,#18222d);
+  box-shadow:inset 0 1px rgba(255,255,255,.045),0 23px 70px rgba(0,0,0,.17)}
+.winter-hero-layout::after{content:"";position:absolute;left:15%;right:5%;bottom:0;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(239,208,160,.75),transparent);box-shadow:0 0 17px 2px rgba(239,208,160,.18)}
+[data-theme="light"] .winter-hero-layout{background:linear-gradient(120deg,#fcfaf7,#e1ebf1);border-color:var(--line)}
+.winter-hero-text{position:relative;z-index:2;min-width:0}
+.winter-edition-label{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;padding:7px 11px;margin-bottom:14px;
+ border:1px solid rgba(239,208,160,.24);border-radius:7px;background:rgba(209,183,142,.06);
+ color:#e9d9be;font-size:10px;letter-spacing:.115em;font-weight:750}
+[data-theme="light"] .winter-edition-label{color:#694f2e}
+.winter-mini-star{color:#efd0a0;font-size:13px;filter:drop-shadow(0 0 8px rgba(239,208,160,.5))}
+.winter-edition-label .sep{opacity:.32}
+.winter-hero-text .eyebrow{margin-top:3px;color:#a9c5d3}
+.winter-home-hero h1{font-size:clamp(36px,4.25vw,58px);max-width:715px;line-height:1.07;letter-spacing:-.06em;margin:14px 0 18px}
+.winter-home-hero .lead{max-width:640px;color:#b7c4cc;font-size:15px}
+[data-theme="light"] .winter-home-hero .lead{color:#455968}
+.winter-hero-points{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.winter-hero-points span{color:#bfcbd4;font-size:11px;border-radius:7px;border:1px solid rgba(180,208,226,.16);padding:6px 9px;background:rgba(255,255,255,.035)}
+[data-theme="light"] .winter-hero-points span{color:#455968}
+.winter-hero-art{position:relative;height:340px;min-width:0;display:grid;place-items:center;isolation:isolate}
+.winter-hero-art:before{content:"";position:absolute;inset:16px 0;border-radius:50%;background:radial-gradient(ellipse at center,rgba(200,165,104,.22),transparent 58%);filter:blur(22px)}
+.winter-halo{position:absolute;border:1px solid rgba(239,208,160,.28);border-radius:50%;pointer-events:none;transform:rotate(-22deg)}
+.winter-halo-a{width:320px;height:110px;top:90px;box-shadow:0 0 18px rgba(221,172,106,.08)}
+.winter-halo-b{width:370px;height:152px;top:88px;border-color:rgba(166,206,225,.15);transform:rotate(23deg)}
+.winter-stars{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:space-around;padding-top:32px;color:#f1d19c;
+ letter-spacing:18px;font-size:15px;filter:drop-shadow(0 0 8px rgba(242,192,114,.5));animation:star-breathe 6s ease-in-out infinite alternate}
+.winter-stars span{font-size:9px;color:#c5dfeb}
+@keyframes star-breathe{from{opacity:.36}to{opacity:.93}}
+.winter-gift{position:absolute;z-index:2;width:177px;height:148px;top:120px;left:50%;transform:translateX(-50%) rotate(-5deg);
+ border-radius:9px 9px 17px 17px;border:1px solid rgba(239,208,160,.48);
+ background:linear-gradient(125deg,#3a4b56 0%,#1b2934 39%,#101821 90%);
+ box-shadow:18px 20px 36px rgba(0,0,0,.33),inset 10px 0 17px rgba(255,255,255,.055),0 0 40px rgba(231,189,128,.10)}
+.winter-gift-lid{position:absolute;left:-11px;top:-23px;width:197px;height:40px;border:1px solid rgba(241,208,151,.5);
+ border-radius:7px;background:linear-gradient(155deg,#445666,#18232c 80%);box-shadow:0 8px 13px rgba(0,0,0,.28)}
+.winter-gift-ribbon-v{position:absolute;z-index:3;left:70px;top:-23px;width:36px;height:171px;background:linear-gradient(90deg,#866037,#f7e0ae 48%,#a17645);
+ opacity:.93;box-shadow:0 0 14px rgba(238,194,135,.11)}
+.winter-gift-ribbon-h{position:absolute;z-index:4;top:-5px;left:-10px;width:195px;height:19px;background:linear-gradient(#caa273,#795531)}
+.winter-gift-mark{position:absolute;z-index:5;bottom:25px;left:14px;font:800 23px var(--fh);letter-spacing:.09em;color:#f2ddb5;text-shadow:0 0 15px rgba(255,206,138,.2)}
+.winter-gift-mark span{display:block;font:600 10px var(--fh);letter-spacing:.31em;color:#dbc49d}
+.winter-gift-bow{position:absolute;z-index:5;top:-52px;left:78px;width:54px;height:31px;border:9px solid #e5c390;border-radius:45px 42px 15px 33px;transform:rotate(-34deg);box-shadow:inset 0 0 8px rgba(0,0,0,.17)}
+.winter-gift-bow.two{left:41px;transform:rotate(35deg) scaleX(-1)}
+.winter-art-caption{position:absolute;z-index:3;bottom:0;text-align:center;font:800 22px var(--fh);letter-spacing:.18em;color:#e9d7bc}
+.winter-art-caption b{font-size:30px;letter-spacing:.04em;color:#f5e9d5}
+.winter-art-caption small{display:block;font:650 9px var(--fh);letter-spacing:.18em;color:#9db0bd}
+.home-directory{margin:17px 0 0;gap:12px}
+.home-directory>a{border-radius:15px;min-height:140px;background:linear-gradient(135deg,#17232e,#121c26)!important;border:1px solid var(--line);
+  padding:19px 17px;box-shadow:inset 0 1px rgba(255,255,255,.03);transition:transform .18s,border-color .18s}
+.home-directory>a:hover{transform:translateY(-3px);border-color:var(--edge-strong)}
+.home-directory>a b{font-size:15px}.home-directory>a small{color:var(--mute);font-size:11px}
+[data-theme="light"] .home-directory>a{background:linear-gradient(140deg,#fff,#f4f8fa)!important}
+.stats{margin:26px 0 0;gap:12px}
+.stat{background:rgba(19,30,40,.9)!important;border-radius:14px!important;padding:19px 21px}
+.stat b{color:var(--ink)}.stat span{color:var(--mute)}
+.home-vip-beacon{border-color:var(--edge-strong)!important;background:linear-gradient(120deg,#222d37,#161e29)!important}
+.home-vip-emblem{color:var(--winter-gold);border-color:var(--line)}
+.home-vip-beacon .home-vip-title{color:var(--winter-gold)}
+.marquee{margin-top:42px;border-color:var(--line);background:rgba(26,39,52,.3);border-radius:9px;padding:10px 0}
+.marquee div{animation:none!important;font:600 13px var(--fh);letter-spacing:.11em}
+.marquee span{padding-right:45px}
+/* Prize reel, with real side-to-side scrolling and matching server-selected prize */
+.winter-page-head{padding-top:29px}
+.winter-page-kicker{font:750 10px var(--fh);letter-spacing:.17em;color:var(--winter-gold);margin-bottom:12px}
+.reel-panel{margin-top:18px;overflow:hidden;border-radius:25px;padding:25px 22px 23px;isolation:isolate;position:relative;
+ border:1px solid rgba(238,209,165,.27);background:radial-gradient(ellipse at 50% -14%,rgba(198,146,80,.11),transparent 53%),linear-gradient(145deg,#16222d,#0f1923 70%);
+ box-shadow:inset 0 1px rgba(255,255,255,.065),0 16px 50px rgba(0,0,0,.20)}
+.reel-panel:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+ background:radial-gradient(circle at 10% 20%,#eec995 0 1px,transparent 2px),radial-gradient(circle at 87% 39%,#a9d6e8 0 1px,transparent 2px);
+ background-size:137px 151px,205px 223px}
+.reel-head{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:21px}
+.reel-kicker{font-size:10px;font-weight:800;letter-spacing:.17em;color:var(--winter-gold)}
+.reel-head h2{font:800 clamp(25px,3.4vw,35px)/1.1 var(--fh);letter-spacing:-.05em;margin:9px 0}
+.reel-head p{color:#acb9c5;font-size:13px;line-height:1.6;max-width:590px}
+.reel-counter{display:flex;gap:9px;align-items:center;padding:10px 15px;border:1px solid rgba(208,226,236,.22);background:rgba(12,20,27,.67);border-radius:11px;
+ color:#c9d4dc;white-space:nowrap;font-size:12px}
+.reel-counter .ic{color:var(--winter-gold)}.reel-counter strong{color:#f8ead5;font:800 21px var(--fh);margin-left:10px}
+.reel-machine{position:relative;padding:21px 0;margin:8px 0 14px;border-radius:22px;background:linear-gradient(180deg,#0b131b,#15212c 49%,#0c141d);border:1px solid rgba(197,216,226,.21);
+ box-shadow:inset 0 13px 18px rgba(0,0,0,.28),inset 0 -12px 17px rgba(0,0,0,.24),0 12px 28px rgba(0,0,0,.16)}
+.reel-viewport{height:174px;overflow:hidden;position:relative;mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%)}
+.reel-track{position:relative;display:flex;align-items:center;gap:10px;width:max-content;height:100%;transform:translate3d(0,0,0);will-change:transform}
+.reel-prize{flex:0 0 159px;height:160px;padding:15px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;
+ border:1px solid rgba(179,201,216,.19);border-radius:16px;background:linear-gradient(140deg,#25313d,#17212b);
+ color:#edf4f9;box-shadow:inset 0 1px rgba(255,255,255,.055);transition:border-color .25s,background .25s,box-shadow .25s}
+.reel-prize-icon{display:grid;place-items:center;width:45px;height:45px;margin-bottom:5px;border:1px solid rgba(235,209,168,.18);border-radius:13px;background:rgba(239,208,160,.065);color:#efd0a0}
+.reel-prize-icon .ic{width:25px;height:25px}
+.reel-prize b{font-size:14px;font-weight:750;line-height:1.34;max-width:125px;overflow-wrap:anywhere}
+.reel-prize small{font-size:10px;color:#aab8c5;line-height:1.2}
+.reel-prize.is-selected{border-color:#f3cd92;background:linear-gradient(140deg,#4a3c30,#24242b);box-shadow:0 0 22px rgba(240,197,126,.40),inset 0 0 14px rgba(240,197,126,.09)}
+.reel-prize.is-selected .reel-prize-icon{border-color:rgba(244,209,148,.48)}
+.reel-upper-rail,.reel-lower-rail{position:absolute;left:7%;right:7%;height:2px;z-index:2;pointer-events:none;
+ background:linear-gradient(90deg,transparent,rgba(239,208,160,.6),rgba(175,216,230,.35),rgba(239,208,160,.6),transparent);
+ box-shadow:0 0 14px 2px rgba(239,208,160,.12)}
+.reel-upper-rail{top:8px}.reel-lower-rail{bottom:8px}
+.reel-marker{position:absolute;z-index:5;left:50%;transform:translateX(-50%);pointer-events:none;width:0;height:0;filter:drop-shadow(0 0 9px rgba(255,212,147,.8))}
+.reel-marker-top{top:1px;border-left:13px solid transparent;border-right:13px solid transparent;border-top:20px solid #f3d29c}
+.reel-marker-bottom{bottom:1px;border-left:13px solid transparent;border-right:13px solid transparent;border-bottom:20px solid #f3d29c}
+.reel-machine:after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;border-radius:inherit;
+ background:linear-gradient(90deg,rgba(10,18,26,.76) 0%,transparent 16%,transparent 84%,rgba(10,18,26,.76) 100%)}
+.reel-machine.is-spinning .reel-marker{filter:drop-shadow(0 0 15px rgba(255,223,156,1))}
+.reel-controls{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,1.15fr) minmax(0,1fr);align-items:center;gap:12px;margin-top:19px}
+.reel-price-note{display:flex;align-items:center;gap:8px;font-size:12px;color:#bbc8d1}
+.reel-price-note .ic{color:#efd0a0}
+.reel-spin-btn{min-height:55px;box-shadow:0 7px 28px rgba(226,188,123,.13)!important;display:flex;align-items:center;justify-content:center;gap:12px;font-size:15px}
+.reel-spin-btn.is-busy{opacity:.64;filter:saturate(.7)}
+.reel-spin-arrow{font-size:22px;margin-left:9px;font-weight:400}
+.reel-daily-btn{justify-self:end;max-width:100%;font-size:12px;padding:12px 14px}
+.reel-announcement{position:relative;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px 2px;color:#adbac5;font-size:12px;text-align:center}
+.reel-announcement b{color:#f0d1a2}.reel-announcement .ic{width:16px;height:16px;color:#7ed1ae}
+.winter-wallet{margin:11px 0;gap:8px}
+.winter-wallet .tag{padding:8px 12px}
+.reel-empty{padding:60px 10px;color:var(--mute)}
+[data-theme="light"] .reel-panel{background:linear-gradient(135deg,#fff,#e8edf1);border-color:var(--line)}
+[data-theme="light"] .reel-head p,[data-theme="light"] .reel-price-note,[data-theme="light"] .reel-announcement{color:#526472}
+[data-theme="light"] .reel-head h2,[data-theme="light"] .reel-counter strong{color:#192936}
+/* Rest of the site: improved readability and balance */
+.search,.pills,.filters{gap:9px}
+.search{background:var(--surface2);border-color:var(--line);border-radius:13px}
+select,input,textarea{border-radius:10px;background:var(--surface2);border:1px solid var(--line);min-height:43px;color:var(--ink)}
+input:focus,select:focus,textarea:focus{border-color:var(--edge-strong);box-shadow:0 0 0 3px rgba(239,208,160,.10)}
+:where(a,button,input,select,textarea,[role="button"]):focus-visible{outline:2px solid var(--winter-gold)!important;outline-offset:3px!important}
+.pill{background:var(--surface2);border:1px solid var(--line);border-radius:10px}
+.pill.on{background:rgba(239,208,160,.14);color:var(--winter-gold);border-color:rgba(239,208,160,.31)}
+.mr{border-radius:14px}.mr img{border-radius:11px}
+.prof-banner{background:linear-gradient(125deg,#314755,#15232e)!important}
+.avatar{border-color:var(--surface)}
+.vip-identity .prof-banner{background:linear-gradient(130deg,#263746,#1e2934)!important;animation:none!important}
+.nexus-landing,.nexus-member,.nexus-studio,.nexus-desk,.nexus-tier{animation:none!important}
+.nexus-landing{background:linear-gradient(140deg,#192632,#101c25)!important;border:1px solid var(--line)!important}
+.nexus-benefits,.nexus-benefit{background:var(--surface2)!important;border-color:var(--line)!important}
+.nexus-landing:before,.nexus-landing:after,.nexus-pass:before,.nexus-tier-pass:before,.membership-hero:before,.vip-card:after,.vip-status:after{display:none!important}
+.vip-card,.nexus-tier,.nexus-preview-card,.nexus-tier-pass,.membership-hero,.vip-reveal-card{
+ background:linear-gradient(140deg,#202d37,#121d26)!important;border-color:var(--line)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.055)!important}
+.nexus-preview-card,.nexus-tier-pass,.vip-mini-preview{transform:none!important}
+.membership-orbit,.membership-orbit-a,.membership-orbit-b,.membership-orbit-c,.orbit-star{animation:none!important}
+.membership-orbit-a,.membership-orbit-b,.membership-orbit:before,.membership-orbit:after{display:none!important}
+.nexus-member-title,.membership-title{background:none!important;-webkit-text-fill-color:var(--ink)!important;color:var(--ink)!important;filter:none!important;text-shadow:none!important}
+.nexus-tier-price{color:var(--winter-gold)!important}
+.nexus-tier:hover{border-color:var(--edge-strong)!important}
+.nexus-studio,.studio{background:var(--surface)!important}
+.vip-card .btn{background:linear-gradient(140deg,#f3e7d3,#cfb58d)!important}
+.vip-desk h3,.nexus-desk h3{color:var(--ink)}
+.studio-colors label:hover,.vip-desk-links a:hover{transform:translateY(-1px)!important}
+.cd div{background:var(--surface2);border-color:var(--line);border-radius:11px}
+.cart-bar{border-radius:15px;background:linear-gradient(120deg,#ebd7b7,#b6d0d8);color:#14222d}
+.empty,.notice{border-color:var(--line);border-radius:14px;color:var(--mute)}
+.table{overflow-x:auto}.table th{color:var(--mute)}
+.sheet-wrap{background:rgba(6,11,16,.7)}.sheet{background:#101a23;border-radius:22px 22px 0 0;border-color:var(--line)}
+[data-theme="light"] .sheet{background:#fff}
+.toast{border:1px solid var(--edge-strong);background:#17242e;color:#f6f7f8;box-shadow:0 10px 42px rgba(0,0,0,.35)}
+footer{border-color:var(--line)}.links a{color:var(--text-soft)}.links a:hover{color:var(--winter-gold)}
+.tabbar{background:rgba(14,23,31,.96);border-color:rgba(239,208,160,.20);box-shadow:0 10px 45px rgba(0,0,0,.32)}
+.tabbar .ind{background:rgba(239,208,160,.13);border-color:rgba(239,208,160,.30)}
+.tabbar a.on{color:#f4d9ae}
+/* Accessibility; no pseudo-element can block buttons. */
+@media(max-width:1060px){.winter-hero-layout{gap:13px;padding:34px 26px}.winter-hero-art{transform:scale(.87)}.reel-controls{grid-template-columns:1fr 1fr}.reel-price-note{grid-column:1/-1;justify-content:center}.reel-spin-btn{grid-column:1}.reel-daily-btn{grid-column:2}}
+@media(max-width:820px){
+ .top{min-height:61px;padding:10px 14px}
+ main{padding:16px 14px 122px}
+ .winter-hero-layout{grid-template-columns:1fr;gap:6px;padding:25px 22px 20px}
+ .winter-hero-art{height:205px;max-width:390px;width:100%;margin:0 auto;transform:none}
+ .winter-hero-art:before{inset:0}
+ .winter-gift{top:50px;transform:translateX(-50%) rotate(-5deg) scale(.72)}
+ .winter-halo-a{width:265px;top:43px;height:90px}.winter-halo-b{width:290px;top:55px;height:120px}
+ .winter-art-caption{bottom:1px;font-size:16px}.winter-art-caption b{font-size:22px}
+ .winter-stars{padding-top:4px}
+ .winter-home-hero h1{font-size:clamp(32px,6.8vw,45px)}
+ .home-directory{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .reel-panel{padding:21px 13px}
+ .reel-viewport{height:158px}
+ .reel-prize{flex-basis:137px;height:145px;padding:11px 8px}
+ .reel-prize b{font-size:13px}
+ .reel-prize-icon{width:39px;height:39px}
+ .reel-controls{display:flex;flex-direction:column;gap:9px;align-items:stretch}
+ .reel-price-note{justify-content:center;order:2}
+ .reel-spin-btn{order:0;min-height:53px}
+ .reel-daily-btn{order:1;justify-self:stretch;max-width:100%}
+ .ph{padding:22px 19px}
+}
+@media(max-width:550px){
+ .top{padding:9px 10px;gap:5px}
+ .brand{font-size:14px}.mark{width:32px;height:32px}
+ .winter-home-hero h1{font-size:clamp(30px,8.3vw,41px)}
+ .winter-edition-label{letter-spacing:.07em;font-size:9px}
+ .winter-hero-layout{padding:24px 17px 14px;border-radius:18px}
+ .winter-hero-points{margin-top:13px}
+ .winter-hero-points span{font-size:10px;padding:5px 7px}
+ .winter-hero-art{height:176px}
+ .winter-gift{top:35px;transform:translateX(-50%) rotate(-5deg) scale(.61)}
+ .winter-halo-a{top:29px;width:220px}.winter-halo-b{top:38px;width:260px}
+ .winter-art-caption small{font-size:8px}
+ .home-directory>a{padding:13px 12px;min-height:128px}
+ .home-directory>a b{font-size:13px}
+ .home-directory>a small{font-size:10px}
+ .hero-actions .btn{font-size:12px;min-width:0}
+ .stats{gap:8px}.stat{padding:12px 10px}.stat b{font-size:24px}
+ .reel-panel{border-radius:18px;padding:17px 10px 18px}
+ .reel-head{gap:10px;margin-bottom:16px}
+ .reel-head h2{font-size:24px}
+ .reel-head p{font-size:11px}
+ .reel-counter{width:100%;justify-content:space-between;padding:9px 11px}
+ .reel-machine{border-radius:16px;padding:16px 0}
+ .reel-viewport{height:142px}
+ .reel-prize{flex-basis:114px;height:132px;border-radius:11px;gap:4px}
+ .reel-prize-icon{height:32px;width:32px;border-radius:9px;margin-bottom:1px}
+ .reel-prize-icon .ic{height:19px;width:19px}
+ .reel-prize b{font-size:11px;max-width:96px}.reel-prize small{font-size:9px}
+ .reel-track{gap:8px}
+ .reel-announcement{font-size:11px}
+ .tabbar{left:8px;right:8px;bottom:calc(7px + env(safe-area-inset-bottom));padding:5px;border-radius:17px}
+ .tabbar .ind{border-radius:12px}
+ .tabbar a{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .winter-sky i,.winter-stars{animation:none!important}
+ .btn,.home-directory>a,.glass,.reel-prize{transition:none!important}
+}
+body.calm .winter-sky i,body.calm .winter-stars{animation:none!important}
+/* Final small-screen polish and light-mode readability. */
+[data-theme="light"] .winter-hero-text .eyebrow{color:#456a81}
+[data-theme="light"] .home-directory>a b,[data-theme="light"] .home-directory>a small{color:var(--ink)}
+[data-theme="light"] .stat{background:#fff!important}
+@media(max-width:560px){
+ .cd{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+ .cd div{min-width:0;padding:10px 2px}
+ .cd b{font-size:clamp(16px,5.4vw,22px)}
+ .cd span{font-size:9px}
+}
+
+</style>
+<style>
+/* Winter refresh: restrained surfaces, compositor-only motion. */
+:root{--acc:#d9c294}
+.pg{animation:section-arrive .32s ease-out!important}
+@keyframes section-arrive{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.dnav a,.tabbar a,.btn,.icon-btn{transition:background .2s,color .2s,box-shadow .2s,transform .18s!important}
+.btn:active,.icon-btn:active{transform:scale(.975)!important}
+.dnav a:hover,.tabbar a:hover{background:rgba(186,208,225,.07)}
+.winter-stars,.marquee,.winter-gift-bow{display:none!important}
+.winter-hero-art{filter:saturate(.5)}
+.reel-prize{--rare:#9eabb8;border-top:2px solid var(--rare)!important}
+.reel-prize[data-rarity="Rare"]{--rare:#9fc8dd}
+.reel-prize[data-rarity="Epic"]{--rare:#b5aad1}
+.reel-prize[data-rarity="Legendary"]{--rare:#d9bc80}
+.reel-prize small{color:var(--rare);letter-spacing:.1em;font-size:10px;text-transform:uppercase}
+.reel-prize.is-selected{border-color:var(--rare)!important;box-shadow:inset 0 0 30px #d9bc8010,0 0 24px #d9bc8022!important}
+.reel-track{will-change:transform}
+.reel-rules{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
+.chance-row{display:grid;grid-template-columns:minmax(110px,1fr) 100px 130px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.chance-row input,.chance-row select{width:100%;min-width:0}
+.chance-row small{display:block;color:var(--muted);margin-top:4px}
+.odds-table{width:100%;border-collapse:collapse}.odds-table th,.odds-table td{padding:13px 8px;text-align:left;border-bottom:1px solid var(--line)}
+#chancesTotal{font-variant-numeric:tabular-nums;margin:16px 0}
+@media(max-width:600px){.chance-row{grid-template-columns:minmax(85px,1fr) 75px 100px;gap:7px}.winter-sky i:nth-child(n+9){display:none}.reel-prize{backdrop-filter:none!important}.reel-machine.is-spinning .reel-marker{filter:none!important}}
+@media(prefers-reduced-motion:reduce){.pg{animation:none!important}.dnav a,.tabbar a,.btn,.icon-btn{transition:none!important}}
+body.calm .pg{animation:none!important}
+
+/* Frostglass: a lit display window over a horizontal gallery. */
+.reel-panel{background:radial-gradient(ellipse at 50% 0%,#214354 0%,#101f2b 44%,#0a111b 90%)!important;border:1px solid #668b9f55!important;box-shadow:0 24px 72px #0005,inset 0 1px #c9eff83b!important}
+.reel-machine{isolation:isolate;border-radius:24px!important;background:radial-gradient(ellipse at 50% 100%,#659dae55,transparent 66%),linear-gradient(#08111a,#142633)!important;padding-block:24px!important}
+.reel-upper-rail,.reel-lower-rail{display:none!important}
+.reel-viewport{position:relative;z-index:1}
+.frost-window{position:absolute;z-index:4;pointer-events:none;inset:9px auto 9px 50%;transform:translateX(-50%);width:clamp(100px,18%,146px);border:1px solid #a8e7ff88;border-radius:20px;background:linear-gradient(150deg,#a8e7ff18,transparent 40%,#e5f7ff14);box-shadow:0 0 28px #84d7fb25,inset 0 0 19px #8cdcff24}
+.frost-window i{position:absolute;left:50%;top:-11px;translate:-50% 0;font-style:normal;color:#e1faff;background:#152d3d;border:1px solid #a8e7ff88;border-radius:50%;width:24px;height:24px;text-align:center;line-height:22px}
+.reel-prize{background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--rare) 23%,transparent),transparent 72%),linear-gradient(160deg,#1b2e3c,#101723)!important;border:1px solid color-mix(in srgb,var(--rare) 76%,transparent)!important;border-radius:16px!important;box-shadow:inset 0 1px color-mix(in srgb,var(--rare) 35%,transparent),inset 0 -14px 26px #0003!important}
+.reel-prize[data-rarity="Rare"]{--rare:#78dfff}
+.reel-prize[data-rarity="Epic"]{--rare:#bd92ff}
+.reel-prize[data-rarity="Legendary"]{--rare:#ffd584}
+.reel-prize[data-rarity="Mythic"]{--rare:#ff9cbd;border-style:double!important;border-width:3px!important}
+.reel-prize.is-selected{animation:frost-win .55s ease-out both}
+@keyframes frost-win{0%{filter:brightness(1.55);transform:scale(.94)}100%{filter:brightness(1.13);transform:scale(1)}}
+.winter-sky i{filter:drop-shadow(0 0 6px #a7e9ff)}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ body:not(.calm) :is(.grid > .glass,.home-directory > a,.nexus-tier,.reel-prize){transition:transform .34s cubic-bezier(.2,.65,.3,1),box-shadow .34s,border-color .34s}
+ body:not(.calm) :is(.grid > .glass,.home-directory > a,.nexus-tier):hover{transform:perspective(850px) translateY(-5px) rotateX(4deg) rotateY(-3deg);box-shadow:0 18px 36px #0006,0 0 22px #8ddcf225;border-color:#99d7ec73}
+ body:not(.calm) .reel-machine:not(.is-spinning) .reel-prize:not(.is-selected):hover{transform:perspective(650px) translateY(-4px) rotateX(6deg)}
+}
+body.calm .reel-prize.is-selected{animation:none}
+@media(prefers-reduced-motion:reduce){.reel-prize.is-selected{animation:none}}
+</style></head>
+<body>
+<div id="splash"><div class="ring"></div><b>A782</b></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="winter-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<header class="top">
+  <a class="brand" href="#home"><span class="mark">A</span><span id="brand">A782</span></a>
+  <nav class="dnav" id="dnav"></nav>
+  <div class="tools"><div class="seg" id="lang"></div><span id="gear"></span></div>
+</header>
+<main id="main"></main>
+<nav class="tabbar" id="tabbar"></nav>
+<div class="sheet-wrap" id="sheetWrap"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const ICON={
+crown:'<path d="M2 8l5 4 5-8 5 8 5-4-2 12H4z"/><path d="M4 20h16"/>',
+sparkles:'<path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/><path d="M19 2v5M16.5 4.5h5"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+palette:'<path d="M12 3a9 9 0 100 18h2a2 2 0 001-4c-1-1-1-2 1-2h2c2 0 3-2 3-4a9 9 0 00-9-8z"/><circle cx="7.5" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16.5" cy="10" r="1"/>',
+'mouse-pointer':'<path d="M5 3l14 9-7 1-3 7z"/>',
+home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',
+gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zm0 0c2-4 6-4 6-1.5S14 8 12 8z"/>',
+cube:'<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>',
+radio:'<circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 010 8.4M7.8 7.8a6 6 0 000 8.4M19 5a10 10 0 010 14M5 5a10 10 0 000 14"/>',
+bag:'<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 016 0v2"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
+gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
+search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',
+dl:'<path d="M12 4v11M7 10l5 5 5-5M4 20h16"/>',
+copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+minus:'<path d="M5 12h14"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+check:'<path d="M5 12l5 5 9-10"/>',
+cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l3 12h11l2-8H6"/>',
+trophy:'<path d="M8 4h8v5a4 4 0 01-8 0z"/><path d="M8 6H4v2a3 3 0 003 3M16 6h4v2a3 3 0 01-3 3M12 13v4M8 21h8"/>',
+refresh:'<path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+star:'<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17l-5.5 2.9 1-6.2L3 9.6l6.2-.9z"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c.6-3.5 3.3-5.5 7-5.5s6.4 2 7 5.5"/><circle cx="17" cy="9" r="2.5"/>',
+gem:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/>',
+bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+ticket:'<path d="M3 8a2 2 0 002-2h14a2 2 0 002 2v2a2 2 0 000 4v2a2 2 0 00-2 2H5a2 2 0 00-2-2v-2a2 2 0 000-4z"/><path d="M14 6v12"/>',
+play:'<path d="M7 5v14l12-7z"/>',
+send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
+calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+pin:'<path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+coins:'<circle cx="12" cy="12" r="8"/><path d="M9 12h6M12 9v6"/>',
+percent:'<path d="M19 5L5 19"/><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/>',
+flame:'<path d="M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>',
+swords:'<path d="M14 4l6 6-8 8-6-6zM4 20l4-4M6 14l-2 6 6-2"/>',
+gamepad:'<rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 12h4M9 10v4M15 11h.01M17 13h.01"/>',
+disc:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/>',
+ext:'<path d="M14 4h6v6M20 4l-9 9M10 6H5v13h13v-5"/>'
 };
-const tierOf = (plan) => VIP_TIERS.includes(plan?.tier) ? plan.tier : VIP_TIERS.includes(plan?.name?.toUpperCase()) ? plan.name.toUpperCase() : "VIP-PLUS";
-// Practical Premium capabilities are checked on the server, never just in the UI.
-const VIP_CAPS = {
-  standard: {limit:12, presets:[], shortcuts:0},
-  "VIP-PLUS": {limit:60, presets:["cyan","ocean","mint"], shortcuts:1},
-  "VIP-PRO": {limit:160, presets:["cyan","ocean","mint","violet","rose","ember"], shortcuts:3},
-  "VIP-ULTRA": {limit:500, presets:["cyan","ocean","mint","violet","rose","ember","gold","aurora","obsidian"], shortcuts:5}
+const ic=(n,c="")=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[n]||""}</svg>`;
+
+/* ===================== ТІЛДЕР (әр тіл — тек өз мәтіні) ===================== */
+const T={
+kk:{home:"Басты бет",gw:"Ұтыс ойындары",mc:"Minecraft",st:"Стрим",store:"Дүкен",me:"Профиль",set:"Баптаулар",adm:"Админ",
+tag:"A782 DIGITAL · Ойын және цифрлық қызметтер",htitle:"Ойыншыларға арналған дүкен мен қауымдастық",hlead:"Цифрлық тауарлар мен қызметтерді қараңыз, Minecraft модпактарын жүктеңіз, ұтыс ойындарына қатысыңыз және ойын чаттарын табыңыз.",
+bgw:"Ұтыс ойындарына өту",bmc:"Minecraft Hub",smp:"модпак",sdl:"жүктеу",
+live:"Эфирде",off:"Эфирде емес",next:"Келесі стрим",secgw:"Белсенді ұтыс ойындары",secmp:"Модпактар",secg:"Ойындар және жеке чаттар",all:"Барлығы",
+ck:"Тапсырыс",ct:"Сайт және стрим дизайны",cp:"Қажетті нәрсені жазыңыз, бағасын Telegram-да келісеміз.",ctg:"Telegram-да жазу",
+follow:"TikTok-қа жазылу",tg:"Telegram",chan:"Каналға өту",gamechat:"Чатқа кіру",soon:"Жақында",
+add:"Себетке қосу",inc:"Себетте",added:"себетке қосылды",cart:"Себет",sub:"Аралық сома",disc:"Жеңілдік",total:"Барлығы",
+coupon:"Промокод",apply:"Қолдану",cok:"Промокод қабылданды",cbad:"Промокод жарамсыз",chint:"A782 (10%) немесе WELCOME (5%) көріңіз.",
+checkout:"Тапсырыс беру",mkaspi:"Kaspi аударымы",mtg:"Telegram арқылы",mdemo:"Демо",
+kaspit:"Kaspi нөміріне аударып, чек кодын енгізіңіз. Админ растаған соң тапсырыс төленеді.",kaspin:"Kaspi нөмірі көрсетілмеген. Telegram арқылы тапсырыс беріңіз.",
+receipt:"Чек коды",send:"Жіберу",tgt:"Тапсырыс мәтіні көшіріледі, сосын Telegram ашылады. Мәтінді жіберіңіз.",
+demot:"Демо режим: ақша алынбайды.",demob:"Демо төлеу",ok:"Тапсырыс қабылданды",tgok:"Мәтін көшірілді, Telegram ашылды",
+orders:"Тапсырыстар",noorders:"Тапсырыс жоқ",pend:"Күтуде",paid:"Төленді",cempty:"Себет бос",browse:"Дүкенге өту",
+stitle:"Цифрлық дүкен",slead:"Заңды цифрлық өнімдер мен дизайн қызметтері.",
+cat0:"Барлығы",cat1:"Minecraft пакі",cat2:"Оверлейлер",cat3:"Дизайн",cat4:"Нұсқаулық",
+mctitle:"Minecraft Hub",mclead:"Модтарды Modrinth-тен іздеңіз, модпактарды жүктеңіз.",search:"Іздеу",sph:"Мод немесе пакет атауы",
+tmod:"Модтар",tpack:"Модпактар",tres:"Ресурс-пактар",tshd:"Шейдерлер",any:"Барлығы",
+sdn:"Көп жүктелген",sfol:"Көп ұнаған",snew:"Жаңалары",supd:"Жаңартылған",
+mods:"модтар",dls:"жүктелді",dload:"Жүктеу",nofile:"Файл әлі қосылмаған",by:"авторы",lic:"Лицензия",nores:"Нәтиже жоқ",neterr:"Қызмет жауап бермеуде",
+srv:"A782 сервері",srvc:"Сервер әлі ашылмаған",copy:"Көшіру",copied:"Көшірілді",
+steps:"Minecraft Java → Сетевая игра → Add Server → IP",
+sttitle:"Тікелей эфирлер",stlead:"Minecraft және ойын стримдері TikTok-та өтеді.",sched:"Апталық кесте",watch:"Эфирді көру",
+days:"күн",hrs:"сағ",min:"мин",sec:"сек",dn:["Дс","Сс","Ср","Бс","Жм","Сб","Жк"],
+gwtitle:"Ұтыс ойындары",gwlead:"Билет жинап, ұтыс ойынына қатысыңыз. Жеңімпазды админ жариялайды.",
+tickets:"Билет",tokens:"Токен",diamonds:"Алмаз",daily:"Күнделікті билет",dailyok:"+1 билет берілді",dailydone:"Бүгін алынған",
+login:"Алдымен кіріңіз",spin:"Айналдыру",wtitle:"Сәттілік дөңгелегі",wlead:"Билет жұмсаңыз. Ұтыстар виртуалды, ақшалай құны жоқ.",
+exch:"Айырбас",ex1:"50 токен → 1 билет",ex2:"100 токен → 10% купон",exdone:"Айырбас орындалды",
+mywins:"Менің ұтыстарым",nowins:"Әзірге ұтыс жоқ",
+enter:"Қатысу",entered:"Қатыстыңыз",ended:"Аяқталды",winner:"Жеңімпаз",parts:"қатысушы",cost:"Құны",
+req:"Шарт: TikTok-қа жазылу және ойын ID-ін жазу",draw:"Жеребе тарту",again:"Қайта",close:"Жабу",
+notick:"Билет жеткіліксіз",joined:"Қатыстыңыз!",prizenote:"Жүлдені админ береді. Кодты Telegram-ға жіберіңіз.",
+me_t:"Профиль",login_b:"Кіру",reg_b:"Тіркелу",email:"Email",pass:"Құпиясөз (6+)",nick:"Никнейм",cont:"Жалғастыру",
+authnote:"Құпиясөз хештеліп серверде сақталады.",logout:"Шығу",save:"Сақтау",avurl:"Аватар сілтемесі (URL)",bgurl:"Баннер сілтемесі (URL)",
+upload:"Құрылғыдан жүктеу",bio:"Өзі туралы",mcn:"Minecraft ник",ffid:"Free Fire ID",so2:"Standoff 2 ID",tgn:"Telegram",
+setl:"Баптаулар",lang:"Тіл",theme:"Тақырып",dark:"Қараңғы",light:"Ашық",motion:"Анимация",motiond:"Беттің өтуі, жарқыл, бөлшектер",
+admgo:"Админ панеліне өту",admt:"Админ панелі",pinph:"PIN-кодты енгізіңіз",open:"Кіру",lock:"Құлыптау",pinnote:"PIN серверде тексеріледі",
+sec_site:"Сайт және стрим",sec_gw:"Ұтыс ойындары",sec_pr:"Дүкен тауарлары",sec_mp:"Модпактар",sec_g:"Ойындар және жеке чаттар",sec_b:"Қолданушылар",sec_o:"Тапсырыстар",sec_d:"Деректер",
+name:"Атауы",handle:"Handle",tiktok:"TikTok сілтемесі",tgl:"Telegram сілтемесі",kaspin:"Kaspi нөмірі",ip:"Сервер IP",ver:"Нұсқа",wcost:"Айналдыру құны (билет)",
+snext:"Келесі стрим уақыты",ssched:"Кесте: күн(0-6) | уақыт | тақырып KK | RU | EN",slive:"Қазір эфирде",stitle2:"Стрим тақырыбы",
+title:"Атауы",desc:"Сипаттама",price:"Бағасы (₸)",cat:"Санаты",img:"Сурет сілтемесі",
+gicon:"Белгі",gprize:"Жүлде",gcost:"Билет құны",
+mtitle:"Модпак атауы",mver:"Minecraft нұсқасы",mload:"Жүктеуші",mmods:"Модтар саны",msize:"Көлемі (MB)",mfile:"Файл сілтемесі (.zip, тікелей)",mkeys:"Негізгі модтар (үтірмен)",
+gstatus:"Күйі",glink:"Telegram канал сілтемесі",gdesc:"Сипаттама",gname:"Ойын атауы",
+live2:"Тікелей (Live)",soon2:"Жақында",
+add2:"Қосу",edit:"Өңдеу",del:"Өшіру",saved:"Сақталды",deleted:"Өшірілді",bal:"Баланс",mpaid:"Төленді деп бекіту",mpend:"Күтуге қайту",
+noval:"Ескерту: бұл PIN тек интерфейсті қорғайды.",newf:"Жаңа қосу",cancel:"Бас тарту",
+export:"Экспорт (JSON)",imp:"Импорт (JSON)",rall:"Барлығын тазалау",confirm:"Барлық деректерді өшіру керек пе?",badj:"JSON қате",impok:"Импортталды",
+ordsmall:"Тапсырыс",nousers:"Қолданушы жоқ",pidh:"Файл сілтемесі GitHub Releases немесе Google Drive-тан болуы керек."},
+ru:{home:"Главная",gw:"Розыгрыши",mc:"Minecraft",st:"Стримы",store:"Магазин",me:"Профиль",set:"Настройки",adm:"Админ",
+tag:"A782 DIGITAL · Игры и цифровые услуги",htitle:"Магазин и сообщество для игроков",hlead:"Цифровые товары и услуги, модпаки Minecraft, розыгрыши и игровые чаты — всё в одном месте.",
+bgw:"К розыгрышам",bmc:"Minecraft Hub",sgw:"активных розыгрышей",smp:"модпаков",sdl:"скачиваний",
+live:"В эфире",off:"Не в эфире",next:"Следующий стрим",secgw:"Активные розыгрыши",secmp:"Модпаки",secg:"Игры и отдельные чаты",all:"Все",
+ck:"Заказы",ct:"Дизайн сайта и стрима",cp:"Напишите, что нужно. Цену согласуем в Telegram.",ctg:"Написать в Telegram",
+follow:"Подписаться в TikTok",tg:"Telegram",chan:"Перейти в канал",gamechat:"Открыть чат",soon:"Скоро",
+add:"В корзину",inc:"В корзине",added:"добавлено в корзину",cart:"Корзина",sub:"Подытог",disc:"Скидка",total:"Итого",
+coupon:"Промокод",apply:"Применить",cok:"Промокод принят",cbad:"Промокод не действует",chint:"Попробуйте A782 (10%) или WELCOME (5%).",
+checkout:"Оформить заказ",mkaspi:"Перевод Kaspi",mtg:"Через Telegram",mdemo:"Демо",
+kaspit:"Переведите на номер Kaspi и введите код чека. После подтверждения админом заказ будет оплачен.",kaspin:"Номер Kaspi не указан. Оформите заказ через Telegram.",
+receipt:"Код чека",send:"Отправить",tgt:"Текст заказа будет скопирован, затем откроется Telegram. Отправьте текст.",
+demot:"Демо-режим: деньги не списываются.",demob:"Демо-оплата",ok:"Заказ принят",tgok:"Текст скопирован, Telegram открыт",
+orders:"Заказы",noorders:"Заказов нет",pend:"Ожидает",paid:"Оплачен",cempty:"Корзина пуста",browse:"В магазин",
+stitle:"Цифровой магазин",slead:"Легальные цифровые товары и дизайн.",
+cat0:"Все",cat1:"Паки Minecraft",cat2:"Оверлеи",cat3:"Дизайн",cat4:"Гайды",
+mctitle:"Minecraft Hub",mclead:"Ищите моды на Modrinth, скачивайте модпаки.",search:"Поиск",sph:"Название мода или сборки",
+tmod:"Моды",tpack:"Модпаки",tres:"Ресурс-паки",tshd:"Шейдеры",any:"Все",
+sdn:"Популярные",sfol:"Любимые",snew:"Новые",supd:"Обновлённые",
+mods:"модов",dls:"скачиваний",dload:"Скачать",nofile:"Файл пока не добавлен",by:"автор",lic:"Лицензия",nores:"Ничего не найдено",neterr:"Сервис не отвечает",
+srv:"Сервер A782",srvc:"Сервер ещё не открыт",copy:"Копировать",copied:"Скопировано",
+steps:"Minecraft Java → Сетевая игра → Add Server → IP",
+sttitle:"Прямые эфиры",stlead:"Стримы Minecraft и игр проходят в TikTok.",sched:"Расписание на неделю",watch:"Смотреть эфир",
+days:"дн.",hrs:"ч",min:"мин",sec:"сек",dn:["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
+gwtitle:"Розыгрыши",gwlead:"Копите билеты и участвуйте. Победителя объявляет админ.",
+tickets:"Билеты",tokens:"Токены",diamonds:"Алмазы",daily:"Билет за день",dailyok:"+1 билет начислен",dailydone:"Уже получено сегодня",
+login:"Сначала войдите",spin:"Крутить",wtitle:"Колесо удачи",wlead:"Потратьте билет. Призы виртуальные, без денежной стоимости.",
+exch:"Обмен",ex1:"50 токенов → 1 билет",ex2:"100 токенов → купон 10%",exdone:"Обмен выполнен",
+mywins:"Мои призы",nowins:"Призов пока нет",
+enter:"Участвовать",entered:"Вы участвуете",ended:"Завершён",winner:"Победитель",parts:"участников",cost:"Цена",
+req:"Условие: подписка на TikTok и игровой ID",draw:"Разыграть",again:"Ещё раз",close:"Закрыть",
+notick:"Недостаточно билетов",joined:"Вы участвуете!",prizenote:"Приз выдаёт админ. Отправьте код в Telegram.",
+me_t:"Профиль",login_b:"Войти",reg_b:"Регистрация",email:"Email",pass:"Пароль (6+)",nick:"Никнейм",cont:"Продолжить",
+authnote:"Пароль хранится на сервере в виде хеша.",logout:"Выйти",save:"Сохранить",avurl:"Ссылка на аватар (URL)",bgurl:"Ссылка на баннер (URL)",
+upload:"Загрузить с устройства",bio:"О себе",mcn:"Ник в Minecraft",ffid:"Free Fire ID",so2:"Standoff 2 ID",tgn:"Telegram",
+setl:"Настройки",lang:"Язык",theme:"Тема",dark:"Тёмная",light:"Светлая",motion:"Анимации",motiond:"Переходы, блеск, частицы",
+admgo:"Открыть админ-панель",admt:"Админ-панель",pinph:"Введите PIN",open:"Войти",lock:"Выйти",pinnote:"PIN проверяется на сервере",
+sec_site:"Сайт и стрим",sec_gw:"Розыгрыши",sec_pr:"Товары магазина",sec_mp:"Модпаки",sec_g:"Игры и отдельные чаты",sec_b:"Пользователи",sec_o:"Заказы",sec_d:"Данные",
+name:"Название",handle:"Handle",tiktok:"Ссылка TikTok",tgl:"Ссылка Telegram",kaspin:"Номер Kaspi",ip:"IP сервера",ver:"Версия",wcost:"Цена спина (билеты)",
+snext:"Время следующего стрима",ssched:"Расписание: день(0-6) | время | тема KK | RU | EN",slive:"Сейчас в эфире",stitle2:"Название стрима",
+title:"Название",desc:"Описание",price:"Цена (₸)",cat:"Категория",img:"Ссылка на фото",
+gicon:"Иконка",gprize:"Приз",gcost:"Цена в билетах",
+mtitle:"Название модпака",mver:"Версия Minecraft",mload:"Загрузчик",mmods:"Количество модов",msize:"Размер (MB)",mfile:"Ссылка на файл (.zip, прямая)",mkeys:"Основные моды (через запятую)",
+gstatus:"Статус",glink:"Ссылка на Telegram-канал",gdesc:"Описание",gname:"Название игры",
+live2:"Прямой (Live)",soon2:"Скоро",
+add2:"Добавить",edit:"Изменить",del:"Удалить",saved:"Сохранено",deleted:"Удалено",bal:"Баланс",mpaid:"Подтвердить оплату",mpend:"Вернуть в ожидание",
+noval:"Внимание: PIN защищает только интерфейс.",newf:"Новая запись",cancel:"Отмена",
+export:"Экспорт (JSON)",imp:"Импорт (JSON)",rall:"Сбросить всё",confirm:"Удалить все данные?",badj:"Неверный JSON",impok:"Импортировано",
+ordsmall:"Заказ",nousers:"Пользователей нет",pidh:"Ссылка на файл — из GitHub Releases или Google Drive."},
+en:{home:"Home",gw:"Giveaways",mc:"Minecraft",st:"Streams",store:"Store",me:"Profile",set:"Settings",adm:"Admin",
+tag:"A782 DIGITAL · Gaming and digital services",htitle:"A store and community for gamers",hlead:"Explore digital products and services, download Minecraft modpacks, join giveaways and find gaming chats.",
+bgw:"Open giveaways",bmc:"Minecraft Hub",sgw:"active giveaways",smp:"modpacks",sdl:"downloads",
+live:"Live",off:"Offline",next:"Next stream",secgw:"Active giveaways",secmp:"Modpacks",secg:"Games and separate chats",all:"View all",
+ck:"Commissions",ct:"Website and stream design",cp:"Tell us what you need. We agree on price in Telegram.",ctg:"Message on Telegram",
+follow:"Follow on TikTok",tg:"Telegram",chan:"Open channel",gamechat:"Open chat",soon:"Soon",
+add:"Add to cart",inc:"In cart",added:"added to cart",cart:"Cart",sub:"Subtotal",disc:"Discount",total:"Total",
+coupon:"Coupon code",apply:"Apply",cok:"Coupon applied",cbad:"Invalid coupon",chint:"Try A782 (10%) or WELCOME (5%).",
+checkout:"Place order",mkaspi:"Kaspi transfer",mtg:"Via Telegram",mdemo:"Demo",
+kaspit:"Send the amount to the Kaspi number and enter the receipt code. Paid after admin confirmation.",kaspin:"Kaspi number is not set. Order via Telegram.",
+receipt:"Receipt code",send:"Send",tgt:"The order text will be copied, then Telegram opens. Send the text.",
+demot:"Demo mode: no money is charged.",demob:"Pay (demo)",ok:"Order placed",tgok:"Text copied, Telegram opened",
+orders:"Orders",noorders:"No orders",pend:"Pending",paid:"Paid",cempty:"Your cart is empty",browse:"Browse store",
+stitle:"Digital store",slead:"Legal digital goods and design services.",
+cat0:"All",cat1:"Minecraft packs",cat2:"Overlays",cat3:"Design",cat4:"Guides",
+mctitle:"Minecraft Hub",mclead:"Search mods on Modrinth, download modpacks.",search:"Search",sph:"Mod or pack name",
+tmod:"Mods",tpack:"Modpacks",tres:"Resource packs",tshd:"Shaders",any:"Any",
+sdn:"Most downloaded",sfol:"Most followed",snew:"Newest",supd:"Recently updated",
+mods:"mods",dls:"downloads",dload:"Download",nofile:"File not added yet",by:"by",lic:"License",nores:"No results",neterr:"Service unavailable",
+srv:"A782 server",srvc:"Server is not open yet",copy:"Copy",copied:"Copied",
+steps:"Minecraft Java → Multiplayer → Add Server → IP",
+sttitle:"Live streams",stlead:"Minecraft and game streams run on TikTok.",sched:"Weekly schedule",watch:"Watch live",
+days:"days",hrs:"hrs",min:"min",sec:"sec",dn:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+gwtitle:"Giveaways",gwlead:"Collect tickets and join. The admin announces the winner.",
+tickets:"Tickets",tokens:"Tokens",diamonds:"Diamonds",daily:"Daily ticket",dailyok:"+1 ticket added",dailydone:"Already claimed today",
+login:"Please log in first",spin:"Spin",wtitle:"Lucky wheel",wlead:"Spend a ticket. Prizes are virtual with no cash value.",
+exch:"Exchange",ex1:"50 tokens → 1 ticket",ex2:"100 tokens → 10% coupon",exdone:"Exchange done",
+mywins:"My prizes",nowins:"No prizes yet",
+enter:"Enter",entered:"Entered",ended:"Ended",winner:"Winner",parts:"participants",cost:"Cost",
+req:"Requirement: follow on TikTok and add your game ID",draw:"Draw winner",again:"Again",close:"Close",
+notick:"Not enough tickets",joined:"You entered!",prizenote:"The admin delivers the prize. Send the code on Telegram.",
+me_t:"Profile",login_b:"Log in",reg_b:"Sign up",email:"Email",pass:"Password (6+)",nick:"Nickname",cont:"Continue",
+authnote:"Passwords are stored hashed on the server.",logout:"Log out",save:"Save",avurl:"Avatar URL",bgurl:"Banner URL",
+upload:"Upload from device",bio:"About me",mcn:"Minecraft IGN",ffid:"Free Fire ID",so2:"Standoff 2 ID",tgn:"Telegram",
+setl:"Settings",lang:"Language",theme:"Theme",dark:"Dark",light:"Light",motion:"Animations",motiond:"Transitions, shine, particles",
+admgo:"Open admin panel",admt:"Admin panel",pinph:"Enter PIN",open:"Unlock",lock:"Lock",pinnote:"The PIN is checked on the server",
+sec_site:"Site and stream",sec_gw:"Giveaways",sec_pr:"Store products",sec_mp:"Modpacks",sec_g:"Games and separate chats",sec_b:"Users",sec_o:"Orders",sec_d:"Data",
+name:"Name",handle:"Handle",tiktok:"TikTok link",tgl:"Telegram link",kaspin:"Kaspi number",ip:"Server IP",ver:"Version",wcost:"Spin cost (tickets)",
+snext:"Next stream time",ssched:"Schedule: day(0-6) | time | topic KK | RU | EN",slive:"Live now",stitle2:"Stream title",
+title:"Title",desc:"Description",price:"Price (₸)",cat:"Category",img:"Image URL",
+gicon:"Icon",gprize:"Prize",gcost:"Ticket cost",
+mtitle:"Modpack name",mver:"Minecraft version",mload:"Loader",mmods:"Mods count",msize:"Size (MB)",mfile:"File link (.zip, direct)",mkeys:"Key mods (comma separated)",
+gstatus:"Status",glink:"Telegram channel link",gdesc:"Description",gname:"Game name",
+live2:"Live",soon2:"Soon",
+add2:"Add",edit:"Edit",del:"Delete",saved:"Saved",deleted:"Deleted",bal:"Balance",mpaid:"Mark as paid",mpend:"Mark pending",
+noval:"Note: the PIN only protects the interface.",newf:"New entry",cancel:"Cancel",
+export:"Export (JSON)",imp:"Import (JSON)",rall:"Reset everything",confirm:"Delete all data?",badj:"Invalid JSON",impok:"Imported",
+ordsmall:"Order",nousers:"No users",pidh:"The file link should be from GitHub Releases or Google Drive."}
 };
-const SHORTCUTS=["home","mc","store","streams","vip","me"];
-const vipPublicPlan = p => ({...p, tier:tierOf(p), ...VIP_META[tierOf(p)]});
+const E={
+kk:{generic:"Қате орын алды",login_required:"Алдымен кіріңіз",admin_required:"Админ кіруі керек",bad_login:"Email немесе құпиясөз қате",exists:"Бұл email тіркелген",invalid:"Деректер дұрыс емес",no_tickets:"Билет жеткіліксіз",daily_done:"Бүгін алынған",ended:"Розыгрыш аяқталған",already:"Сіз қатысып қойғансыз",not_enough:"Токен жеткіліксіз",empty_cart:"Себет бос",receipt_required:"Чек коды керек",not_found:"Табылмады",title_required:"Атауы керек",no_participants:"Қатысушылар жоқ",too_large:"Деректер тым үлкен",upstream:"Modrinth жауап бермеуде",bad_pin:"PIN қате",too_many:"Тым көп әрекет, 15 минуттан кейін көріңіз"},
+ru:{generic:"Произошла ошибка",login_required:"Сначала войдите",admin_required:"Нужен вход админа",bad_login:"Неверный email или пароль",exists:"Этот email уже зарегистрирован",invalid:"Неверные данные",no_tickets:"Недостаточно билетов",daily_done:"Уже получено сегодня",ended:"Розыгрыш завершён",already:"Вы уже участвуете",not_enough:"Недостаточно токенов",empty_cart:"Корзина пуста",receipt_required:"Нужен код чека",not_found:"Не найдено",title_required:"Нужно название",no_participants:"Участников нет",too_large:"Данные слишком большие",upstream:"Modrinth не отвечает",bad_pin:"Неверный PIN",too_many:"Слишком много попыток, попробуйте через 15 минут"},
+en:{generic:"Something went wrong",login_required:"Please log in first",admin_required:"Admin login required",bad_login:"Wrong email or password",exists:"This email is already registered",invalid:"Invalid data",no_tickets:"Not enough tickets",daily_done:"Already claimed today",ended:"Giveaway ended",already:"You already joined",not_enough:"Not enough tokens",empty_cart:"Cart is empty",receipt_required:"Receipt code is required",not_found:"Not found",title_required:"Title is required",no_participants:"No participants",too_large:"Data is too large",upstream:"Modrinth is not responding",bad_pin:"Wrong PIN",too_many:"Too many attempts, try again in 15 minutes"}
+};
+let LANG=localStorage.getItem("a782-lang")||"kk";
+const t=k=>(T[LANG][k]??"");
+const L=o=>o&&typeof o==="object"?(o[LANG]||""):(o||"");
+const errMsg=e=>E[LANG][e.code]||E[LANG].generic;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const money=n=>Number(n||0).toLocaleString("en-US")+" ₸";
+const fmt=n=>Number(n||0).toLocaleString("en-US");
+const words=s=>String(s).split(" ").map((w,i)=>`<span class="w"><span style="--i:${i}">${esc(w)}</span></span>`).join(" ");
 
+for(const [code,labels] of Object.entries({
+ invalid_chances:['Пайыз 0–100 аралығында, ең көбі 2 ондық таңбамен берілуі керек.','Процент от 0 до 100, максимум два знака после запятой.','Use 0–100 percent with at most two decimal places.'],
+ chances_total:['Шанстар қосындысы 100% болуы керек.','Сумма шансов должна быть 100%.','Probabilities must total 100%.'],
+ chances_changed:['Шанстар өзгерген. Бетті жаңартып, қайта енгізіңіз.','Шансы изменились. Обновите страницу.','Probabilities changed. Refresh before saving.'],
+ spin_busy:['Айналдыру аяқталғанша күтіңіз.','Дождитесь завершения вращения.','Wait for the current spin to finish.'],
+ storage_failed:['Сақтау расталмады. Кейін қайта басыңыз: сол сұраныс тексеріледі.','Сохранение не подтверждено. Повторите позже: будет проверен тот же запрос.','Save not confirmed. Retry later; the same request will be checked.'],
+ invalid_prize:['Сыйлық түрін және мөлшерін тексеріңіз.','Проверьте тип и количество приза.','Check the prize type and amount.']
+})){['kk','ru','en'].forEach((lang,i)=>E[lang][code]=labels[i])}
+let D=null, ME=null, TOKEN=localStorage.getItem("a782-token")||"", ADMIN=sessionStorage.getItem("a782-admin")||"";
+const ownerView=()=>!!ME?.isOwner;
+// Keep a clicked admin form only in memory while the owner renews an expired PIN session.
+let pendingAdminSave=null;
+function clearAdminSession(){ADMIN="";sessionStorage.removeItem("a782-admin")}
+let S={theme:localStorage.getItem("a782-theme")||"dark", motion:localStorage.getItem("a782-motion")!=="0"};
+let cart=JSON.parse(localStorage.getItem("a782-cart")||"[]");
+let ROUTE="", STORE="all", MPC="all", MC={type:"mod",q:"",loader:"",version:"",sort:"downloads",hits:null};
+let AUTH="login", WHEEL=0, SPIN=false, cdT=null, toastT=null, sParts=[];
+const TABS=["home","gw","mc","store","me"];
+const PAGES={home:pHome,gw:pGw,mc:pMc,streams:pStreams,store:pStore,vip:pVip,me:pMe,settings:pSettings,admin:pAdmin};
+const saveCart=()=>localStorage.setItem("a782-cart",JSON.stringify(cart));
+const cartCount=()=>cart.reduce((s,i)=>s+i.qty,0);
+const inCart=id=>cart.some(i=>i.id===id);
+const prodOf=id=>D.products.find(p=>p.id===id);
+const cartTotal=()=>cart.reduce((s,i)=>{const p=prodOf(i.id);return s+(p?p.price*i.qty:0)},0);
+const catName=c=>({pack:t("cat1"),over:t("cat2"),design:t("cat3"),guide:t("cat4")})[c]||"";
 
-function seed() {
-  return {
-    owner: {
-      name: "A782 DIGITAL", handle: "@a782_asxm",
-      tiktok: "https://www.tiktok.com/@a782_asxm", telegram: "https://t.me/Asxm_A782",
-      kaspi: "", avatar: "", banner: "",
-      bio: L3("Minecraft модпактары, шейдерлер, стримдер және дизайн.", "Модпаки Minecraft, шейдеры, стримы и дизайн.", "Minecraft modpacks, shaders, streams and design.")
-    },
-    stream: {
-      live: false,
-      title: L3("Minecraft survival — жаңа маусым", "Minecraft survival — новый сезон", "Minecraft survival — new season"),
-      nextAt: "2026-11-10T20:00:00+05:00",
-      schedule: [
-        { day: 0, time: "20:00", topic: L3("Minecraft survival", "Minecraft survival", "Minecraft survival") },
-        { day: 2, time: "20:00", topic: L3("Модпак түні", "Ночь модпаков", "Modpack night") },
-        { day: 5, time: "19:00", topic: L3("Дуэт және құрылыс", "Дуэт и стройка", "Duo and building") }
-      ]
-    },
-    server: { ip: "", version: "1.20.1" },
-    wheelCost: 1,
-    prizes: [
-      { label: L3("+50 токен", "+50 токенов", "+50 tokens"), kind: "tokens", val: 50, weight: 30 },
-      { label: L3("+1 билет", "+1 билет", "+1 ticket"), kind: "tickets", val: 1, weight: 30 },
-      { label: L3("+100 алмаз", "+100 алмазов", "+100 diamonds"), kind: "diamonds", val: 100, weight: 8 },
-      { label: L3("Купон 10%", "Купон 10%", "10% coupon"), kind: "coupon", val: 10, weight: 20 },
-      { label: L3("+250 токен", "+250 токенов", "+250 tokens"), kind: "tokens", val: 250, weight: 7 },
-      { label: L3("+2 билет", "+2 билета", "+2 tickets"), kind: "tickets", val: 2, weight: 5 }
-    ],
-    coupons: { A782: 10, WELCOME: 5 },
-    giveaways: [
-      { id: "g1", icon: "gift", title: L3("100 алмаз (Free Fire)", "100 алмазов (Free Fire)", "100 diamonds (Free Fire)"),
-        desc: L3("Жеңімпазға ойын ID-і арқылы беріледі.", "Победитель получит по игровому ID.", "The winner receives by game ID."),
-        prize: L3("100 алмаз", "100 алмазов", "100 diamonds"), cost: 1, participants: [], winner: null },
-      { id: "g2", icon: "users", title: L3("Менімен бірге Minecraft ойнау", "Игра в Minecraft со мной", "Play Minecraft with me"),
-        desc: L3("2 сағат жеке серверде бірге ойнау.", "2 часа на приватном сервере вместе.", "2 hours on a private server together."),
-        prize: L3("Дуэт сессиясы", "Сессия вдвоём", "Duo session"), cost: 1, participants: [], winner: null }
-    ],
-    products: [
-      { id: "p1", cat: "over", name: L3("Стрим оверлейі", "Оверлей для стрима", "Stream overlay"),
-        desc: L3("Оверлей, панельдер, сахна.", "Оверлей, панели, сцены.", "Overlay, panels, scenes."), price: 4500, img: "" },
-      { id: "p2", cat: "design", name: L3("Лендинг шаблоны", "Шаблон лендинга", "Landing template"),
-        desc: L3("HTML/CSS бейімделген лендинг.", "Адаптивный лендинг HTML/CSS.", "Responsive HTML/CSS landing."), price: 7900, img: "" },
-      { id: "p3", cat: "pack", name: L3("Қыс текстуралары", "Зимние текстуры", "Winter textures"),
-        desc: L3("16x қыс пакі.", "Пак 16x.", "16x winter pack."), price: 1500, img: "" }
-    ],
-    modpacks: [
-      { id: "m1", cat: "rpg", title: "A782 Ultimate RPG & Shaders", version: "1.20.1", loader: "Fabric", mods: 145, sizeMb: 380,
-        downloads: 1420, rating: 4.9, file: "", keyMods: ["Distant Horizons", "Iris", "Better Combat"],
-        desc: L3("Жаңа әлем және шейдерлер.", "Новый мир и шейдеры.", "New world and shaders.") },
-      { id: "m2", cat: "pvp", title: "Cyber PvP & FPS Boost", version: "1.20.4", loader: "Fabric", mods: 42, sizeMb: 110,
-        downloads: 3890, rating: 5, file: "", keyMods: ["Sodium", "Entity Culling"],
-        desc: L3("FPS арттыратын топтама.", "Сборка для роста FPS.", "Pack for higher FPS.") }
-    ],
-    games: [
-      { id: "so2", name: "Standoff 2", icon: "swords", status: "soon", link: "",
-        desc: L3("Standoff 2 ойыншыларының жеке чаты.", "Отдельный чат игроков Standoff 2.", "A dedicated Standoff 2 players chat.") },
-      { id: "roblox", name: "Roblox", icon: "gamepad", status: "soon", link: "",
-        desc: L3("Roblox ойыншыларының жеке чаты.", "Отдельный чат игроков Roblox.", "A dedicated Roblox players chat.") },
-      { id: "ff", name: "Free Fire", icon: "flame", status: "soon", link: "",
-        desc: L3("Free Fire ойыншыларының жеке чаты.", "Отдельный чат игроков Free Fire.", "A dedicated Free Fire players chat.") },
-      { id: "brawl", name: "Brawl Stars", icon: "star", status: "soon", link: "",
-        desc: L3("Brawl Stars ойыншыларының жеке чаты.", "Отдельный чат игроков Brawl Stars.", "A dedicated Brawl Stars players chat.") },
-      { id: "coc", name: "Clash of Clans", icon: "shield", status: "soon", link: "",
-        desc: L3("Clash of Clans ойыншыларының жеке чаты.", "Отдельный чат игроков Clash of Clans.", "A dedicated Clash of Clans players chat.") },
-      { id: "mc", name: "Minecraft", icon: "cube", status: "live", link: "",
-        desc: L3("Minecraft ойыншыларының жеке чаты.", "Отдельный чат игроков Minecraft.", "A dedicated Minecraft players chat.") }
-    ],
-    vipPlans: [
-      {id:"vip-free",tier:"VIP-FREE",name:"VIP-FREE",price:0,durationDays:7,active:true},
-      {id:"vip-plus",tier:"VIP-PLUS",name:"VIP-PLUS",price:0,durationDays:30,active:true},
-      {id:"vip-pro",tier:"VIP-PRO",name:"VIP-PRO",price:0,durationDays:30,active:true},
-      {id:"vip-ultra",tier:"VIP-ULTRA",name:"VIP-ULTRA",price:0,durationDays:30,active:true}
-    ], users: [], orders: [], sessions: {}
+async function api(m,p,b,admin){
+  const h={"Content-Type":"application/json"};
+  if(TOKEN) h.Authorization="Bearer "+TOKEN;
+  if(admin&&ADMIN) h["x-admin-token"]=ADMIN;
+  const r=await fetch(p,{method:m,headers:h,body:b?JSON.stringify(b):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error(j.error||"generic");e.code=j.error||"generic";e.status=r.status;throw e}
+  return j;
+}
+function toast(msg,bad){const el=$("#toast");el.innerHTML=`<span class="toast-emblem">${ic(bad?'x':'check')}</span><span class="toast-message">${esc(msg)}</span><span class="toast-timer"></span>`;el.className="toast on"+(bad?" bad":"");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),3300)}
+function openSheet(h){$("#sheet").innerHTML=h;$("#sheetWrap").classList.add("on")}
+function closeSheet(){$("#sheetWrap").classList.remove("on")}
+async function loadData(){D=await api("GET","/api/data")}
+
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}}),{threshold:.12});
+function reveal(){$$(".rv:not(.in)").forEach(el=>io.observe(el))}
+function countUp(){$$("[data-count]").forEach(el=>{const end=+el.dataset.count,t0=performance.now();const st=now=>{const p=Math.min(1,(now-t0)/1100);el.textContent=fmt(Math.round(end*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(st)};requestAnimationFrame(st)})}
+function initFx(){
+  const c=$("#fx"),x=c.getContext("2d");let W,H;
+  const size=()=>{W=c.width=innerWidth;H=c.height=innerHeight;sParts=Array.from({length:Math.min(120,Math.floor(W*H/12000))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.3,v:Math.random()*.25+.05,a:Math.random()*6.28}))};
+  size();addEventListener("resize",size);
+  const loop=()=>{x.clearRect(0,0,W,H);if(S.motion){for(const p of sParts){p.y+=p.v;p.a+=.01;if(p.y>H)p.y=0;x.globalAlpha=.25+.45*Math.abs(Math.sin(p.a));x.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--ink");x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fill()}x.globalAlpha=1}requestAnimationFrame(loop)};
+  loop();
+}
+document.addEventListener("pointerdown",e=>{const b=e.target.closest(".btn");if(!b)return;const r=b.getBoundingClientRect();const s=document.createElement("i");s.className="rip";s.style.left=(e.clientX-r.left)+"px";s.style.top=(e.clientY-r.top)+"px";b.appendChild(s);setTimeout(()=>s.remove(),600)});
+document.addEventListener("pointermove",e=>{const g=e.target.closest&&e.target.closest(".glass");if(!g)return;const r=g.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;g.style.setProperty("--mx",x+"px");g.style.setProperty("--my",y+"px");if(S.motion&&g.classList.contains("tilt")){g.style.transform=`perspective(900px) rotateX(${(y/r.height-.5)*-4}deg) rotateY(${(x/r.width-.5)*4}deg) translateY(-3px)`}},{passive:true});
+document.addEventListener("pointerout",e=>{const g=e.target.closest&&e.target.closest(".glass");if(g&&!g.contains(e.relatedTarget))g.style.transform=""});
+function applySettings(){document.documentElement.dataset.theme=S.theme;document.body.classList.toggle("calm",!S.motion);document.documentElement.lang=LANG}
+
+function chrome(){
+  $("#brand").textContent=D.owner.name;
+  $("#dnav").innerHTML=[["home","home"],["giveaways","gw"],["minecraft","mc"],["streams","st"],["store","store"],["vip","vip"],["me","me"]].map(([k,l])=>`<a href="#${k}" data-r="${k}">${l==="vip"?"VIP":t(l)}</a>`).join("");
+  $("#tabbar").innerHTML=`<span class="ind"></span>`+[["home","home","home"],["gw","gift","gw"],["mc","cube","mc"],["store","bag","store"],["me","user","me"]].map(([k,i,l])=>`<a href="#${k}" data-r="${k}">${ic(i)}<span>${t(l)}</span></a>`).join("");
+  $("#lang").innerHTML=[["kk","KZ"],["ru","RU"],["en","EN"]].map(([k,l])=>`<button class="${LANG===k?"on":""}" data-lang="${k}">${l}</button>`).join("");
+  $("#gear").innerHTML=`${ME?.vip?`<a class="nav-vip-marker" href="#me" title="${esc(ME.vip.name)}">${ic('crown')}<span>${esc(ME.vip.tier==='VIP-FREE'?'TRIAL':(ME.vip.visualTier||ME.vip.tier).replace('VIP-',''))}</span></a>`:`<a class="icon-btn" href="#vip" title="VIP CLUB" aria-label="VIP CLUB" style="color:var(--acc)">${ic("crown")}</a>`}<button class="icon-btn" data-go="settings" aria-label="settings">${ic("gear")}</button>`;
+}
+const footer=()=>`<footer class="rv"><div class="links"><a href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener">TikTok ${esc(D.owner.handle)}</a><a href="${esc(D.owner.telegram)}" target="_blank" rel="noopener">${t("tg")}</a><a href="#giveaways">${t("gw")}</a><a href="#minecraft">${t("mc")}</a><a href="#vip">VIP</a></div><span>© 2026 ${esc(D.owner.name)}</span></footer>`;
+
+function gameCard(g,i=0){
+  const live=g.status==="live";
+  return `<article class="glass tilt card rv" style="--d:${i*70}ms">
+    <div class="between row"><span class="tag ${live?"g":""}">${live?t("live"):t("soon")}</span><span class="tag">${t("gamechat")}</span></div>
+    <div class="row" style="gap:12px"><div class="ibox">${ic(g.icon||"gamepad")}</div><h3 style="margin:0;font-size:19px">${esc(g.name)}</h3></div>
+    <p class="mute">${esc(L(g.desc))}</p>
+    <div class="foot">${g.link?`<a class="btn sm" href="${esc(g.link)}" target="_blank" rel="noopener">${ic("ext")} ${t("gamechat")}</a>`:`<span class="tag">${t("soon")}</span>`}</div>
+  </article>`;
+}
+function gwCard(g,i=0){
+  const joined=ME&&g.participants.includes(ME.nick);
+  const action=g.winner?`<div class="win">${ic("trophy")}<span>${t("winner")}: <b>${esc(g.winner.name)}</b></span></div>`
+    :`<button class="btn wide" data-enter="${esc(g.id)}" ${joined?"disabled":""}>${ic("check")} ${joined?t("entered"):t("enter")}</button>`;
+  return `<article class="glass tilt card ${g.winner?"":"glow"} rv" style="--d:${i*80}ms">
+    <div class="between row"><span class="tag a">${ic("gift")} ${esc(L(g.prize))}</span><span class="tag ${g.winner?"":"g"}">${g.winner?t("ended"):t("live")}</span></div>
+    <div class="row" style="gap:12px"><div class="ibox">${ic(g.icon||"gift")}</div><div><h3 style="margin:0;font-size:18px">${esc(L(g.title))}</h3><span class="mute sm">${t("cost")}: ${g.cost} ${t("tickets").toLowerCase()}</span></div></div>
+    <p class="mute">${esc(L(g.desc))}</p>
+    ${action}
+    <div class="foot"><span>${ic("users")} ${g.participants.length} ${t("parts")}</span></div>
+  </article>`;
+}
+function mpCard(m,i=0){
+  return `<article class="glass tilt card rv" style="--d:${i*70}ms">
+    <div class="between row"><span class="tag a">${esc(m.version)} · ${esc(m.loader)}</span><span class="tag">${ic("star")} ${m.rating}</span></div>
+    <h3 style="font-size:20px;margin:0">${esc(m.title)}</h3>
+    <p class="mute">${esc(L(m.desc))}</p>
+    <div class="specs"><span>${m.mods} ${t("mods")}</span><span>${m.sizeMb} MB</span><span>${fmt(m.downloads)} ${t("dls")}</span></div>
+    <div class="row">${m.keyMods.map(k=>`<span class="tag">${esc(k)}</span>`).join("")}</div>
+    <div class="row" style="margin-top:auto">${libBtn("modpack",m.id)}</div><div>${m.file?`<a class="btn wide" href="${esc(m.file)}" target="_blank" rel="noopener">${ic("dl")} ${t("dload")}</a>`:`<button class="btn ghost wide" data-nofile="1">${ic("clock")} ${t("nofile")}</button>`}</div>
+  </article>`;
+}
+function prodCard(p,i=0){
+  return `<article class="glass tilt card rv" style="--d:${(i%8)*60}ms">
+    <div class="between row"><span class="tag">${esc(catName(p.cat))}</span><b style="color:var(--acc);font:700 20px var(--fh)">${money(p.price)}</b></div>
+    <h3 style="font-size:18px;margin:0">${esc(L(p.name))}</h3>
+    <p class="mute" style="flex:1">${esc(L(p.desc))}</p>
+    <div class="row"><button class="btn ghost sm" data-add="${esc(p.id)}" ${inCart(p.id)?"disabled":""}>${ic("cart")} ${inCart(p.id)?t("inc"):t("add")}</button>${libBtn("product",p.id)}</div>
+  </article>`;
+}
+function mrHTML(){
+  if(MC.hits==="loading") return `<div class="spin"></div>`;
+  if(MC.hits==="error") return `<div class="notice">${t("neterr")}</div>`;
+  if(!MC.hits) return "";
+  if(!MC.hits.length) return `<div class="empty">${t("nores")}</div>`;
+  return `<div class="mr-list">${MC.hits.map((h,i)=>`<article class="glass mr rv" style="--d:${i*40}ms" data-pid="${esc(h.id)}" data-title="${esc(h.title)}">
+    <img src="${esc(h.icon||"")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+    <div class="mr-i"><b>${esc(h.title)}</b><p>${t("by")} ${esc(h.author)} · ${fmt(h.downloads)} · ${esc(h.license||"")}</p></div><span class="mr-save">${libBtn('modrinth',h.id,{title:h.title})}</span></article>`).join("")}</div>`;
+}
+const winsHTML=()=>ME&&ME.wins.length?ME.wins.map(w=>`<div class="glass ex" style="margin:0"><div><b>${esc(L(w.title))}</b><small class="mute" style="display:block">${esc(w.date)}</small></div>${w.code?`<span class="tag">${esc(w.code)}</span>`:""}</div>`).join(""):`<p class="mute">${t("nowins")}</p>`;
+function ordersTable(list){
+  if(!list.length) return `<p class="mute">${t("noorders")}</p>`;
+  return `<div class="glass table"><table><tr><th>#</th><th>${t("total")}</th><th>—</th></tr>${list.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${money(o.total)}</td><td><span class="tag ${o.status==="paid"?"g":""}">${o.type==='vip'?(o.approvedAt?tri('VIP расталды','VIP активирован','VIP approved'):tri('VIP күтілуде','VIP ожидает','VIP pending')):o.status==="paid"?t("paid"):t("pend")}</span></td></tr>`).join("")}</table></div>`;
+}
+
+function pHome(){
+  const ga=D.giveaways.filter(g=>!g.winner);
+  const dl=D.modpacks.reduce((s,m)=>s+m.downloads,0);
+  return `<section class="hero winter-home-hero">
+    <div class="winter-hero-layout">
+      <div class="winter-hero-text">
+        <p class="winter-edition-label"><span class="winter-mini-star">✦</span> A782 DIGITAL <span class="sep">/</span> WINTER EDITION 2026–27</p>
+        <p class="eyebrow rv">${t("tag")}</p>
+        <h1>${words(t("htitle"))}</h1>
+        <p class="lead rv">${t("hlead")}</p>
+        <div class="row rv hero-actions"><a class="btn" href="#store">${ic("bag")} ${t("store")} ${ic("arrow")}</a><a class="btn ghost" href="#minecraft">${ic("cube")} ${t("bmc")}</a></div>
+        <div class="winter-hero-points"><span>✧ ${tri('Цифрлық тауарлар','Цифровые товары','Digital goods')}</span><span>✧ Minecraft</span><span>✧ ${t('gw')}</span></div>
+      </div>
+      <div class="winter-hero-art" aria-hidden="true">
+        <div class="winter-halo winter-halo-a"></div><div class="winter-halo winter-halo-b"></div>
+        <div class="winter-stars">✦ <span>✧</span> ✦ <span>✦</span> ✧</div>
+        <div class="winter-gift"><div class="winter-gift-lid"></div><div class="winter-gift-ribbon-v"></div><div class="winter-gift-ribbon-h"></div><div class="winter-gift-mark">A782<span>DIGITAL</span></div><div class="winter-gift-bow one"></div><div class="winter-gift-bow two"></div></div>
+        <div class="winter-art-caption">WINTER <b>2027</b><small>NEW SEASON · SAME A782</small></div>
+      </div>
+    </div>
+    <div class="home-directory rv" aria-label="A782 sections">
+      <a href="#store"><span class="directory-icon">${ic('bag')}</span><b>${t('store')}</b><small>${tri('Тауарлар мен қызметтер','Товары и услуги','Products & services')}</small>${ic('arrow','directory-arrow')}</a>
+      <a href="#minecraft"><span class="directory-icon">${ic('cube')}</span><b>Minecraft</b><small>${tri('Модпактар мен модтар','Модпаки и моды','Mods & modpacks')}</small>${ic('arrow','directory-arrow')}</a>
+      <a href="#giveaways"><span class="directory-icon">${ic('gift')}</span><b>${t('gw')}</b><small>${tri('Билет жинап қатысу','Участвовать за билеты','Enter with tickets')}</small>${ic('arrow','directory-arrow')}</a>
+      <a href="#vip"><span class="directory-icon">${ic('shield')}</span><b>Premium</b><small>${tri('Қосымша мүмкіндіктер','Дополнительные функции','Extra features')}</small>${ic('arrow','directory-arrow')}</a>
+    </div>
+    <div class="stats rv">
+      <div class="glass stat"><b data-count="${ga.length}">0</b><span>${t("sgw")}</span></div>
+      <div class="glass stat"><b data-count="${D.modpacks.length}">0</b><span>${t("smp")}</span></div>
+      <div class="glass stat"><b data-count="${dl}">0</b><span>${t("sdl")}</span></div>
+    </div>
+  </section>
+  ${ME?.vip?`<a class="home-vip-beacon rv" href="#me"><div class="home-vip-emblem">${ic('crown')}</div><div><b class="home-vip-title">${esc(ME.vip.tier==='VIP-FREE'?'ULTRA TRIAL':ME.vip.name)} ✦</b><span class="home-vip-sub">${tri('VIP профилің іске қосылған • Толық көру','VIP-профиль активен • Открыть','VIP profile active • View now')}</span></div><span class="home-vip-arr">${ic('arrow')}</span></a>`:""}
+  ${homeVipDesk()}
+  <a class="glass rv" href="#streams" style="display:flex;align-items:center;gap:14px;margin-top:26px"><span class="dot ${D.stream.live?"on":""}"></span>
+    <div style="flex:1;min-width:0"><b>${esc(L(D.stream.title))}</b><small class="mute" style="display:block">${D.stream.live?t("live"):t("next")}</small>
+      <div class="cd" id="cd" style="margin-top:10px"></div></div><span style="margin-left:auto;color:var(--acc)">${ic("arrow")}</span></a>
+  <section class="bl"><h2 class="bl rv">${t("secgw")}</h2><div class="grid">${ga.slice(0,2).map(gwCard).join("")||`<div class="empty">${t("nores")}</div>`}</div></section>
+  <section class="bl"><h2 class="bl rv">${t("secmp")}</h2><div class="grid">${D.modpacks.slice(0,2).map(mpCard).join("")}</div></section>
+  <section class="bl"><h2 class="bl rv">${t("secg")}</h2><div class="grid">${D.games.map(gameCard).join("")}</div></section>
+  <section class="glass bl rv"><p class="eyebrow">${t("ck")}</p><h2 class="bl" style="margin:6px 0">${t("ct")}</h2><p class="mute">${t("cp")}</p>
+    <a class="btn" href="${esc(D.owner.telegram)}" target="_blank" rel="noopener" style="margin-top:14px">${ic("send")} ${t("ctg")}</a></section>
+  <div class="marquee"><div><span>Minecraft · Shaders · Packs · Giveaways · Streams ✦</span><span>Minecraft · Shaders · Packs · Giveaways · Streams ✦</span></div></div>
+  ${footer()}`;
+}
+function prizeIcon(kind){
+  return ({tokens:'star',tickets:'gift',diamonds:'gem',coupon:'tag'})[kind]||'gift';
+}
+function prizeCard(pr,n){
+ return `<div class="reel-prize" data-reel-n="${n}" data-prize-id="${esc(pr.id)}" data-rarity="${esc(pr.rarity||'Common')}"><div class="reel-prize-icon">${ic(prizeIcon(pr.kind))}</div><b>${esc(L(pr.label))}</b><small>${esc(pr.rarity||'Common')}</small></div>`;
+}
+function reelCards(){
+ const prizes=D?.prizes||[];
+ return prizes.length?Array.from({length:72},(_,n)=>prizeCard(prizes[n%prizes.length],n)).join(''):`<div class="reel-empty">${t('nores')}</div>`;
+}
+function chanceAdmin(){
+ return `<section class="glass bl rv"><h3>${tri('Рулетка шанстары','Шансы рулетки','Roulette probabilities')}</h3><p class="mute">${tri('Барлығы 100%. 0% сыйлық ұтылмайды. Сиректік — бөлек белгі.','Сумма 100%. Призы с 0% не выпадают. Редкость — отдельная метка.','Total must be 100%. Zero-percent prizes cannot win. Rarity is a separate label.')}</p>
+ <form id="chanceForm">${D.prizes.map(p=>`<div class="chance-row" data-chance-id="${esc(p.id)}"><label for="chance-${esc(p.id)}">${esc(L(p.label))}</label><input id="chance-${esc(p.id)}" aria-label="${esc(L(p.label))} %" type="number" min="0" max="100" step="0.01" required value="${p.chanceBps/100}"><select aria-label="Rarity">${['Common','Rare','Epic','Legendary','Mythic'].map(r=>`<option ${r===p.rarity?'selected':''}>${r}</option>`).join('')}</select></div>`).join('')}<p id="chancesTotal" role="status"></p><p id="chanceError" role="alert"></p><button class="btn" type="submit">${t('saved')==='Saved'?'Save':tri('Сақтау','Сохранить','Save')}</button></form>
+ <details class="bl"><summary>${tri('Жаңа сыйлық қосу','Добавить приз','Add prize')}</summary><form id="newWheelPrize" class="form">${ml('label',tri('Атауы','Название','Name'),{})}<label class="field">${tri('Түрі','Тип','Type')}<select name="kind"><option value="tickets">Tickets</option><option value="tokens">Tokens</option><option value="diamonds">Diamonds</option><option value="coupon">Coupon %</option></select></label><label class="field">${tri('Мөлшері','Количество','Amount')}<input name="val" type="number" min="1" max="1000000" required></label><label class="field">Rarity<select name="rarity"><option>Common</option><option>Rare</option><option>Epic</option><option>Legendary</option><option>Mythic</option></select></label><p class="mute">${tri('0% шансымен қосылады. Содан кейін шанстарды реттеп сақтаңыз.','Добавляется с шансом 0%. Затем настройте и сохраните шансы.','Added at 0%. Then adjust and save the probabilities.')}</p><button class="btn" type="submit">${tri('Қосу','Добавить','Add')}</button></form></details></section>`;
+}
+function updateChanceTotal(){
+ const el=document.getElementById('chancesTotal'); if(!el)return;
+ const inputs=[...document.querySelectorAll('[data-chance-id] input')];
+ const sum=inputs.reduce((a,x)=>a+Math.round(Number(x.value)*100),0);
+ el.textContent=tri('Жалпы: ','Всего: ','Total: ')+(sum/100).toFixed(2)+'% / 100%';
+ el.style.color=sum===10000?'#b6d2c2':'#e2ae9f';
+}
+async function showOdds(){
+ try{
+  const fresh=await api('GET','/api/data');
+  openSheet(`<h2>${tri('Ұтыс ережелері','Правила розыгрыша','Draw rules')}</h2><p class="mute">${tri('Тегін қатысу билеттері. Ақша тігу және ақшалай ұтыс жоқ. Нәтижені сервер таңдап, аккаунтқа сақтайды.','Бесплатные билеты участия. Без денежных ставок и денежных выигрышей. Сервер выбирает и сохраняет приз.','Free participation tickets. No cash bets or cash payouts. The server selects and saves your reward.')}</p><table class="odds-table"><thead><tr><th>${tri('Сыйлық','Приз','Prize')}</th><th>Rarity</th><th>%</th></tr></thead><tbody>${fresh.prizes.map(p=>`<tr><td>${esc(L(p.label))}</td><td>${esc(p.rarity)}</td><td>${(p.chanceBps/100).toFixed(2)}%</td></tr>`).join('')}</tbody></table><p class="mute">${tri('Әр айналдыру тәуелсіз. Сиректік белгісі нақты пайызды алмастырмайды.','Каждое вращение независимо. Метка редкости не заменяет точный процент.','Each draw is independent. Rarity labels do not replace exact probabilities.')}</p><button class="btn ghost" onclick="closeSheet()">${tri('Жабу','Закрыть','Close')}</button>`);
+ }catch(e){toast(errMsg(e),true)}
+}
+function pGw(){
+  const price=Number(D.wheelCost)||1;
+  return `<header class="ph rv winter-page-head"><div class="winter-page-kicker">✦ A782 WINTER EVENT · 2026–27</div><p class="eyebrow">${ic('gift')} ${t('gw')}</p><h1>${t('gwtitle')}</h1><p class="lead">${tri('Жүлде лентасын айналдырып, виртуалды сыйлық алыңыз.','Запустите ленту призов и получите виртуальную награду.','Spin the prize reel for a virtual reward.')}</p></header>
+  <section class="reel-panel rv" id="reelPanel">
+    <div class="reel-head"><div><span class="reel-kicker">✦ A782 WINTER REWARDS</span><h2>${tri('Сыйлықтар лентасы','Лента наград','Prize reel')}</h2><p>${t('wlead')}</p></div><div class="reel-counter">${ic('gift')} <span>${t('tickets')}</span><strong id="reelTicketCount">${fmt(ME?.tickets??0)}</strong></div></div>
+    <div class="reel-machine" id="winterReel">
+      <div class="reel-upper-rail"></div>
+      <div class="frost-window" aria-hidden="true"><i>❄</i></div>
+      <div class="reel-viewport" id="reelViewport"><div class="reel-track" id="reelTrack">${reelCards()}</div></div>
+      <div class="reel-lower-rail"></div>
+    </div>
+    <div class="reel-controls"><div class="reel-price-note">${ic('gift')} <span>${price} ${t('tickets').toLowerCase()} / ${tri('айналдыру','вращение','spin')}</span></div>
+      <button class="btn reel-spin-btn" id="spinBtn" ${SPIN||!D.prizes?.length?'disabled':''}>${ic('play')} <span class="reel-spin-label">${t('spin')}</span> <span class="reel-spin-arrow">→</span></button>
+      ${ME?`<button class="btn ghost reel-daily-btn" id="daily">${ic('plus')} ${t('daily')}</button>`:`<a href="#me" class="btn ghost reel-daily-btn">${ic('user')} ${t('login_b')}</a>`}
+    </div>
+    <div class="reel-rules"><span class="mute">Common · Rare · Epic · Legendary · Mythic</span><button class="btn ghost sm" type="button" onclick="showOdds()">${tri('Ұтыс ережелері','Правила розыгрыша','Draw rules')}</button></div><div id="reelAnnouncement" role="status" aria-live="polite" class="reel-announcement">${REEL_LAST_WIN?`${ic('check')} ${tri('Соңғы ұтыс','Последний приз','Last reward')}: <b>${esc(L(REEL_LAST_WIN.label))}</b>`:tri('Ортасындағы белгі тоқтаған жүлдені көрсетеді.','Маркер в центре укажет на приз.','The center marker indicates your reward.')}</div>
+  </section>
+  ${ME?`<div class="row rv winter-wallet"><span class="tag">${t('tokens')} <b>${fmt(ME.tokens)}</b></span><span class="tag">${t('diamonds')} <b>${fmt(ME.diamonds)}</b></span></div>`:`<p class="notice rv">${t('login')}</p>`}
+  <section class="bl"><h3 class="rv">${t('exch')}</h3>
+    <div class="glass ex"><span>${t('ex1')}</span><button class="btn ghost sm" data-ex="ticket">${ic('refresh')}</button></div>
+    <div class="glass ex"><span>${t('ex2')}</span><button class="btn ghost sm" data-ex="coupon">${ic('refresh')}</button></div>
+  </section>
+  <section class="bl"><h2 class="bl rv">${t('secgw')}</h2><div class="grid">${D.giveaways.map(gwCard).join('')||`<div class="empty">${t('nores')}</div>`}</div></section>
+  ${ME?`<section class="glass bl rv"><h3>${t('mywins')}</h3>${winsHTML()}<p class="mute sm" style="margin-top:10px">${t('prizenote')}</p></section>`:''}
+  ${footer()}`;
+}
+function pMc(){
+  const cats=[["all","cat0"],["rpg","cat1"],["pvp","cat2"],["tech","cat3"],["anime","cat4"]];
+  const mcat={rpg:"RPG",pvp:"PvP",tech:"Tech",anime:"Anime",surv:"Survival"};
+  const list=D.modpacks.filter(m=>MPC==="all"||m.cat===MPC);
+  return `<header class="ph rv"><p class="eyebrow">${ic("cube")} Minecraft</p><h1>${t("mctitle")}</h1><p class="lead">${t("mclead")}</p></header>
+  <form class="search rv" id="mcForm">${ic("search")}<input id="mcQ" value="${esc(MC.q)}" placeholder="${esc(t("sph"))}" autocomplete="off"><button class="btn sm" type="submit">${t("search")}</button></form>
+  <div class="pills rv">${["mod","modpack","resourcepack","shader"].map(k=>`<button class="pill ${MC.type===k?"on":""}" data-mtype="${k}">${t({mod:"tmod",modpack:"tpack",resourcepack:"tres",shader:"tshd"}[k])}</button>`).join("")}</div>
+  <div class="filters rv">
+    <select id="fLoader"><option value="">${t("any")}</option>${["fabric","forge","neoforge","quilt"].map(x=>`<option value="${x}" ${MC.loader===x?"selected":""}>${x}</option>`).join("")}</select>
+    <select id="fVer"><option value="">${t("any")}</option>${["1.21.1","1.20.1","1.19.2"].map(x=>`<option value="${x}" ${MC.version===x?"selected":""}>${x}</option>`).join("")}</select>
+    <select id="fSort">${[["downloads","sdn"],["follows","sfol"],["newest","snew"],["updated","supd"]].map(([v,k])=>`<option value="${v}" ${MC.sort===v?"selected":""}>${t(k)}</option>`).join("")}</select>
+  </div>
+  <div id="mrOut">${mrHTML()}</div>
+  <h2 class="bl rv">${t("secmp")}</h2>
+  <div class="pills rv">${cats.map(([k,l])=>`<button class="pill ${MPC===k?"on":""}" data-mpcat="${k}">${t(l)}</button>`).join("")}</div>
+  <div class="grid">${list.map(mpCard).join("")||`<div class="empty">${t("nores")}</div>`}</div>
+  <section class="glass bl rv" id="server"><p class="eyebrow">${ic("pin")} ${t("srv")}</p>
+    ${D.server.ip?`<div class="ipbox">${esc(D.server.ip)}</div><div><button class="btn sm" id="copyIp">${ic("copy")} ${t("copy")}</button></div>`:`<p class="mute" style="margin-top:8px">${t("srvc")}</p>`}
+    <p class="mute sm" style="margin-top:10px">${t("steps")}</p></section>
+  ${footer()}`;
+}
+function pStreams(){
+  return `<header class="ph rv"><p class="eyebrow">${ic("radio")} ${t("st")}</p><h1>${t("sttitle")}</h1><p class="lead">${t("stlead")}</p></header>
+  <section class="glass rv"><span class="tag ${D.stream.live?"g":""}">${D.stream.live?t("live"):t("off")}</span>
+    <h2 style="font:700 26px var(--fh);margin:12px 0 4px">${esc(L(D.stream.title))}</h2><p class="mute">${t("next")}</p>
+    <div class="cd" id="cd"></div>
+    <a class="btn wide" href="${esc(D.owner.tiktok)}" target="_blank" rel="noopener" style="margin-top:18px">${ic("play")} ${D.stream.live?t("watch"):t("follow")}</a></section>
+  <h2 class="bl rv">${t("sched")}</h2>
+  <div class="grid">${D.stream.schedule.map((s,i)=>`<div class="glass rv" style="--d:${i*80}ms"><b>${t("dn")[s.day]||""} · ${esc(s.time)}</b><p class="mute">${esc(L(s.topic))}</p></div>`).join("")}</div>
+  ${footer()}`;
+}
+function pStore(){
+  const list=D.products.filter(p=>STORE==="all"||p.cat===STORE);
+  const n=cartCount();
+  return `<header class="ph rv"><p class="eyebrow">${ic("bag")} ${t("store")}</p><h1>${t("stitle")}</h1><p class="lead">${t("slead")}</p></header>
+  <div class="pills rv">${[["all","cat0"],["pack","cat1"],["over","cat2"],["design","cat3"],["guide","cat4"]].map(([k,l])=>`<button class="pill ${STORE===k?"on":""}" data-scat="${k}">${t(l)}</button>`).join("")}</div>
+  <div class="grid">${list.map(prodCard).join("")||`<div class="empty">${t("nores")}</div>`}</div>
+  <div class="glass rv bl"><h3>✦ VIP A782</h3><p class="mute">${LANG==="ru"?"VIP Studio: избранное, темы и быстрые переходы":LANG==="en"?"VIP Studio: saved collections, themes and quick links":"VIP Studio: таңдаулылар, жеке түс пен жылдам бөлімдер"}</p><a class="btn" href="#vip" style="margin-top:12px">VIP ✦</a></div>
+  ${n?`<div class="cart-bar"><span>${t("cart")}: ${n}</span><b>${money(cartTotal())}</b><button class="btn sm" id="openCart">${t("checkout")}</button></div>`:""}
+  <h2 class="bl rv">${t("orders")}</h2><div id="ordersBox">${ME?"":`<p class="notice">${t("login")}</p>`}</div>
+  ${footer()}`;
+}
+// Tier-specific, server-authorized visual membership experience.
+function membershipHero(u){
+ const v=u.vip;if(!v)return '';
+ const tier=v.visualTier||v.tier||'VIP-PLUS', trial=v.tier==='VIP-FREE';
+ const name=tier.replace('VIP-',''), trialName=trial?'ULTRA TRIAL':name;
+ const cap=vipCapsClient(), saves=Array.isArray(u.library)?u.library.length:0;
+ const expiry=v.expiresAt?`<span data-vip-countdown="${esc(v.expiresAt)}">${vipEndText(v)}</span>`:tri('Мерзімсіз','Бессрочно','Lifetime');
+ return `<section class="nexus-member rv" data-tier="${esc(tier)}" aria-label="${esc(trial?'ULTRA TRIAL':v.name||tier)}">
+   <div class="nexus-member-noise" aria-hidden="true"></div>
+   <div class="nexus-member-header"><span class="nexus-live">${ic('shield')} ${tri('VIP МӘРТЕБЕСІ БЕЛСЕНДІ','VIP-СТАТУС АКТИВЕН','VIP MEMBERSHIP ACTIVE')}</span><span class="nexus-serial">A782 / ${esc(String(u.id).slice(0,12))}</span></div>
+   <div class="nexus-member-body">
+     <div class="nexus-member-info"><p class="nexus-micro">A782 <b>PREMIUM UNIVERSE</b> · 2026</p>
+       <h2 class="nexus-member-title">${trial?'ULTRA':esc(name)}<span>${trial?'FREE ACCESS':tri('ӨЗІҢНІҢ ЖАҢА ДЕҢГЕЙІҢ','ТВОЙ НОВЫЙ УРОВЕНЬ','YOUR NEXT LEVEL')}</span></h2>
+       <p class="nexus-member-user">${ic('check')} @${esc(u.nick)} <span class="nexus-verified">VERIFIED</span></p>
+       <p class="nexus-member-description">${tri('Сенің жеке тақырыптарың, статусың және таңдаулыларың — енді барлығы бір Premium кеңістікте.','Твои темы, статус и избранное — всё в одном Premium-пространстве.','Your themes, status and saved items — all inside one Premium space.')}</p>
+       <div class="nexus-member-stats"><span><strong>${cap.themes.length}</strong><small>${tri('Тақырып','Тем','Themes')}</small></span><span><strong>${cap.count}</strong><small>${tri('Жылдам сілтеме','Быстрых ссылок','Shortcuts')}</small></span><span><strong>${saves}</strong><small>${tri('Сақталған','Сохранено','Saved')}</small></span></div>
+       <div class="nexus-member-expiry">${ic('clock')} ${expiry}</div>
+       <button type="button" class="nexus-member-open" data-open-studio="1" aria-controls="premiumStudio">${ic('palette')} ${tri('Premium Studio ашу','Открыть Premium Studio','Open Premium Studio')} ${ic('arrow')}</button>
+     </div>
+     <div class="nexus-member-art" aria-hidden="true"><div class="nexus-member-aura"></div>
+       <div class="nexus-pass tilt-card"><div class="nexus-pass-top"><span>A782 <b>·</b> DIGITAL</span>${ic('star')}</div>
+         <div class="nexus-pass-symbol"><div class="nexus-pass-symbol-inner">${ic(tier==='VIP-PLUS'?'bolt':tier==='VIP-PRO'?'gem':'crown')}</div></div>
+         <div class="nexus-pass-bottom"><span>MEMBER ACCESS<br><b>${esc(trialName)}</b></span><small>✦ ELITE<br>${esc(String(u.id).slice(-6).toUpperCase())}</small></div>
+       </div><div class="nexus-pass-shadow"></div>
+     </div>
+   </div><div class="nexus-member-footer"><span>✦ A782 ORIGINAL MEMBERSHIP</span><span>${trial?'7-DAY TRIAL':tri('VIP РАСТАЛҒАН','VIP ПОДТВЕРЖДЁН','VIP VERIFIED')}</span></div>
+ </section>`;
+}
+function maybeVipReveal(){
+  if(!ME?.vip||!S.motion||!['me','vip'].includes(ROUTE))return;
+  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+  const v=ME.vip, key=`a782-reveal-${ME.id}-${v.startedAt||v.planId}`;
+  if(sessionStorage.getItem(key))return;
+  sessionStorage.setItem(key,'1');
+  const level=v.visualTier||v.tier;
+  const layer=document.createElement('div');layer.className='vip-reveal';layer.dataset.tier=level;
+  layer.innerHTML=`<div class="vip-reveal-card"><div class="vip-reveal-crown">${ic('crown')}</div><p>ACCESS GRANTED</p><strong>${esc(v.tier==='VIP-FREE'?'ULTRA TRIAL':v.name||level)}</strong><span>${tri('VIP мәртебең белсенді','VIP-статус активирован','Your VIP status is active')}</span><button class="btn sm" type="button" data-revealclose="1">${tri('Профильді көру','Открыть профиль','View profile')}</button></div>`;
+  document.body.appendChild(layer);requestAnimationFrame(()=>layer.classList.add('show'));
+  const timer=setTimeout(()=>layer.remove(),4900);
+  layer.addEventListener('click',e=>{if(e.target===layer||e.target.closest('[data-revealclose]')){clearTimeout(timer);layer.remove()}});
+}
+function pMe(){
+  if(!ME) return `<header class="ph rv"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${t("me_t")}</h1></header>
+  <section class="glass auth rv">
+    <div class="seg"><button class="${AUTH==="login"?"on":""}" data-auth="login">${t("login_b")}</button><button class="${AUTH==="reg"?"on":""}" data-auth="reg">${t("reg_b")}</button></div>
+    <form id="authForm" class="form" style="margin-top:14px">
+      <input name="nick" placeholder="${esc(t("nick"))}" style="display:${AUTH==="reg"?"block":"none"}">
+      <input name="email" type="email" placeholder="${esc(t("email"))}" required>
+      <input name="password" type="password" minlength="6" placeholder="${esc(t("pass"))}" required>
+      <button class="btn wide" type="submit">${t("cont")}</button>
+    </form>
+    <p class="mute sm" style="margin-top:12px">${t("authnote")}</p></section>
+  ${footer()}`;
+  const u=ME;
+  return `<header class="ph rv profile-heading"><p class="eyebrow">${ic("user")} ${t("me")}</p><h1>${esc(u.nick)}</h1>${u.vip&&u.vipPrefs?.status?`<span class="tag profile-custom-status">${esc(u.vipPrefs?.statusEmoji||"✦")} ${esc(u.vipPrefs.status)}</span>`:""}${u.vip?`<span class="profile-rank" style="--rank:${vipColor(u.vip)}">${ic('crown')} ${esc(u.vip.tier==='VIP-FREE'?'ULTRA TRIAL':u.vip.name)}</span>`:''}</header>
+  ${u.vip?membershipHero(u):`<div class="glass rv" style="margin-bottom:16px"><div class="row between"><span class="mute">${tri("VIP әлі қосылмаған","VIP пока не активирован","VIP not active yet")}</span><a class="btn sm" href="#vip">VIP CLUB ✨</a></div></div>`}
+  <section class="glass rv ${u.vip?'vip-identity':''}" ${u.vip?`data-vip="${esc(u.vip.visualTier||u.vip.tier||'VIP-PLUS')}" style="--vip-accent:${vipColor(u.vip)};padding:0;overflow:hidden"`:'style="padding:0;overflow:hidden"'}>
+    <div class="prof-banner ${u.vip?'prof-banner-vip':''}" style="${u.banner?`--profile-art:url('${esc(u.banner)}')`:""}">${u.vip?`<div class="prof-banner-vip-top"><span>${ic('sparkles')} PREMIUM PLAYER</span><span>${ic('crown')} ${esc(u.vip.visualTier||u.vip.tier)}</span></div><div class="prof-banner-huge">${esc((u.vip.visualTier||u.vip.tier).replace('VIP-',''))}</div>`:""}</div>
+    <div class="prof-top"><div class="avatar-shell ${u.vip?'avatar-shell-vip':''}"><div class="avatar">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:ic(u.icon||"user")}</div>${u.vip?`<span class="avatar-crown">${ic('crown')}</span>`:""}</div>
+      <div class="row"><span class="tag">${t("tickets")} <b>${u.tickets}</b></span><span class="tag">${t("tokens")} <b>${u.tokens}</b></span><span class="tag">${t("diamonds")} <b>${u.diamonds}</b></span></div></div>
+    ${u.vip?`<div class="vip-identity-title"><span>${ic('shield')} ${esc(u.nick)} · ${esc(u.vip.tier==='VIP-FREE'?'ULTRA TRIAL':u.vip.name)}</span><small>✦ VERIFIED A782 VIP</small></div>`:""}
+    <form id="profForm" class="form" style="padding:0 22px 22px">
+      <div class="icons">${["user","gem","bolt","cube","trophy","shield","star","swords"].map(k=>`<button type="button" class="ibtn ${!u.avatar&&u.icon===k?"on":""}" data-icon="${k}">${ic(k)}</button>`).join("")}</div>
+      <div class="g2">
+        <label class="field">${t("avurl")}<input name="avatar" value="${esc(u.avatar.startsWith("data:")?"":u.avatar)}" placeholder="https://"></label>
+        <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="avatar" data-max="200"></label>
+        <label class="field">${t("bgurl")}<input name="banner" value="${esc(u.banner.startsWith("data:")?"":u.banner)}" placeholder="https://"></label>
+        <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="banner" data-max="480"></label>
+        <label class="field">${t("nick")}<input name="nick" value="${esc(u.nick)}" required></label>
+        <label class="field">${t("mcn")}<input name="mc" value="${esc(u.mc)}"></label>
+        <label class="field">${t("ffid")}<input name="ff" value="${esc(u.ff)}"></label>
+        <label class="field">${t("so2")}<input name="so2" value="${esc(u.so2)}"></label>
+        <label class="field">${t("tgn")}<input name="tg" value="${esc(u.tg)}"></label>
+      </div>
+      <label class="field">${t("bio")}<textarea name="bio" rows="3">${esc(u.bio)}</textarea></label>
+      <div class="row"><button class="btn" type="submit">${t("save")}</button><button class="btn ghost" type="button" id="logout">${t("logout")}</button></div>
+    </form></section>
+  ${vipStudioUI()}
+  ${myLibraryUI()}
+  <section class="glass bl rv"><h3>${t("mywins")}</h3>${winsHTML()}</section>
+  <section class="glass bl rv"><h3>${t("orders")}</h3><div id="ordersBox"></div></section>
+  <div class="row bl"><a class="btn ghost sm" href="#settings">${ic("gear")} ${t("setl")}</a></div>
+  ${footer()}`;
+}
+const tri=(kk,ru,en)=>LANG==="ru"?ru:LANG==="en"?en:kk;
+const vipColor=v=>({"VIP-FREE":"#ffc76d","VIP-PLUS":"#48d5ff","VIP-PRO":"#b18cff","VIP-ULTRA":"#ffc76d"})[v.visualTier||v.tier||v.name]||"#ffc76d";
+const LIB_KIND={product:'store',modpack:'mc',game:'home',modrinth:'mc'};
+const VIP_PRESETS={
+ cyan:['#51dfff','#81c5ff','#568aff'],ocean:['#5caaff','#76e4ff','#5b8af4'],mint:['#5df0bd','#a8ffe1','#61bcb0'],
+ violet:['#b991ff','#efbaff','#8675ff'],rose:['#ff89ca','#efbaff','#ed7d98'],ember:['#ff9d74','#ffd28a','#e88070'],
+ gold:['#ffce70','#e1b0ff','#f7a76a'],aurora:['#76e5d2','#e18fff','#ffc7a1'],obsidian:['#b1b8f6','#bec9ed','#7780c9']
+};
+const LIB_LABELS=()=>({product:tri('Дүкен','Товары','Store'),modpack:'Minecraft',game:tri('Ойындар','Игры','Games'),modrinth:'Modrinth'});
+const libSaved=(kind,id)=>!!ME?.library?.some(x=>x.kind===kind&&x.id===id);
+const libBtn=(kind,id,meta={})=>`<button type="button" class="btn ghost sm lib-toggle ${libSaved(kind,id)?'is-saved':''}" data-library="${kind}:${esc(id)}" ${meta.title?`data-title="${esc(meta.title)}"`:''} aria-label="${libSaved(kind,id)?tri('Таңдаулыдан алу','Убрать из избранного','Remove saved'):tri('Таңдаулыға қосу','Сохранить','Save item')}">${ic(libSaved(kind,id)?'check':'star')} ${libSaved(kind,id)?tri('Сақталған','Сохранено','Saved'):tri('Сақтау','Сохранить','Save')}</button>`;
+const libraryEntry=x=>{
+ const item=x.kind==='modrinth'?null:(D[{product:'products',modpack:'modpacks',game:'games'}[x.kind]]||[]).find(p=>p.id===x.id);
+ if(!item&&x.kind!=='modrinth')return '';
+ const title=x.kind==='modrinth'?x.title:x.kind==='product'?L(item.name):x.kind==='modpack'?item.title:item.name;
+ const url=x.kind==='modrinth'?`https://modrinth.com/project/${encodeURIComponent(x.id)}`:`#${LIB_KIND[x.kind]}`;
+ return `<div class="library-item"><div class="library-icon">${ic(['modpack','modrinth'].includes(x.kind)?'cube':x.kind==='game'?'gamepad':'bag')}</div><div><b>${esc(title)}</b><small>${LIB_LABELS()[x.kind]}</small></div><a class="btn ghost sm" href="${esc(url)}" ${x.kind==='modrinth'?'target="_blank" rel="noopener noreferrer"':''}>${ic('arrow')}</a>${libBtn(x.kind,x.id,{title})}</div>`;
+};
+const vipCapsClient=()=>{
+ const v=ME?.vip?.visualTier||ME?.vip?.tier||'';
+ return {count:v==='VIP-ULTRA'?5:v==='VIP-PRO'?3:v==='VIP-PLUS'?1:0,
+ themes:v==='VIP-ULTRA'?Object.keys(VIP_PRESETS):v==='VIP-PRO'?Object.keys(VIP_PRESETS).slice(0,6):Object.keys(VIP_PRESETS).slice(0,3)};
+};
+function vipStudioUI(){
+ if(!ME?.vip)return '';
+ const v=ME.vipPrefs||{},caps=vipCapsClient(),defaultPreset=ME.vip.visualTier==='VIP-ULTRA'?'gold':ME.vip.visualTier==='VIP-PRO'?'violet':'cyan',preset=caps.themes.includes(v.preset)?v.preset:defaultPreset,emoji=v.statusEmoji||'✦';
+ const links=[['home',tri('Басты бет','Главная','Home')],['mc','Minecraft'],['store',tri('Дүкен','Магазин','Store')],['streams',tri('Стримдер','Стримы','Streams')],['vip','VIP'],['me',tri('Профиль','Профиль','Profile')]];
+ return `<section class="rv nexus-studio" id="premiumStudio" style="--preview-color:${VIP_PRESETS[preset][0]};--preview-color-2:${VIP_PRESETS[preset][1]}">
+ <div class="nexus-studio-intro"><span class="nexus-kicker">${ic('sparkles')} PREMIUM CONTROL ROOM</span><h2>${tri('Өз әлеміңді бапта.','Создай свой стиль.','Make it yours.')}</h2><p>${tri('Түсті таңда, өз статусыңды жаз, жиі қолданатын бөлімдеріңді ретте. Өзгерістер бірден preview-де көрінеді.','Выбирай цвет, добавляй статус и быстрые ссылки. Предпросмотр меняется сразу.','Pick a color, set your status, and choose shortcuts. Your preview updates instantly.')}</p></div>
+ <div class="nexus-studio-grid">
+  <div class="nexus-studio-preview"><div class="nexus-studio-orb" aria-hidden="true"></div><div class="nexus-preview-label">${ic('eye')} LIVE PREVIEW <i></i></div>
+    <div class="nexus-preview-card" id="nexusPreviewCard"><div class="nexus-preview-top">A782 <span>✦ PREMIUM ID</span></div><div class="nexus-preview-avatar">${ME.avatar?`<img src="${esc(ME.avatar)}" alt="">`:ic(ME.icon||'user')}</div><b>${esc(ME.nick)}</b><span class="nexus-preview-status" id="nexusPreviewStatus">${esc(emoji)} ${esc(v.status||'PREMIUM')}</span><p id="nexusPreviewHeadline">${esc(v.headline||'A782 DIGITAL MEMBER')}</p><div class="nexus-preview-bottom"><span>AUTHENTIC MEMBER</span><span>${esc((ME.vip.visualTier||ME.vip.tier).replace('VIP-',''))} ✦</span></div></div>
+    <div class="nexus-preview-tip">${ic('mouse-pointer')} ${tri('Сақтамай тұрып нәтижесін көр','Посмотри результат до сохранения','See the result before saving')}</div></div>
+  <form id="vipStudioForm" class="nexus-studio-form form">
+   <div class="nexus-field-title"><span>01</span><strong>${tri('Түс палитрасы','Цветовая палитра','Color palette')}</strong></div>
+   <div class="studio-colors">${caps.themes.map(k=>`<label title="${k}"><input type="radio" name="preset" value="${k}" ${k===preset?'checked':''}><span class="color-dot" style="--c1:${VIP_PRESETS[k][0]};--c2:${VIP_PRESETS[k][1]}"></span><small>${k}</small></label>`).join('')}</div>
+   <div class="nexus-field-title"><span>02</span><strong>${tri('Жеке статус','Личный статус','Your status')}</strong></div>
+   <div class="g2"><label class="field">${tri('Белгі','Значок','Icon')}<select name="statusEmoji">${['✦','⚡','🎮','🚀','💎','👑','🌌','🛡️','🎨','✨'].map(x=>`<option ${emoji===x?'selected':''} value="${x}">${x}</option>`).join('')}</select></label><label class="field">${tri('Мәтін','Текст','Text')}<input name="status" maxlength="32" value="${esc(v.status||'')}" placeholder="Building my world..."></label></div>
+   ${caps.count>1?`<label class="field">${tri('Профиль ұраны','Подпись профиля','Profile headline')}<input name="headline" maxlength="70" value="${esc(v.headline||'')}" placeholder="My Minecraft world ✦"></label>`:''}
+   <div class="nexus-field-title"><span>03</span><strong>${tri('Жылдам бөлімдер','Быстрые разделы','Quick access')}</strong><small>${caps.count} MAX</small></div>
+   <fieldset class="studio-links"><legend>${tri('Таңдаулы бөлімдер','Избранные разделы','Favorite sections')}</legend>${links.map(([id,label])=>`<label><input type="checkbox" name="shortcuts" value="${id}" ${(v.shortcuts||[]).includes(id)?'checked':''}><span>${label}</span></label>`).join('')}</fieldset>
+   <div class="studio-feedback"><span id="studioShortcutCount" aria-live="polite">${(v.shortcuts||[]).length} / ${caps.count}</span><span id="studioSaveStatus" role="status">${tri('Өзгерісті сақтасаң, профильге қолданылады','Сохрани изменения, чтобы применить их','Save changes to apply to your profile')}</span></div>
+   <div class="studio-actions"><button class="btn nexus-save" type="submit">${ic('check')} ${tri('Өзгерістерді сақтау','Сохранить изменения','Save changes')} ${ic('arrow')}</button><button class="btn ghost studio-reset" data-studio-reset="1" type="button">${ic('refresh')} ${tri('Бастапқы күйге қайтару','Сбросить изменения','Reset changes')}</button></div>
+   <p class="nexus-studio-note">${ic('shield')} ${tri('Баптаулар аккаунтыңда бұлтқа сақталады.','Настройки сохраняются в облаке аккаунта.','Settings are saved to your cloud account.')}</p>
+  </form></div></section>`;
+}
+function myLibraryUI(){
+ if(!ME)return '';
+ const entries=(ME.library||[]).map(libraryEntry).filter(Boolean);
+ return `<section class="glass bl rv my-library"><div class="row between"><div><p class="eyebrow">${ic('star')} A782 LIBRARY</p><h3>${tri('Менің таңдаулыларым','Моё избранное','My saved collection')}</h3></div><span class="tag">${entries.length} / ${ME.libraryLimit||12}</span></div>
+ <p class="mute sm" style="margin:4px 0 15px">${tri('Minecraft жинақтары мен тауарларың осы аккаунтта сақталады. VIP аяқталса да таңдаулылар өшпейді.','Сохранения привязаны к аккаунту и не исчезают после VIP.','Saved items stay in your account after VIP expires.')}</p>
+ <div class="library-list">${entries.length?entries.join(''):`<p class="mute sm">${tri('Әзірше бос. Дүкенде немесе Minecraft-та «Сақтау» бас.','Пока пусто. Нажми «Сохранить» в магазине или Minecraft.','Nothing saved yet. Use Save in Store or Minecraft.')}</p>`}</div></section>`;
+}
+function homeVipDesk(){
+ if(!ME?.vip)return '';
+ const shortcuts=Array.isArray(ME.vipPrefs?.shortcuts)?ME.vipPrefs.shortcuts:[];
+ const names={home:tri('Басты бет','Главная','Home'),mc:'Minecraft',store:tri('Дүкен','Магазин','Store'),streams:tri('Стрим','Стрим','Streams'),vip:'VIP',me:tri('Профиль','Профиль','Profile')};
+ const list=shortcuts.length?shortcuts:['mc','store','me'];
+ const count=Array.isArray(ME.library)?ME.library.length:0;
+ return `<section class="nexus-desk rv"><div class="nexus-desk-head"><div><span class="nexus-kicker">${ic('bolt')} PREMIUM COMMAND CENTER</span><h2>${esc(ME.vipPrefs?.statusEmoji||'✦')} ${esc(ME.vipPrefs?.status||tri('Менің A782 әлемім','Мой мир A782','My A782 world'))}</h2><p>${esc(ME.vipPrefs?.headline||tri('Таңдаулыларың мен керек бөлімдерің бір жерде.','Избранное и быстрые переходы в одном месте.','Your saved items and favorite places, in one spot.'))}</p></div><button type="button" class="nexus-desk-edit" data-open-studio="1">${ic('palette')} ${tri('Баптау','Настроить','Customize')}</button></div>
+ <div class="nexus-desk-grid"><div class="nexus-desk-saved"><span>${ic('star')} A782 LIBRARY</span><strong>${count}<small> / ${ME.libraryLimit||12}</small></strong><a href="#me">${tri('Таңдаулыларды ашу','Открыть избранное','View saved items')} ${ic('arrow')}</a></div><div class="nexus-desk-links">${list.map((k,i)=>`<a href="#${k}" style="--i:${i}">${ic(k==='mc'?'cube':k==='store'?'bag':k==='streams'?'radio':k==='vip'?'crown':k==='me'?'user':'home')}<span>${esc(names[k]||k)}</span>${ic('arrow')}</a>`).join('')}</div></div></section>`;
+}
+async function toggleLibrary(spec,btn){
+ if(!ME){toast(t('login'),true);location.hash='#me';return}
+ const [kind,id]=spec.split(':');btn.disabled=true;
+ try{
+  const r=await api('POST','/api/library',{kind,id,title:btn.dataset.title||'',save:!libSaved(kind,id)});
+  ME=r.user;render(true);toast(tri('Таңдаулылар жаңартылды','Избранное обновлено','Saved collection updated'));
+ }catch(e){btn.disabled=false;toast(e.code==='library_limit'?tri('Таңдаулы лимиті толық','Достигнут лимит избранного','Saved limit reached'):errMsg(e),true)}
+}
+const vipEndText=v=>v.expiresAt?tri("Аяқталады: ","Истекает: ","Expires: ")+new Date(v.expiresAt).toLocaleString(LANG==="kk"?"kk-KZ":LANG==="ru"?"ru-RU":"en-US"):"∞";
+function pVip(){
+ const plans=(D.vipPlans||[]).slice().sort((a,b)=>['VIP-FREE','VIP-PLUS','VIP-PRO','VIP-ULTRA'].indexOf(a.tier)-['VIP-FREE','VIP-PLUS','VIP-PRO','VIP-ULTRA'].indexOf(b.tier));
+ const lineup={
+  'VIP-FREE':{num:'00',kind:'ULTRA TRIAL',face:'FREE',desc:tri('ULTRA әлемін 7 күн тегін сезін.','Попробуй мир ULTRA бесплатно 7 дней.','Discover the ULTRA experience free for seven days.'),color:'#c9e1ff',count:'500',themes:'9',links:'5'},
+  'VIP-PLUS':{num:'01',kind:'YOUR FIRST UPGRADE',face:'PLUS',desc:tri('Күнделікті ыңғайлы Premium мүмкіндіктер.','Полезные Premium-функции на каждый день.','Everyday premium tools with a fresh neon identity.'),color:'#56dfff',count:'60',themes:'3',links:'1'},
+  'VIP-PRO':{num:'02',kind:'GO BEYOND',face:'PRO',desc:tri('Көбірек бақылау, жеке стиль, еркіндік.','Больше настроек, стиля и возможностей.','More room for your style and shortcuts.'),color:'#c29aff',count:'160',themes:'6',links:'3'},
+  'VIP-ULTRA':{num:'03',kind:'THE COMPLETE EXPERIENCE',face:'ULTRA',desc:tri('Барлық мүмкіндіктің толық жиынтығы.','Все Premium-возможности без компромиссов.','Everything A782 Premium can offer, unlocked.'),color:'#ffd281',count:'500',themes:'9',links:'5'}
+ };
+ return `<section class="nexus-landing rv"><div class="nexus-landing-lines" aria-hidden="true"></div>
+   <div class="nexus-landing-copy"><span class="nexus-kicker">${ic('shield')} A782 / PREMIUM</span><h1>${tri('PREMIUM','PREMIUM','PREMIUM')}<br><em>${tri('МҮМКІНДІКТЕР','ВОЗМОЖНОСТИ','FEATURES')}</em></h1><p>${tri('Профиль дизайнын баптау, таңдаулыларды сақтау және жылдам сілтемелер. Тарифтерді салыстырып, керегін таңдаңыз.','Оформление профиля, избранное и быстрые ссылки. Сравните тарифы и выберите подходящий.','Profile themes, saved items and shortcuts. Compare the plans and choose what you need.')}</p>
+     <div class="nexus-landing-actions"><a href="#vip-levels" class="btn">${tri('Деңгейлерді қарау','Смотреть уровни','Explore levels')} ${ic('arrow')}</a><a href="#me" class="nexus-simple-link">${ic('user')} ${tri('Менің профилім','Мой профиль','My profile')}</a></div><div class="nexus-landing-foot"><span>VIP-FREE</span><i></i><span>VIP-PLUS</span><i></i><span>VIP-PRO</span><i></i><span>VIP-ULTRA</span></div>
+   </div>
+   <div class="nexus-benefits" aria-label="Premium features">
+      <div class="nexus-benefits-head"><span>${ic('shield')}</span><strong>PREMIUM</strong><small>A782 DIGITAL</small></div>
+      <div class="nexus-benefit"><span>${ic('palette')}</span><div><b>${tri('Жеке дизайн','Персональная тема','Personal theme')}</b><small>${tri('Профиль түсін өзің таңда','Настрой цвет профиля','Choose your profile theme')}</small></div></div>
+      <div class="nexus-benefit"><span>${ic('star')}</span><div><b>${tri('Таңдаулылар','Избранное','Saved items')}</b><small>${tri('Керек заттарыңды сақтап қой','Сохраняй нужные материалы','Keep what matters to you')}</small></div></div>
+      <div class="nexus-benefit"><span>${ic('bolt')}</span><div><b>${tri('Жылдам бөлімдер','Быстрые ссылки','Quick access')}</b><small>${tri('Жиі кіретін беттерге тез өт','Быстрый доступ к разделам','Get to your pages faster')}</small></div></div>
+      <div class="nexus-benefits-foot">VIP-FREE · VIP-PLUS · VIP-PRO · VIP-ULTRA</div>
+   </div>
+ </section>
+ ${ME?.vip?membershipHero(ME):''}
+ <section id="vip-levels" class="nexus-levels"><div class="nexus-section-heading rv"><div><span class="nexus-kicker">${ic('gem')} A782 MEMBERSHIP</span><h2>${tri('Өзіңнің деңгейіңді таңда','Выбери свой уровень','Choose your level')}</h2></div><p>${tri('Әр деңгей өз мүмкіндігімен келеді. Бағаны админ белгілейді, ақылы VIP тек төлемді растаған соң қосылады.','У каждого уровня свои функции. Цены устанавливает админ; платный VIP включается после подтверждения.','Each tier has its own tools. Admin sets prices and approves paid VIP before activation.')}</p></div>
+ <div class="nexus-tier-grid">${plans.map(p=>{
+   const data=lineup[p.tier]||lineup['VIP-PLUS'];const free=p.tier==='VIP-FREE',ultra=p.tier==='VIP-ULTRA',ready=free||Number(p.price)>0,locked=free&&(!!ME?.vip||!!ME?.vipTrialUsed);
+   const features=[`${data.count} ${tri('таңдаулы','избранных','saved items')}`,`${data.themes} ${tri('түс тақырыбы','цветовых тем','color themes')}`,`${data.links} ${tri('жылдам сілтеме','быстрых ссылок','shortcuts')}`];
+   return `<article class="nexus-tier rv tilt-card" data-tier="${esc(p.tier)}" style="--nexus-tier:${esc(data.color)}"><div class="nexus-tier-top"><span>EDITION ${data.num}</span>${ultra?'<span class="nexus-tier-best">✦ TOP LEVEL</span>':`<span>${data.kind}</span>`}</div>
+   <div class="nexus-tier-pass"><span class="nexus-tier-pass-a">A782 <b>✦</b></span><span class="nexus-tier-pass-icon">${ic(free?'sparkles':p.tier==='VIP-PLUS'?'bolt':p.tier==='VIP-PRO'?'gem':'crown')}</span><span class="nexus-tier-pass-name">${esc(data.face)}</span><span class="nexus-tier-pass-bottom">DIGITAL MEMBERSHIP <b>✦ ${data.num}</b></span></div>
+   <div class="nexus-tier-body"><div class="nexus-tier-name"><div><small>VIP / ${data.num}</small><h3>${esc(p.name)}</h3></div><span>${ic('arrow')}</span></div><p class="nexus-tier-description">${data.desc}</p>
+   <div class="nexus-tier-price">${free?tri('ТЕГІН','БЕСПЛАТНО','FREE'):ready?money(p.price):tri('Баға қойылмаған','Цена не установлена','Price not set')}<small> / ${!free&&Number(p.durationDays)===0?tri('мерзімсіз','бессрочно','lifetime'):`${free?'7':Number(p.durationDays)||30} ${tri('күн','дней','days')}`}</small></div>
+   <div class="nexus-tier-features">${features.map(x=>`<span>${ic('check')} ${esc(x)}</span>`).join('')}</div>
+   <div class="nexus-tier-buttons"><button class="btn nexus-tier-buy" type="button" ${locked||!ready||p.active===false?'disabled':''} ${free?'data-viptrial="1"':`data-vipbuy="${esc(p.id)}"`}>${locked?tri('Сынақ қолданылған','Пробный период использован','Trial used'):p.active===false?tri('Қолжетімсіз','Недоступно','Unavailable'):!ready?tri('Бағаны күту','Ожидание цены','Price pending'):free?tri('7 күнге қосу','Активировать на 7 дней','Activate 7 days'):tri('VIP-ке тапсырыс беру','Заказать VIP','Order VIP')} ${ic('arrow')}</button><button class="nexus-tier-preview" type="button" data-premiumpreview="${esc(p.tier)}">${ic('eye')} ${tri('Дизайнды көру','Предпросмотр','Preview look')}</button></div></div></article>`}).join('')}</div>
+ <div class="nexus-levels-footnote">${ic('shield')} ${tri('VIP-FREE әр аккаунтқа бір рет, 7 күн ULTRA мүмкіндіктерімен беріледі. Мерзім біткен соң автоматты тоқтайды.','VIP-FREE предоставляется один раз на аккаунт: 7 дней функций ULTRA, после чего доступ заканчивается.','VIP-FREE is a one-time 7-day ULTRA trial per account. Access expires automatically.')}</div></section>
+ <section class="nexus-why rv"><div><span class="nexus-kicker">✦ BUILT FOR PLAYERS</span><h2>${tri('Тек көрініс емес. Мүмкіндік.','Не только оформление. Возможности.','Not just the look. The tools.')}</h2></div><div class="nexus-why-items"><div>${ic('star')}<b>A782 LIBRARY</b><small>${tri('Модтар мен тауарларды сақта','Сохраняй моды и товары','Keep mods and store items saved')}</small></div><div>${ic('palette')}<b>PREMIUM STUDIO</b><small>${tri('Жеке түс, статус, профиль стилі','Темы, статус и профиль','Themes, status and profile style')}</small></div><div>${ic('bolt')}<b>COMMAND CENTER</b><small>${tri('Қажетті бөлімдерің бір басуда','Любимые разделы в один клик','Your favorite links in one tap')}</small></div></div></section>
+ ${footer()}`;
+}
+async function claimVipTrial(){
+ if(!ME){toast(t("login"),true);location.hash="#me";return}
+ try{
+   const r=await api("POST","/api/vip/trial",{});
+   ME=r.user;toast(tri("ULTRA сынағы 7 күнге қосылды ✨","Пробный ULTRA активирован на 7 дней ✨","ULTRA trial activated for 7 days ✨"));render(true);
+ }catch(e){toast(({trial_used:tri("Тегін сынақ бұрын қолданылған","Пробный период уже использован","Trial already used"),vip_active:tri("Сізде VIP белсенді","У вас уже есть VIP","VIP already active")})[e.code]||errMsg(e),true)}
+}
+async function buyVip(id){
+ if(!ME){toast(t("login"),true);location.hash="#me";return}
+ try{
+  const r=await api("POST","/api/vip/orders",{planId:id});
+  const o=r.order;
+  const msg=`A782 VIP\nOrder: ${o.id}\nUser ID: ${o.userId}\nNick: ${o.nick}\nPlan: ${o.planName}\nPrice: ${o.total} KZT\nPlease confirm payment manually.`;
+  const ok=await copyText(msg);
+  openSheet(`<h3>✦ VIP ${esc(o.planName)}</h3><p class="mute">${esc(o.id)} · ${money(o.total)}</p><p style="margin:12px 0">${LANG==="kk"?"Тапсырысты Telegram-ға жіберіңіз. VIP тек админ төлемді растағаннан кейін қосылады; «Төленді» деген жазудың өзі VIP іске қосылды дегенді білдірмейді.":"Send the order details on Telegram. Admin verifies payment before activating VIP."}</p><textarea id="vipMsg" rows="7" readonly>${esc(msg)}</textarea><div class="row" style="margin-top:12px"><button class="btn ghost" id="vipCopy">${t("copy")}</button><a class="btn" href="${esc(r.telegram)}" target="_blank" rel="noopener">Telegram ↗</a></div>`);
+  if(ok)toast(t("copied"));
+ }catch(e){toast(errMsg(e),true)}
+}
+function pSettings(){
+  const sw=(k,l,d)=>`<div class="set"><div><b>${l}</b><small class="mute" style="display:block">${d}</small></div><label class="switch"><input type="checkbox" id="mo" ${S.motion?"checked":""}><span></span></label></div>`;
+  return `<header class="ph rv"><p class="eyebrow">${ic("gear")} ${t("setl")}</p><h1>${t("setl")}</h1></header>
+  <section class="glass rv"><h3>${t("lang")}</h3><div class="seg">${[["kk","Қазақша"],["ru","Русский"],["en","English"]].map(([k,l])=>`<button class="${LANG===k?"on":""}" data-lang="${k}">${l}</button>`).join("")}</div></section>
+  <section class="glass rv bl"><h3>${t("theme")}</h3><div class="seg">${[["dark",t("dark")],["light",t("light")]].map(([k,l])=>`<button class="${S.theme===k?"on":""}" data-theme="${k}">${l}</button>`).join("")}</div></section>
+  <section class="glass rv bl">${sw("mo",t("motion"),t("motiond"))}</section>
+  ${ownerView()?`<section class="glass rv bl" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><b>${t("admt")}</b><a class="btn ghost sm" href="#admin">${ic("lock")} ${t("admgo")}</a></section>`:""}
+  ${footer()}`;
+}
+
+/* ===================== АДМИН ===================== */
+const FORMS={games:"fGame",giveaways:"fGw",products:"fPr",modpacks:"fMp"};
+function ml(base,label,val){
+  return ["kk","ru","en"].map(k=>`<label class="field">${label} · ${k.toUpperCase()}<input name="${base}_${k}" value="${esc(val&&typeof val==="object"?val[k]:"")}"></label>`).join("");
+}
+function pAdmin(){
+  if(!ownerView()) return `<header class="ph"><h1>404</h1></header><p class="mute">${tri('Бет табылмады','Страница не найдена','Page not found')}</p>${footer()}`;
+  if(!ADMIN) return `<header class="ph rv"><p class="eyebrow">${ic("lock")} ${t("adm")}</p><h1>${t("admt")}</h1></header>
+    <form id="pinForm" class="glass auth rv"><input name="pin" type="password" inputmode="numeric" placeholder="${esc(t("pinph"))}" required>
+    <button class="btn wide" type="submit" style="margin-top:12px">${t("open")}</button>
+    ${pendingAdminSave?`<p class="notice" role="status" style="margin-top:12px">${tri('Админ сессиясы жаңаруы керек. PIN енгізсең, басқан «Қосу» әрекетің жалғасады.','Сессия администратора истекла. Введи PIN, чтобы завершить сохранение.','Admin session expired. Enter your PIN to finish saving.')}</p>`:''}
+    <p class="mute sm" style="margin-top:10px">${t("pinnote")}</p></form>${footer()}`;
+  const o=D.owner,s=D.stream;
+  const schedTxt=s.schedule.map(x=>`${x.day} | ${x.time} | ${x.topic.kk} | ${x.topic.ru} | ${x.topic.en}`).join("\n");
+  const sel=(name,opts)=>`<select name="${name}">${opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select>`;
+  return `<header class="ph rv"><p class="eyebrow">${ic("lock")} ${t("adm")}</p><h1>${t("admt")}</h1>
+    <div class="row"><button class="btn ghost sm" id="admOut">${ic("lock")} ${t("lock")}</button></div></header>
+  ${chanceAdmin()}<section class="glass rv"><h3>${t("sec_site")}</h3>
+    <form id="fSite" class="form"><div class="g2">
+      <label class="field">${t("name")}<input name="name" value="${esc(o.name)}"></label>
+      <label class="field">${t("handle")}<input name="handle" value="${esc(o.handle)}"></label>
+      <label class="field">${t("tiktok")}<input name="tiktok" value="${esc(o.tiktok)}"></label>
+      <label class="field">${t("tgl")}<input name="telegram" value="${esc(o.telegram)}"></label>
+      <label class="field">${t("kaspin")}<input name="kaspi" value="${esc(o.kaspi)}"></label>
+      <label class="field">${t("avurl")}<input name="avatar" value="${esc(o.avatar.startsWith("data:")?"":o.avatar)}"></label>
+      <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="avatar" data-max="200" data-form="fSite"></label>
+      <label class="field">${t("bgurl")}<input name="banner" value="${esc(o.banner.startsWith("data:")?"":o.banner)}"></label>
+      <label class="field">${t("upload")}<input type="file" accept="image/*" data-tofield="banner" data-max="480" data-form="fSite"></label>
+      ${ml("bio","Bio",o.bio)}
+      ${ml("stitle",t("stitle2"),s.title)}
+      <label class="field">${t("snext")}<input name="nextAt" type="datetime-local" value="${esc(String(s.nextAt).slice(0,16))}"></label>
+      <label class="field">${t("ip")}<input name="ip" value="${esc(D.server.ip)}"></label>
+      <label class="field">${t("ver")}<input name="version" value="${esc(D.server.version)}"></label>
+      <label class="field">${t("wcost")}<input name="wheelCost" type="number" min="1" value="${D.wheelCost}"></label>
+    </div>
+    <label class="field">${t("ssched")}<textarea name="sched" rows="3">${esc(schedTxt)}</textarea></label>
+    <label class="row" style="color:var(--ink)"><input type="checkbox" name="live" ${s.live?"checked":""}> ${t("slive")}</label>
+    <div><button class="btn" type="submit">${ic("check")} ${t("save")}</button></div></form></section>
+
+  <section class="glass rv bl"><h3>${t("sec_g")} (${D.games.length})</h3>
+    ${D.games.map(g=>`<div class="ex-row"><span>${esc(g.name)} · ${g.status==="live"?t("live2"):t("soon2")}</span><span class="row"><button class="btn ghost sm" data-edit="games:${g.id}">${t("edit")}</button><button class="btn red sm" data-del="games:${g.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fGame" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
+      <div class="g2"><label class="field">${t("gname")}<input name="name" required></label>
+        <label class="field">${t("gstatus")}${sel("status",[["soon",t("soon2")],["live",t("live2")]])}</label>
+        <label class="field">${t("glink")}<input name="link" placeholder="https://t.me/..."></label>
+        <label class="field">${t("gicon")}${sel("icon",[["gamepad","gamepad"],["cube","cube"],["swords","swords"],["flame","flame"],["star","star"],["shield","shield"]])}</label></div>
+      <div class="g3">${ml("desc",t("gdesc"),{})}</div>
+      <div class="row"><button class="btn sm" type="submit" data-adminsubmit="fGame">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGame">${t("cancel")}</button></div><p data-admin-status role="status" aria-live="polite" style="min-height:20px;font-size:13px;margin-top:5px;color:var(--mute)"></p></form></section>
+
+  <section class="glass rv bl"><h3>${t("sec_gw")} (${D.giveaways.length})</h3>
+    ${D.giveaways.map(g=>`<div class="ex-row"><span>${esc(L(g.title))} · ${g.participants.length}${g.winner?` · ${t("winner")}: ${esc(g.winner.name)}`:""}</span>
+      <span class="row"><button class="btn sm" data-draw="${g.id}">${t("draw")}</button><button class="btn ghost sm" data-edit="giveaways:${g.id}">${t("edit")}</button><button class="btn red sm" data-del="giveaways:${g.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fGw" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
+      <div class="g3">${ml("title",t("title"),{})}</div>
+      <div class="g3">${ml("desc",t("desc"),{})}</div>
+      <div class="g3">${ml("prize",t("gprize"),{})}</div>
+      <div class="g2"><label class="field">${t("gcost")}<input name="cost" type="number" value="1" min="1"></label>
+        <label class="field">${t("gicon")}${sel("icon",[["gift","gift"],["users","users"],["gem","gem"],["bolt","bolt"],["trophy","trophy"],["star","star"],["swords","swords"]])}</label></div>
+      <div class="row"><button class="btn sm" type="button" data-adminsubmit="fGw">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fGw">${t("cancel")}</button></div></form></section>
+
+  <section class="glass rv bl"><h3>${t("sec_pr")} (${D.products.length})</h3>
+    ${D.products.map(p=>`<div class="ex-row"><span>${esc(L(p.name))} · ${money(p.price)}</span><span class="row"><button class="btn ghost sm" data-edit="products:${p.id}">${t("edit")}</button><button class="btn red sm" data-del="products:${p.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fPr" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
+      <div class="g3">${ml("name",t("title"),{})}</div>
+      <p class="mute sm">${tri("Атауын кемінде бір тілде жаз (KK / RU / EN).", "Заполни название хотя бы на одном языке (KK / RU / EN).", "Enter a name in at least one language (KK / RU / EN).")}</p>
+      <div class="g3">${ml("desc",t("desc"),{})}</div>
+      <div class="g2"><label class="field">${t("price")}<input name="price" type="number" required></label>
+        <label class="field">${t("cat")}${sel("cat",[["pack","pack"],["over","over"],["design","design"],["guide","guide"]])}</label></div>
+      <label class="field">${t("img")}<input name="img" placeholder="https://"></label>
+      <div class="row"><button class="btn sm" type="submit" data-adminsubmit="fPr">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fPr">${t("cancel")}</button></div><p data-admin-status role="status" aria-live="polite" style="min-height:20px;font-size:13px;margin-top:5px;color:var(--mute)"></p><p class="mute sm" style="font-size:11px;opacity:.8">A782 STORE ADD FIX V5 · 09.11.2026</p></form></section>
+
+  <section class="glass rv bl"><h3>${t("sec_mp")} (${D.modpacks.length})</h3>
+    ${D.modpacks.map(m=>`<div class="ex-row"><span>${esc(m.title)} · ${esc(m.version)} ${esc(m.loader)}</span><span class="row"><button class="btn ghost sm" data-edit="modpacks:${m.id}">${t("edit")}</button><button class="btn red sm" data-del="modpacks:${m.id}">${t("del")}</button></span></div>`).join("")}
+    <form id="fMp" class="form" novalidate style="margin-top:14px"><input type="hidden" name="id">
+      <label class="field">${t("mtitle")}<input name="title" required></label>
+      <div class="g3"><label class="field">${t("mver")}<input name="version" value="1.20.1"></label>
+        <label class="field">${t("mload")}${sel("loader",[["Fabric","Fabric"],["Forge","Forge"],["NeoForge","NeoForge"],["Quilt","Quilt"]])}</label>
+        <label class="field">${t("cat")}${sel("cat",[["rpg","rpg"],["pvp","pvp"],["tech","tech"],["anime","anime"],["surv","surv"]])}</label></div>
+      <div class="g3"><label class="field">${t("mmods")}<input name="mods" type="number" value="50"></label>
+        <label class="field">${t("msize")}<input name="sizeMb" type="number" value="200"></label>
+        <label class="field">${t("mkeys")}<input name="keys"></label></div>
+      <label class="field">${t("mfile")}<input name="file" placeholder="https://"></label>
+      <div class="g3">${ml("desc",t("desc"),{})}</div>
+      <p class="mute sm">${t("pidh")}</p>
+      <div class="row"><button class="btn sm" type="submit" data-adminsubmit="fMp">${ic("plus")} ${t("add2")}</button><button class="btn ghost sm" type="button" data-reset="fMp">${t("cancel")}</button></div><p data-admin-status role="status" aria-live="polite" style="min-height:20px;font-size:13px;margin-top:5px;color:var(--mute)"></p></form></section>
+
+  <section class="glass rv bl"><h3>✦ VIP тарифтері</h3><div id="vipAdminPlans"></div>
+    <p class="mute sm">${tri("Деңгейді «Өңдеу» арқылы таңдаңыз. VIP-FREE әрқашан 7 күн және тегін.","Нажмите «Изменить» для нужного уровня. FREE всегда бесплатен на 7 дней.","Select a tier via Edit. FREE is always a 7-day free trial.")}</p>
+    <form id="vipPlanForm" class="form"><input type="hidden" name="id"><div class="g3">
+    <label class="field">VIP деңгейі<input name="name" readonly required placeholder="Алдымен Өңдеу бас"></label>
+    <label class="field">Бағасы ₸<input name="price" type="number" min="0" max="10000000" required></label>
+    <label class="field">Мерзімі (күн)<input name="durationDays" type="number" min="1" max="36500" required value="30"></label></div>
+    <label class="row"><input type="checkbox" name="active" checked> Белсенді / Active</label>
+    <div class="row"><button class="btn sm" type="button" id="vipSaveBtn">${t("save")}</button><button class="btn ghost sm" type="reset">${t("cancel")}</button></div></form></section>
+  <section class="glass rv bl"><h3>${t("sec_b")}</h3><div id="usersBox"></div></section>
+  <section class="glass rv bl"><h3>${t("sec_o")}</h3><div id="ordersAdm"></div></section>
+  ${footer()}`;
+}
+function fillForm(form,obj){
+  for(const el of form.elements){
+    if(!el.name) continue;
+    if(el.type==="checkbox"){el.checked=!!obj[el.name];continue}
+    const m=el.name.match(/^(.+)_(kk|ru|en)$/);
+    let v;
+    if(m) v=(obj[m[1]]||{})[m[2]];
+    else if(el.name==="keys") v=(obj.keyMods||[]).join(", ");
+    else v=obj[el.name];
+    el.value=v??"";
+  }
+}
+function formObj(form){
+  const o={};
+  new FormData(form).forEach((v,k)=>o[k]=v);
+  if(form.elements.live) o.live=form.elements.live.checked;
+  return o;
+}
+/* ===================== КОНТЕНТ ЖҮКТЕУ ЖӘНЕ АКЦИЯЛАР ===================== */
+function render(keep){
+  const r=location.hash.slice(1)||"home";
+  const key=r==="giveaways"?"gw":r==="minecraft"?"mc":r==="streams"?"streams":PAGES[r]?r:"home";
+  const pageKey=key==="gw"?"gw":key==="mc"?"minecraft":key;
+  const fn=key==="gw"?pGw:key==="mc"?pMc:key==="streams"?pStreams:PAGES[key]||pHome;
+  const changed=key!==ROUTE;
+  const dir=(TABS.indexOf(key)>=TABS.indexOf(ROUTE)||TABS.indexOf(ROUTE)<0)?1:-1;
+  ROUTE=key;
+  const y=scrollY;
+  document.body.classList.toggle("vip-view",!!ME?.vip);
+  document.body.dataset.activeTier=ME?.vip?(ME.vip.visualTier||ME.vip.tier||''):'';
+  document.documentElement.style.setProperty("--vip-accent",ME?.vip?vipColor(ME.vip):"#ffc76d");
+  applySettings();
+  const customPreset=ME?.vip&&ME.vipPrefs?.preset&&VIP_PRESETS[ME.vipPrefs.preset];
+  const canUsePreset=ME?.vip&&vipCapsClient().themes.includes(ME.vipPrefs?.preset);
+  if(customPreset&&canUsePreset){const [a,b,c]=customPreset;document.documentElement.style.setProperty('--acc',a);document.documentElement.style.setProperty('--acc2',b);document.documentElement.style.setProperty('--acc3',c)}
+  else{['--acc','--acc2','--acc3'].forEach(k=>document.documentElement.style.removeProperty(k))}
+  chrome();
+  $$("[data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r===(key==="gw"?"giveaways":key==="mc"?"minecraft":key==="streams"?"streams":key)));
+  const ti=TABS.indexOf(key); if(ti>=0) $("#tabbar").style.setProperty("--i",ti);
+  $("#main").innerHTML=`<section class="pg" style="--dir:${dir}">${fn()}</section>`;
+  scrollTo(0,keep?y:0);
+  bindPage(key);
+  maybeVipReveal();
+  $$(".grid > .glass, .grid > article.glass, .stats .glass").forEach(el=>el.classList.add("tilt-card"));
+  reveal();
+}
+function bindPage(key){
+  if(key==="home") setTimeout(countUp,300);
+  if(key==="gw"){syncSpinButton();requestAnimationFrame(initPrizeReel);}
+  if(key==="streams"||key==="home") startCd();
+  if(key==="mc"&&MC.hits===null) searchMC();
+  if(key==="store"||(key==="me"&&ME)) loadOrders();
+  if(key==="me"&&ME) refreshVipProfile();
+  if(key==="admin"&&ADMIN&&ownerView()){loadAdmin();updateChanceTotal();}
+}
+async function refreshVipProfile(){
+  try {
+    const latest=(await api("GET","/api/me")).user;
+    if(!latest || !ME || latest.id!==ME.id)return;
+    const before=JSON.stringify(ME.vip||null), after=JSON.stringify(latest.vip||null);
+    ME=latest;
+    if(before!==after && location.hash==="#me")render(true);
+  }catch(e){console.warn("VIP profile refresh:",e.code||e.message)}
+}
+async function loadOrders(){
+  const box=$("#ordersBox"); if(!box||!TOKEN) return;
+  try{ const r=await api("GET","/api/orders"); box.innerHTML=ordersTable(r.orders); }
+  catch(e){ box.innerHTML=`<div class="notice">${errMsg(e)}</div>`; }
+}
+function startCd(){
+  clearInterval(cdT);
+  const target=new Date(D.stream.nextAt).getTime();
+  const tick=()=>{
+    const box=$("#cd"); if(!box){clearInterval(cdT);return}
+    if(isNaN(target)){box.innerHTML="";return}
+    const left=target-Date.now();
+    if(left<=0 && D.stream.live){box.innerHTML=`<div style="flex:1"><b style="color:var(--ok);font-size:20px">${t("live")}</b><span>${t("watch")}</span></div>`;return}
+    const d=Math.max(0,left);
+    box.innerHTML=[[Math.floor(d/864e5),t("days")],[Math.floor(d%864e5/36e5),t("hrs")],[Math.floor(d%36e5/6e4),t("min")],[Math.floor(d%6e4/1e3),t("sec")]]
+      .map(([v,l])=>`<div><b>${String(v).padStart(2,"0")}</b><span>${l}</span></div>`).join("");
   };
+  tick(); cdT=setInterval(tick,1000);
 }
 
-let db = seed();
-let remoteReady = !REMOTE;
-let dirty = false;
-let storageBlocked = false;
-let requestQueue = Promise.resolve();
-const RARITIES = ["Common", "Rare", "Epic", "Legendary"];
-function migrateWheel() {
-  if (!db.wheelRevision) db.wheelRevision = 1;
-  if (!db.spinReceipts) db.spinReceipts = {};
-  const weights = db.prizes.map(p => Math.max(0, Number(p.weight) || 0));
-  const total = weights.reduce((a,b) => a+b, 0);
-  const raw = weights.map(w => total ? w / total * 10000 : 0);
-  const points = raw.map(Math.floor);
-  if (total) {
-    const order = raw.map((v,i) => i).sort((a,b) => (raw[b]-points[b])-(raw[a]-points[a]));
-    for (let n = 10000-points.reduce((a,b)=>a+b,0), i=0; i<n; i++) points[order[i%order.length]]++;
-  }
-  db.prizes.forEach((p,i) => {
-    p.id ||= 'legacy-prize-' + i;
-    if (!Number.isInteger(p.chanceBps)) p.chanceBps = points[i];
-    if (!RARITIES.includes(p.rarity)) p.rarity = p.chanceBps <= 100 ? 'Legendary' : p.chanceBps <= 900 ? 'Epic' : p.chanceBps <= 2000 ? 'Rare' : 'Common';
+/* ===================== HORIZONTAL PRIZE REEL ===================== */
+let REEL_LAST_WIN=null;
+let reelReadyAt=0;
+let reelCooldownTimer;
+function syncSpinButton(){
+  clearTimeout(reelCooldownTimer);
+  const button=document.getElementById("spinBtn");
+  if(!button)return;
+  const wait=Math.max(0,reelReadyAt-Date.now());
+  button.disabled=SPIN||wait>0||!D?.prizes?.length;
+  button.classList.toggle("is-busy",SPIN);
+  button.querySelector(".reel-spin-label").textContent=wait&&!SPIN ? t("spin")+" · "+Math.ceil(wait/1000)+"s" : t("spin");
+  if(wait&&!SPIN)reelCooldownTimer=setTimeout(syncSpinButton,Math.min(1000,wait));
+}
+let REEL_LAST_IDX=null;
+let reelAnchor=0;
+let reelRunId=0;
+function reelTranslateTo(n){
+  const viewport=document.getElementById('reelViewport');
+  const card=document.querySelector(`[data-reel-n="${n}"]`);
+  if(!viewport||!card)return 0;
+  return viewport.clientWidth/2-(card.offsetLeft+card.offsetWidth/2);
+}
+function initPrizeReel(){
+  const track=document.getElementById('reelTrack'),p=D?.prizes||[];
+  if(!track||!p.length)return;
+  reelAnchor=4;
+  if(REEL_LAST_WIN) track.querySelector(`[data-reel-n="4"]`).outerHTML=prizeCard(REEL_LAST_WIN,4);
+  track.style.transition='none';
+  track.style.transform=`translate3d(${reelTranslateTo(reelAnchor)}px,0,0)`;
+  document.querySelectorAll('.reel-prize.is-selected').forEach(el=>el.classList.remove('is-selected'));
+  document.querySelector(`[data-reel-n="${reelAnchor}"]`)?.classList.add(REEL_LAST_WIN?'is-selected':'is-at-rest');
+}
+function animateReelTo(prize){
+  return new Promise(resolve=>{
+    const track=document.getElementById('reelTrack');
+    const items=Array.isArray(D?.prizes)?D.prizes:[];
+    const n=items.length;
+    if(!track||n===0){resolve();return}
+    // Eight to ten complete visual cycles before the server-selected reward.
+    const goal=64;
+    track.querySelector(`[data-reel-n="${goal}"]`).outerHTML=prizeCard(prize,goal);
+    const duration=(!S.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches)?180:5200;
+    const run=++reelRunId;
+    document.getElementById('winterReel')?.classList.add('is-spinning');
+    track.querySelectorAll('.is-at-rest,.is-selected').forEach(el=>el.classList.remove('is-at-rest','is-selected'));
+    // Allow the browser to paint the initial state before starting the slide.
+    track.style.transition='none';
+    track.style.transform=`translate3d(${reelTranslateTo(reelAnchor)}px,0,0)`;
+    void track.offsetHeight;
+    track.style.transition=`transform ${duration}ms cubic-bezier(.10,.77,.11,1)`;
+    track.style.transform=`translate3d(${reelTranslateTo(goal)}px,0,0)`;
+    let done=false;
+    const finish=()=>{
+      if(done||run!==reelRunId)return;
+      done=true;
+      track.style.transition='none';
+      track.style.transform=`translate3d(${reelTranslateTo(goal)}px,0,0)`;
+      track.removeEventListener('transitionend',onEnd);
+      document.getElementById('winterReel')?.classList.remove('is-spinning');
+      track.querySelector(`[data-reel-n="${goal}"]`)?.classList.add('is-selected');
+      resolve();
+    };
+    const onEnd=ev=>{if(ev.target===track&&ev.propertyName==='transform')finish()};
+    track.addEventListener('transitionend',onEnd);
+    // Handles hidden tabs, transition interruption and reduced motion.
+    setTimeout(finish,duration+300);
   });
 }
-function validChances(prizes) {
-  return prizes.length > 0 && prizes.every(p => Number.isInteger(p.chanceBps) && p.chanceBps >= 0 && p.chanceBps <= 10000) && prizes.reduce((a,p)=>a+p.chanceBps,0) === 10000;
+async function spin(){
+ if(SPIN)return;
+ if(navigator.locks && ME){
+  return navigator.locks.request('a782-wheel:'+ME.id,{ifAvailable:true},async lock=>{
+   if(!lock){toast(E[LANG].spin_busy,true);return}await performSpin();
+  });
+ }
+ return performSpin();
 }
-function pickPrizeIndex(prizes, roll = crypto.randomInt(10000)) {
-  for (let i=0; i<prizes.length; i++) { roll -= prizes[i].chanceBps; if(roll<0)return i; }
-  fail(503, 'invalid_chances');
+async function performSpin(){
+  if(SPIN)return;
+  if(!TOKEN){toast(t('login'),true);location.hash='#me';return}
+  if(!Array.isArray(D?.prizes)||!D.prizes.length){toast(t('nores'),true);return}
+  SPIN=true;
+  const announcement=document.getElementById('reelAnnouncement');
+  syncSpinButton();
+  if(announcement)announcement.textContent=tri('Жүлде анықталып жатыр…','Выбираем приз…','Selecting reward…');
+  try{
+    const pendingKey='a782-spin-pending:'+ME.id;
+    let requestId=localStorage.getItem(pendingKey);
+    if(!requestId){requestId=crypto.randomUUID();localStorage.setItem(pendingKey,requestId)}
+    const r=await api('POST','/api/wheel/spin',{requestId});
+    ME=r.user;
+    reelReadyAt=Date.now()+(r.cooldownMs||0);
+    localStorage.removeItem(pendingKey);
+    REEL_LAST_WIN=r.prize;
+    REEL_LAST_IDX=r.index;
+    await animateReelTo(r.prize);
+    if(S.motion && !matchMedia('(prefers-reduced-motion: reduce)').matches)await new Promise(resolve=>setTimeout(resolve,300));
+    toast(L(r.prize.label)+(r.code?` · ${r.code}`:''));
+
+    render(true);
+  }catch(e){if(e.status && e.status<500 && e.code!=='spin_busy')localStorage.removeItem('a782-spin-pending:'+ME.id);toast(errMsg(e),true);if(announcement)announcement.textContent=errMsg(e)}
+  finally{SPIN=false;syncSpinButton()}
 }
 
+/* ===================== ӘРЕКЕТТЕР ===================== */
+function addToCart(id){
+  const f=cart.find(i=>i.id===id);
+  if(f) f.qty++; else cart.push({id,qty:1});
+  saveCart();
+  toast(`${L(prodOf(id).name)} ${t("added")}`);
+  render(true);
+}
+async function enterGw(id){
+  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
+  try{ const r=await api("POST",`/api/giveaways/${id}/enter`); ME=r.user; await loadData(); toast(t("joined")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
+}
+async function exchange(kind){
+  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
+  try{ const r=await api("POST","/api/me/exchange",{kind}); ME=r.user; toast(t("exdone")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
+}
+async function claimDaily(){
+  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
+  try{ const r=await api("POST","/api/me/daily"); ME=r.user; toast(t("dailyok")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
+}
+async function logout(){
+  try{ await api("POST","/api/logout") }catch(e){}
+  TOKEN="";ME=null;clearAdminSession();localStorage.removeItem("a782-token");
+  toast(t("logout")); render(true);
+}
+async function openVersions(pid,title){
+  const head=`<div class="mhead"><b style="font:700 20px var(--fh)">${esc(title)}</b><button class="icon-btn" data-close>${ic("x")}</button></div>`;
+  openSheet(head+`<div class="spin"></div>`);
+  try{
+    const r=await api("GET",`/api/mc/versions?id=${encodeURIComponent(pid)}`);
+    openSheet(head+`<div style="display:grid;gap:10px">${r.versions.map(v=>`<div class="glass ex" style="margin:0"><div><b>${esc(v.name)}</b><small class="mute" style="display:block">${esc(v.games.join(", "))} · ${esc(v.loaders.join(", "))}</small></div>${v.file?`<a class="btn sm" href="${esc(v.file)}" target="_blank" rel="noopener">${ic("dl")} ${t("dload")}</a>`:""}</div>`).join("")||`<p class="mute">${t("nores")}</p>`}</div>`);
+  }catch(err){ openSheet(head+`<div class="notice">${errMsg(err)}</div>`) }
+}
+async function searchMC(){
+  MC.hits="loading";updateMC();
+  const p=new URLSearchParams({q:MC.q,type:MC.type,loader:MC.loader,version:MC.version,sort:MC.sort});
+  try{ const r=await api("GET","/api/mc/search?"+p); MC.hits=r.hits }catch(e){ MC.hits="error" }
+  updateMC();
+}
+function updateMC(){ const o=$("#mrOut"); if(o){ o.innerHTML=mrHTML(); reveal() } }
 
-function migrate() {
-  const s = seed();
-  for (const k of Object.keys(s)) if (db[k] === undefined) db[k] = s[k];
-  migrateWheel();
-  if (!db.owner.bio || typeof db.owner.bio !== "object") db.owner.bio = s.owner.bio;
-  if (!db.stream.title || typeof db.stream.title !== "object") db.stream.title = s.stream.title;
-  if (!Array.isArray(db.stream.schedule) || db.stream.schedule.some(x => typeof x.day !== "number")) db.stream.schedule = s.stream.schedule;
-  if (!Array.isArray(db.vipPlans)) db.vipPlans = [];
-  // Existing VIP plans and orders are retained; only missing fixed tiers are added.
-  for (const template of s.vipPlans) {
-    let current = db.vipPlans.find(p => p.id === template.id || p.tier === template.tier || String(p.name||"").toUpperCase() === template.tier);
-    if (!current) db.vipPlans.push({...template});
-    else { current.tier = template.tier; current.name = template.name; if(template.tier === "VIP-FREE") {current.price=0;current.durationDays=7;} }
+/* ===================== СЕБЕТ ===================== */
+function cartSheet(){
+  const items=cart.map(i=>{const p=prodOf(i.id);if(!p)return "";return `<div class="line"><div><b>${esc(L(p.name))}</b><small class="mute" style="display:block">${money(p.price)}</small></div>
+    <div class="qty"><button data-cdec="${esc(i.id)}">${ic("minus")}</button><b>${i.qty}</b><button data-cinc="${esc(i.id)}">${ic("plus")}</button></div></div>`}).join("");
+  const kaspi=!!D.owner.kaspi;
+  const method=kaspi?(sParts.method||"kaspi"):"telegram";
+  const tv=totalsNow();
+  return `<div class="mhead"><b style="font:700 22px var(--fh)">${t("cart")}</b><button class="icon-btn" data-close>${ic("x")}</button></div>
+    ${items||`<p class="mute">${t("cempty")}</p>`}
+    <form id="cartForm" class="form" style="margin-top:14px">
+      <label class="field">${t("coupon")}<input name="coupon" value="${esc(sParts.coupon||"")}"></label>
+      <div class="seg">
+        ${kaspi?`<button type="button" class="${method==="kaspi"?"on":""}" data-pm="kaspi">${t("mkaspi")}</button>`:""}
+        <button type="button" class="${method==="telegram"?"on":""}" data-pm="telegram">${t("mtg")}</button>
+        ${D.demoPay?`<button type="button" class="${method==="demo"?"on":""}" data-pm="demo">${t("mdemo")}</button>`:""}
+      </div>
+      <input type="hidden" name="method" value="${method}">
+      <p class="mute sm">${method==="kaspi"?`${t("kaspit")}<br><b>${esc(D.owner.kaspi)}</b>`:method==="telegram"?t("tgt"):t("demot")}</p>
+      ${method==="kaspi"?`<label class="field">${t("receipt")}<input name="receipt" required></label>`:""}
+      <div class="total"><span>${t("total")}</span><span>${money(tv)}</span></div>
+      <button class="btn wide" type="submit">${ic("receipt")} ${method==="demo"?t("demob"):t("send")}</button>
+    </form>`;
+}
+function totalsNow(){
+  const sub=cartTotal();
+  const pct=sParts.couponPct||0;
+  return Math.max(0,sub-Math.round(sub*pct/100));
+}
+function openCart(){
+  if(!cart.length){toast(t("cempty"),true);return}
+  openSheet(cartSheet());
+}
+function changeQty(id,d){
+  const it=cart.find(i=>i.id===id);if(!it)return;
+  it.qty+=d;if(it.qty<=0) cart=cart.filter(i=>i!==it);
+  saveCart();
+  if(!cart.length){closeSheet();return render(true)}
+  openSheet(cartSheet());render(true);
+}
+function orderText(order){
+  const lines=order.items.map(i=>`- ${L(i.name)||i.name} x${i.qty} = ${money(i.price*i.qty)}`).join("\n");
+  return `A782 ${order.id}\n${lines}\n${t("total")}: ${money(order.total)}`;
+}
+async function copyText(txt){
+  try{ await navigator.clipboard.writeText(txt); return true }catch(e){ return false }
+}
+
+/* ===================== АДМИН ТІЗІМДЕРІ ===================== */
+async function loadAdmin(){
+  if(!ADMIN) return;
+  const sessionAtStart=ADMIN;
+  try{
+    const [{users},{orders},{plans}]=await Promise.all([api("GET","/api/admin/users",null,true),api("GET","/api/admin/orders",null,true),api("GET","/api/admin/vip-plans",null,true)]);
+    window.vipAdminPlans=plans;
+    const vp=$("#vipAdminPlans");if(vp)vp.innerHTML=plans.filter(p=>p.tier).sort((a,b)=>["VIP-FREE","VIP-PLUS","VIP-PRO","VIP-ULTRA"].indexOf(a.tier)-["VIP-FREE","VIP-PLUS","VIP-PRO","VIP-ULTRA"].indexOf(b.tier)).map(p=>`<div class="ex-row"><span>${ic(p.icon||"crown")} <b>${esc(p.name)}</b> · ${money(p.price)} · ${p.durationDays} ${tri("күн","дней","days")} ${p.active?"✓":"(off)"}</span><span class="row"><button class="btn ghost sm" data-vipedit="${esc(p.id)}">${t("edit")}</button><button class="btn red sm" data-vipdel="${esc(p.id)}">${t("del")}</button></span></div>`).join("");
+    const ub=$("#usersBox"),ob=$("#ordersAdm");
+    if(ub) ub.innerHTML=users.length?`<div class="table"><table><tr><th>${t("nick")||"Nick"}</th><th>${t("email")}</th><th>${t("tickets")}</th><th>${t("tokens")}</th><th>${t("diamonds")}</th></tr>
+      ${users.map(u=>`<tr><td>${esc(u.nick)} ${u.vip?`<span class="tag a">${ic('crown')} ${esc(u.vip.tier||u.vip.name||'VIP')}</span>`:""}<small class="mute" style="display:block">${esc(u.id)}</small></td><td>${esc(u.email)}</td>
+        <td><div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">
+          <b style="min-width:20px;text-align:center;font-variant-numeric:tabular-nums">${u.tickets}</b>
+          <button type="button" class="btn ghost sm" data-bal="${u.id}|tickets|1" aria-label="${tri('1 билет қосу','Добавить 1 билет','Add 1 ticket')}">+1</button>
+          <button type="button" class="btn red sm" data-bal="${u.id}|tickets|-1" ${Number(u.tickets)<1?'disabled':''} aria-label="${tri('1 билет алу','Убрать 1 билет','Remove 1 ticket')}">−1</button>
+          <button type="button" class="btn red sm" data-bal="${u.id}|tickets|-5" ${Number(u.tickets)<5?'disabled':''} aria-label="${tri('5 билет алу','Убрать 5 билетов','Remove 5 tickets')}">−5</button>
+        </div></td>
+        <td>${u.tokens} <button class="btn ghost sm" data-bal="${u.id}|tokens|100">+100</button></td>
+        <td>${u.diamonds} <button class="btn ghost sm" data-bal="${u.id}|diamonds|100">+100</button></td></tr>`).join("")}</table></div>`:`<p class="mute">${t("nousers")}</p>`;
+    if(ob) ob.innerHTML=orders.length?`<div class="table"><table><tr><th>#</th><th>${t("nick")||"Nick"}</th><th>${t("total")}</th><th>${t("pend")}</th><th></th></tr>
+      ${orders.map(o=>`<tr><td><code>${esc(o.id)}</code></td><td>${esc(o.nick)}</td><td>${money(o.total)}</td>
+        <td>${o.type==="vip"?"✦ VIP "+esc(o.planName):esc(o.method)} · ${o.status==="paid"?t("paid"):t("pend")}</td>
+        <td>${o.type==="vip"?`<button class="btn sm" data-vipapprove="${esc(o.id)}">${o.approvedAt?"VIP расталды · тексеру":"VIP растау / қосу"}</button>`:`<button class="btn ghost sm" data-ost="${o.id}|${o.status==="paid"?"pending":"paid"}">${o.status==="paid"?t("mpend"):t("mpaid")}</button>`}</td></tr>`).join("")}</table></div>`:`<p class="mute">${t("noorders")}</p>`;
+  }catch(e){
+    if(e.code==='admin_required' && ADMIN===sessionAtStart){
+      clearAdminSession();
+      if(ROUTE==='admin' && ownerView()){
+        render(true);
+        toast(tri('Админ PIN сессиясы аяқталды. Қайта PIN енгіз.','Сессия админа истекла. Введи PIN заново.','Admin session expired. Re-enter your PIN.'),true);
+        document.querySelector('#pinForm input[name="pin"]')?.focus();
+      }
+      return;
+    }
+    toast(errMsg(e),true);
   }
-  if (!Array.isArray(db.games)) db.games = [];
-  for (const game of s.games) {
-    const existing = db.games.find(x => x.id === game.id || x.name === game.name);
-    if (!existing) db.games.push(game);
+}
+const ADMIN_ENDPOINT={games:"/api/admin/games",giveaways:"/api/admin/giveaways",products:"/api/admin/products",modpacks:"/api/admin/modpacks"};
+
+// Explicit, mobile-friendly admin add/edit handler.
+// Never lets browser-native required-field validation swallow the Save/Add click.
+const ADMIN_FORM_KINDS={fGame:"games",fGw:"giveaways",fPr:"products",fMp:"modpacks"};
+function adminFormError(form,message,focusName){
+  let box=form.querySelector('[data-admin-error]');
+  if(!box){box=document.createElement('p');box.dataset.adminError='1';box.setAttribute('role','alert');box.style.cssText='color:var(--bad);font-size:13px;margin-top:6px;white-space:pre-wrap';form.appendChild(box)}
+  box.textContent=message;
+  const status=form.querySelector('[data-admin-status]');
+  if(status){status.textContent=message;status.style.color='var(--bad)'}
+  toast(message,true);
+  const field=focusName && form.elements.namedItem(focusName);
+  if(field&&typeof field.focus==='function')field.focus({preventScroll:false});
+}
+function clearAdminFormError(form){const box=form.querySelector('[data-admin-error]');if(box)box.remove();const status=form.querySelector('[data-admin-status]');if(status){status.textContent='';status.style.color='var(--mute)'}}
+async function submitAdminForm(form){
+  if(!form||!ADMIN_FORM_KINDS[form.getAttribute('id')]||form.dataset.submitting==='1')return;
+  clearAdminFormError(form);
+  const fields=formObj(form), kind=ADMIN_FORM_KINDS[form.getAttribute('id')];
+  const hasText=prefix=>['kk','ru','en'].some(lang=>String(fields[prefix+'_'+lang]||'').trim());
+  const titleError=tri('Атауын толтыр (KK, RU немесе EN).','Укажи название (KK, RU или EN).','Enter a title in KK, RU or EN.');
+  if(kind==='products'){
+    if(!hasText('name'))return adminFormError(form,titleError,'name_kk');
+    const price=String(fields.price||'').trim();
+    if(price===''||!/^\d+$/.test(price)||Number(price)>10000000){
+      return adminFormError(form,tri('Бағаны дұрыс жаз: 0 ₸ немесе одан жоғары бүтін сан.','Укажи цену: целое число от 0 ₸.','Enter a valid whole-number price from 0 ₸.'),'price');
+    }
+  }else if(kind==='games'){
+    if(!String(fields.name||'').trim())return adminFormError(form,titleError,'name');
+  }else if(kind==='giveaways'){
+    if(!hasText('title'))return adminFormError(form,titleError,'title_kk');
+  }else if(kind==='modpacks'){
+    if(!String(fields.title||'').trim())return adminFormError(form,titleError,'title');
+  }
+  const button=form.querySelector('[data-adminsubmit],button[type="submit"]');
+  form.dataset.submitting='1';
+  if(button)button.disabled=true;
+  const originalText=button?button.innerHTML:'';
+  if(button)button.textContent=tri('Сақталып жатыр…','Сохраняется…','Saving…');
+  const status=form.querySelector('[data-admin-status]');
+  if(status){status.textContent=tri('Серверге жіберіліп жатыр…','Отправка на сервер…','Sending to server…');status.style.color='var(--acc)'}
+  try{
+    await api('POST',ADMIN_ENDPOINT[kind],fields,true);
+    await loadData();
+    render(true);
+    toast(tri('Сәтті қосылды / сақталды ✓','Добавлено / сохранено ✓','Added / saved ✓'));
+  }catch(err){
+    if(err.code==='admin_required'){
+      // Render redeploy/restart clears server-side admin tokens, not sessionStorage.
+      // Don't discard what the owner typed; reauthenticate and retry the clicked save.
+      pendingAdminSave={id:form.getAttribute('id'),fields:{...fields}};
+      clearAdminSession();
+      render(true);
+      toast(tri('PIN сессиясы аяқталды. Қайта PIN енгіз: тауар жоғалмайды.','Сессия PIN истекла. Введи PIN: данные не потеряются.','PIN session expired. Re-enter PIN; your draft is kept.'),true);
+      document.querySelector('#pinForm input[name="pin"]')?.focus();
+      return;
+    }
+    const reason=err.code==='title_required'?titleError:
+      err.code==='admin_required'?tri('Админ сессиясы аяқталған. Қайта кір.','Сессия администратора истекла. Войди снова.','Admin session expired. Sign in again.'):
+      err.code==='too_large'?tri('Дерек көлемі тым үлкен.','Слишком большой объём данных.','Payload is too large.'):
+      tri('Сақталмады. Сервер жауабы: ','Не сохранено. Ответ сервера: ','Not saved. Server response: ')+(err.code||err.message||'generic')+(err.status?' (HTTP '+err.status+')':'');
+    adminFormError(form,reason);
+  }finally{
+    delete form.dataset.submitting;
+    if(form.isConnected&&button){button.disabled=false;button.innerHTML=originalText}
   }
 }
 
-async function loadDB() {
-  if (!REMOTE) {
-    if (fs.existsSync(DATA_FILE)) db = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-    migrate();
+/* ===================== ОҚИҒАЛАР ===================== */
+document.addEventListener("click",async e=>{
+  const openStudio=e.target.closest('[data-open-studio]');if(openStudio){e.preventDefault();focusPremiumStudio();return}
+  const resetStudio=e.target.closest('[data-studio-reset]');if(resetStudio){
+    e.preventDefault();const form=document.getElementById('vipStudioForm');if(form){form.reset();syncNexusPreview(form);studioFeedback(form,false);const t=document.getElementById('studioSaveStatus');if(t)t.textContent=tri('Соңғы сақталған баптаулар қалпына келді','Возвращены последние сохранённые настройки','Last saved settings restored');}return;
+  }
+  const go=e.target.closest("[data-go]");if(go){location.hash="#"+go.dataset.go;return}
+  const lg=e.target.closest("[data-lang]");if(lg){LANG=lg.dataset.lang;localStorage.setItem("a782-lang",LANG);render(true);return}
+  if(e.target.closest("[data-close]")){closeSheet();return}
+  const libraryButton=e.target.closest("button[data-library]");if(libraryButton){e.preventDefault();e.stopPropagation();toggleLibrary(libraryButton.dataset.library,libraryButton);return}
+  const pid=e.target.closest("[data-pid]");if(pid){openVersions(pid.dataset.pid,pid.dataset.title);return}
+  const btn=e.target.closest("button");if(!btn)return;
+  const d=btn.dataset;
+  if(d.adminsubmit){e.preventDefault();try{await submitAdminForm(document.getElementById(d.adminsubmit))}catch(err){const f=document.getElementById(d.adminsubmit);if(f)adminFormError(f,tri('Сақтау қатесі: ','Ошибка сохранения: ','Save error: ')+(err.code||err.message||'unknown'));console.error('A782 admin button error',err)}return}
+  if(d.add){addToCart(d.add);return}
+  if(d.enter){enterGw(d.enter);return}
+  if(d.nofile){toast(t("nofile"),true);return}
+  if(d.scat){STORE=d.scat;render(true);return}
+  if(d.mpcat){MPC=d.mpcat;render(true);return}
+  if(d.mtype){MC.type=d.mtype;render(true);searchMC();return}
+  if(d.auth){AUTH=d.auth;render(true);return}
+  if(d.icon){const v=d.icon;$$("[data-icon]").forEach(b=>b.classList.toggle("on",b===btn));pendingIcon=v;return}
+  if(d.ex){exchange(d.ex);return}
+  if(d.cinc){changeQty(d.cinc,1);return}
+  if(d.cdec){changeQty(d.cdec,-1);return}
+  if(d.pm){sParts.method=d.pm;openSheet(cartSheet());return}
+  if(d.theme){S.theme=d.theme;localStorage.setItem("a782-theme",S.theme);render(true);return}
+  if(d.draw){adminDraw(d.draw);return}
+  if(d.del){adminDelete(d.del);return}
+  if(d.edit){adminEdit(d.edit);return}
+  if(d.reset){const f=document.getElementById(d.reset);if(f){f.reset();if(f.elements.id)f.elements.id.value=""}return}
+  if(d.bal){adminBal(d.bal);return}
+  if(d.ost){adminOrder(d.ost);return}
+  if(e.target.closest("#vipSaveBtn")){
+    e.preventDefault();
+    const f=document.getElementById("vipPlanForm");
+    if(!f || !f.elements.id.value){toast(tri("Алдымен VIP тарифінің «Өңдеу» батырмасын бас","Сначала нажмите «Изменить» у тарифа","Select a VIP plan with Edit first"),true);return}
+    if(!f.reportValidity())return;
+    const btn=e.target.closest("#vipSaveBtn");
+    const b=Object.fromEntries(new FormData(f));b.active=f.elements.active.checked;
+    btn.disabled=true;
+    try{ await api("POST","/api/admin/vip-plans",b,true);await loadData();render(true);toast(t("saved"))}
+    catch(x){toast(x.code==="storage_failed"?"JSONBin сақтау қатесі: Render logs тексеріңіз":errMsg(x),true)}
+    finally{btn.disabled=false}
     return;
   }
-  const r = await fetch(`https://api.jsonbin.io/v3/b/${JB_ID}/latest`, { headers: { "X-Master-Key": JB_KEY } });
-  if (!r.ok) throw new Error("JSONBin " + r.status);
-  const j = await r.json();
-  if (!j.record || !j.record.owner || !Array.isArray(j.record.users)) throw new Error("JSONBin record is invalid; refusing to overwrite");
-  db = j.record;
-  migrate();
-  remoteReady = true;
-  console.log("JSONBin-нен деректер жүктелді");
-}
-
-// All API requests run through one transaction queue. No delayed writes can
-// overtake a spin, balance update, login or admin edit. Deploy ONE instance.
-function saveDB() { dirty = true; }
-async function saveVipNow() { dirty = true; }
-async function commitDB() {
-  if (!REMOTE) {
-    const tmp = DATA_FILE + ".tmp";
-    fs.writeFileSync(tmp, JSON.stringify(db, null, 2), {mode:0o600});
-    fs.renameSync(tmp, DATA_FILE);
+  if(d.premiumpreview){
+    const tier=d.premiumpreview;
+    const names={'VIP-FREE':'ULTRA TRIAL','VIP-PLUS':'PLUS','VIP-PRO':'PRO','VIP-ULTRA':'ULTRA'};
+    if(!names[tier])return;
+    const accent=({'VIP-FREE':'#c9e1ff','VIP-PLUS':'#56dfff','VIP-PRO':'#c29aff','VIP-ULTRA':'#ffd281'})[tier];
+    openSheet(`<div class="nexus-modal-preview" style="--nexus-tier:${accent}"><span class="nexus-kicker">✦ A782 DESIGN PREVIEW</span><h2>${names[tier]}</h2><p>${tri('Бұл дизайн үлгісі. VIP мүмкіндіктері тек белсенді аккаунтта жұмыс істейді.','Это пример оформления. VIP-функции работают только при активной подписке.','This is a design preview. VIP tools only work with active membership.')}</p><div class="nexus-tier-pass"><span class="nexus-tier-pass-a">A782 <b>✦</b></span><span class="nexus-tier-pass-icon">${ic('crown')}</span><span class="nexus-tier-pass-name">${names[tier]}</span><span class="nexus-tier-pass-bottom">DIGITAL MEMBERSHIP <b>✦ A782</b></span></div><button class="btn ghost" data-close="1">${t('close')}</button></div>`);
     return;
   }
-  if (!remoteReady || storageBlocked) fail(503, "storage_failed");
-  try {
-    const response = await fetch(`https://api.jsonbin.io/v3/b/${JB_ID}`, {
-      method: "PUT", signal: AbortSignal.timeout(15000),
-      headers: { "Content-Type": "application/json", "X-Master-Key": JB_KEY },
-      body: JSON.stringify(db)
-    });
-    if (!response.ok) throw new Error("storage_failed");
-  } catch (error) {
-    // A lost response may mean the write succeeded. Freeze writes until restart
-    // reloads authoritative JSONBin state; NEVER reroll an uncertain result.
-    storageBlocked = true;
-    fail(503, "storage_failed");
+  if(d.viptrial){claimVipTrial();return}
+  if(d.vipbuy){buyVip(d.vipbuy);return}
+  if(d.vipapprove){if(confirm("Төлемді тексердіңіз бе? VIP берілсін бе?"))api("POST",`/api/admin/vip-orders/${d.vipapprove}/approve`,{},true).then(r=>{if(ME&&r.user&&ME.id===r.user.id)ME=r.user;toast("VIP тексерілді / іске қосылды");loadAdmin()}).catch(e=>toast(errMsg(e),true));return}
+  if(d.vipedit){const p=(window.vipAdminPlans||[]).find(x=>x.id===d.vipedit),f=$("#vipPlanForm");if(p&&f){fillForm(f,p);f.elements.active.checked=p.active;const free=p.tier==="VIP-FREE";f.elements.price.readOnly=free;f.elements.durationDays.readOnly=free;f.scrollIntoView({behavior:"smooth"})}return}
+  if(d.vipdel){if(confirm("Тарифті өшіру керек пе?"))api("DELETE",`/api/admin/vip-plans/${d.vipdel}`,null,true).then(async()=>{await loadData();render(true)}).catch(e=>toast(errMsg(e),true));return}
+  switch(btn.id){
+    case "vipCopy":copyText($("#vipMsg").value).then(ok=>toast(ok?t("copied"):"Copy failed",!ok));return;
+    case "spinBtn":case "hub":spin();return;
+    case "daily":claimDaily();return;
+    case "openCart":openCart();return;
+    case "copyIp":copyText(D.server.ip).then(ok=>toast(t("copied"),!ok));return;
+    case "logout":logout();return;
+    case "admOut":pendingAdminSave=null;clearAdminSession();render(true);return;
   }
-}
-async function transaction(req, url) {
-  if (storageBlocked && req.method !== "GET") fail(503, "storage_failed");
-  const before = structuredClone(db);
-  dirty = false;
-  try {
-    const result = await route(req, url, userFrom(req));
-    if (dirty) await commitDB();
-    return result;
-  } catch (error) { db = before; throw error; }
-  finally { dirty = false; }
-}
-
-const uid = () => crypto.randomBytes(8).toString("hex");
-const randCode = () => crypto.randomBytes(3).toString("hex").toUpperCase();
-const hashPw = (pw, salt) => crypto.scryptSync(pw, salt, 64).toString("hex");
-const str = (v, max = 200) => String(v ?? "").trim().slice(0, max);
-const tr = (b, base, max = 400) => ({ kk: str(b[base + "_kk"], max), ru: str(b[base + "_ru"], max), en: str(b[base + "_en"], max) });
-const safeUrl = v => (/^https?:\/\/\S+$/.test(str(v, 500)) ? str(v, 500) : "");
-const safeImg = v => {
-  const s = str(v, 70000);
-  if (/^https:\/\/\S+$/.test(s)) return s;
-  if (/^data:image\/(png|jpe?g|webp);base64,/.test(s)) return s;
-  return "";
-};
-const upsert = (arr, item) => {
-  const i = arr.findIndex(x => x.id === item.id);
-  if (i >= 0) arr[i] = { ...arr[i], ...item }; else arr.unshift(item);
-};
-function fail(status, code) { const e = new Error(code); e.status = status; e.code = code; throw e; }
-const activeVip = u => {
- if (!u.vip || (u.vip.expiresAt !== null && !(Date.parse(u.vip.expiresAt) > Date.now()))) return null;
- const tier = u.vip.tier || tierOf(db.vipPlans.find(p=>p.id===u.vip.planId)||{name:u.vip.name});
- return {...u.vip,tier,visualTier:tier==="VIP-FREE"?"VIP-ULTRA":tier};
-};
-const vipCaps = u => VIP_CAPS[activeVip(u)?.visualTier || "standard"];
-const publicLibrary = u => Array.isArray(u.library) ? u.library.filter(x=>x && typeof x === "object" && ["product","modpack","game","modrinth"].includes(x.kind) && /^[\w-]{1,80}$/.test(String(x.id||""))).slice(0,500) : [];
-const pubUser = u => ({
-  id: u.id, isOwner: isOwnerAccount(u), vip: activeVip(u), vipPrefs:u.vipPrefs||{}, library:publicLibrary(u), libraryLimit:vipCaps(u).limit, vipTrialUsed:!!u.vipTrialUsed || db.orders.some(o=>o.type==="vip-trial"&&o.userId===u.id), nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
-  avatar: u.avatar, banner: u.banner, icon: u.icon,
-  tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds, wins: u.wins
 });
-const pubGw = g => ({ ...g, participants: g.participants.map(p => p.nick), winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null });
-const pubData = () => ({
-  vipPlans: db.vipPlans.filter(p => p.active && VIP_TIERS.includes(tierOf(p)) && p.tier).map(vipPublicPlan).sort((a,b)=>VIP_TIERS.indexOf(a.tier)-VIP_TIERS.indexOf(b.tier)), owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
-  prizes: db.prizes, wheelRevision: db.wheelRevision, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
-  giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
+let pendingIcon=null;
+document.addEventListener("change",e=>{
+  const el=e.target,id=el.id;
+  if(id==="fLoader"){MC.loader=el.value;searchMC();return}
+  if(id==="fVer"){MC.version=el.value;searchMC();return}
+  if(id==="fSort"){MC.sort=el.value;searchMC();return}
+  if(id==="mo"){S.motion=el.checked;localStorage.setItem("a782-motion",S.motion?"1":"0");applySettings();return}
+  if(el.dataset.tofield){
+    const f=el.files[0];if(!f)return;
+    const max=+el.dataset.max||200;
+    const img=new Image(),url=URL.createObjectURL(f);
+    img.onload=()=>{
+      const k=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      const data=c.toDataURL("image/jpeg",.7);
+      URL.revokeObjectURL(url);
+      if(data.length>60000){toast(t("big")||"Too large",true);return}
+      el.form.elements[el.dataset.tofield].value=data;
+      toast(t("saved"));
+    };
+    img.src=url;
+  }
 });
-function parseSchedule(txt) {
-  return str(txt, 3000).split("\n").map(l => l.split("|").map(x => x.trim()))
-    .filter(a => a.length >= 5 && /^[0-6]$/.test(a[0]))
-    .slice(0, 20)
-    .map(a => ({ day: +a[0], time: a[1].slice(0, 5), topic: { kk: a[2].slice(0, 120), ru: a[3].slice(0, 120), en: a[4].slice(0, 120) } }));
+function focusPremiumStudio(){
+ if(!ME?.vip){toast(tri('Алдымен VIP іске қосу керек','Сначала активируйте VIP','Activate VIP first'),true);location.hash='#vip';return}
+ const open=()=>{
+  const studio=document.getElementById('premiumStudio');if(!studio){toast(tri('Studio табылмады','Studio не найдена','Studio not found'),true);return}
+  studio.classList.add('studio-focused');
+  studio.scrollIntoView({behavior:S.motion?'smooth':'auto',block:'start'});
+  setTimeout(()=>{studio.querySelector('input[name="preset"]:checked')?.focus({preventScroll:true});studio.classList.remove('studio-focused')},S.motion?550:60);
+ };
+ if(ROUTE!=='me'){
+  location.hash='#me';setTimeout(open,100);
+ }else open();
 }
-
-function readBody(req, limit = 100 * 1024) {
-  return new Promise((resolve, reject) => {
-    let size = 0; const chunks = [];
-    req.on("data", c => {
-      size += c.length;
-      if (size > limit) { req.destroy(); reject(Object.assign(new Error("too_large"), { status: 413, code: "too_large" })); }
-      else chunks.push(c);
-    });
-    req.on("end", () => {
-      if (!size) return resolve({});
-      try { resolve(JSON.parse(Buffer.concat(chunks).toString("utf8"))); }
-      catch { reject(Object.assign(new Error("invalid"), { status: 400, code: "invalid" })); }
-    });
-    req.on("error", reject);
-  });
+function studioFeedback(form,changed){
+ const count=form.querySelectorAll('input[name="shortcuts"]:checked').length;
+ const max=vipCapsClient().count;
+ const el=document.getElementById('studioShortcutCount');
+ if(el){el.textContent=count+' / '+max;el.classList.toggle('at-limit',count===max)}
+ const status=document.getElementById('studioSaveStatus');
+ if(status&&changed)status.textContent=tri('Сақталмаған өзгерістер бар','Есть несохранённые изменения','You have unsaved changes');
 }
-function send(res, status, body) {
-  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
-  res.end(JSON.stringify(body));
+function syncNexusPreview(form){
+ const preview=document.getElementById('nexusPreviewCard');
+ if(!preview||!form)return;
+ const preset=form.elements.preset?.value;
+ if(VIP_PRESETS[preset]){
+  const [a,b]=VIP_PRESETS[preset];
+  const section=form.closest('.nexus-studio');
+  if(section){section.style.setProperty('--preview-color',a);section.style.setProperty('--preview-color-2',b)}
+ }
+ const status=document.getElementById('nexusPreviewStatus');
+ if(status)status.textContent=(form.elements.statusEmoji?.value||'✦')+' '+(form.elements.status?.value||'PREMIUM');
+ const headline=document.getElementById('nexusPreviewHeadline');
+ if(headline)headline.textContent=form.elements.headline?.value||'A782 DIGITAL MEMBER';
 }
-
-function userFrom(req) {
-  const h = req.headers.authorization || "";
-  const tok = h.startsWith("Bearer ") ? h.slice(7) : "";
-  const id = tok && db.sessions[tok];
-  return id ? db.users.find(u => u.id === id) || null : null;
-}
-const adminTokens = new Map();
-function isAdmin(req) {
-  const tok = req.headers["x-admin-token"];
-  const grant = tok && adminTokens.get(tok);
-  const user = userFrom(req);
-  if (grant && grant.exp > Date.now() && isOwnerAccount(user) && grant.userId === user.id) return true;
-  if (tok) adminTokens.delete(tok);
-  return false;
-}
-const pinHits = new Map();
-
-const mcCache = new Map();
-async function cached(key, load) {
-  const hit = mcCache.get(key);
-  if (hit && Date.now() - hit.t < 5 * 60e3) return hit.v;
-  const v = await load();
-  mcCache.set(key, { t: Date.now(), v });
-  return v;
-}
-async function upstream(url) {
-  let r;
-  try { r = await fetch(url, { headers: { "User-Agent": UA } }); } catch { fail(502, "upstream"); }
-  if (!r.ok) fail(502, "upstream");
-  return r.json();
-}
-async function mcSearch(sp) {
-  const q = str(sp.get("q"), 80);
-  const type = ["mod", "modpack", "resourcepack", "shader"].includes(sp.get("type")) ? sp.get("type") : "mod";
-  const loader = ["fabric", "forge", "neoforge", "quilt"].includes(sp.get("loader")) ? sp.get("loader") : "";
-  const version = /^[\d.]{3,10}$/.test(sp.get("version") || "") ? sp.get("version") : "";
-  const sort = ["downloads", "follows", "newest", "updated"].includes(sp.get("sort")) ? sp.get("sort") : "downloads";
-  const facets = [[`project_type:${type}`]];
-  if (loader && (type === "mod" || type === "modpack")) facets.push([`categories:${loader}`]);
-  if (version) facets.push([`versions:${version}`]);
-  const url = `https://api.modrinth.com/v2/search?query=${encodeURIComponent(q)}&facets=${encodeURIComponent(JSON.stringify(facets))}&index=${q ? "relevance" : sort}&limit=20`;
-  return cached(url, async () => {
-    const d = await upstream(url);
-    return { hits: d.hits.map(h => ({ id: h.project_id, title: h.title, author: h.author, desc: h.description, icon: h.icon_url, downloads: h.downloads, license: h.license })) };
-  });
-}
-async function mcVersions(id) {
-  if (!/^[\w-]{1,64}$/.test(id || "")) fail(400, "invalid");
-  const url = `https://api.modrinth.com/v2/project/${id}/version`;
-  return cached(url, async () => {
-    const vs = await upstream(url);
-    return { versions: vs.slice(0, 12).map(v => ({
-      name: v.name, games: (v.game_versions || []).slice(0, 4), loaders: v.loaders || [],
-      file: ((v.files || []).find(f => f.primary) || (v.files || [])[0] || {}).url || ""
-    })) };
-  });
-}
-
-async function route(req, url, user) {
-  const p = url.pathname, m = req.method;
-  const need = () => user || fail(401, "login_required");
-
-  if (m === "GET" && p === "/api/data") return [200, pubData()];
-  if (m === "GET" && p === "/api/mc/search") return [200, await mcSearch(url.searchParams)];
-  if (m === "GET" && p === "/api/mc/versions") return [200, await mcVersions(url.searchParams.get("id"))];
-
-  if (m === "POST" && p === "/api/register") {
-    const b = await readBody(req);
-    const email = str(b.email, 120).toLowerCase(), pw = String(b.password || ""), nick = str(b.nick, 24);
-    if (!/^\S+@\S+\.\S+$/.test(email) || pw.length < 6 || !nick) fail(400, "invalid");
-    if (db.users.some(x => x.email === email)) fail(409, "exists");
-    // Reserve the configured owner address: it must have been registered before ADMIN_EMAIL is set.
-    if (ADMIN_EMAIL && email === ADMIN_EMAIL) fail(403, "owner_registration_disabled");
-    const salt = crypto.randomBytes(16).toString("hex");
-    const u = { id: uid(), email, salt, pass: hashPw(pw, salt), nick, mc: "", ff: "", so2: "", tg: "", bio: "",
-      avatar: "", banner: "", icon: "user", tickets: 3, tokens: 0, diamonds: 0, wins: [], codes: {}, lastDaily: 0 };
-    db.users.push(u);
-    const token = crypto.randomBytes(32).toString("hex");
-    db.sessions[token] = u.id;
-    saveDB();
-    return [200, { token, user: pubUser(u) }];
+document.addEventListener('input',e=>{const form=e.target.closest('#vipStudioForm');if(form){syncNexusPreview(form);studioFeedback(form,true)}});
+document.addEventListener('change',e=>{
+ const form=e.target.closest('#vipStudioForm');if(!form)return;
+ if(e.target.matches('input[name="shortcuts"]')&&e.target.checked){
+  const max=vipCapsClient().count;
+  if(form.querySelectorAll('input[name="shortcuts"]:checked').length>max){
+   e.target.checked=false;toast(tri('Бұл тарифте тек '+max+' бөлім таңдауға болады','Для тарифа доступно только '+max+' ссылок','This tier allows only '+max+' shortcuts'),true);
   }
-  if (m === "POST" && p === "/api/login") {
-    const b = await readBody(req);
-    const u = db.users.find(x => x.email === str(b.email, 120).toLowerCase());
-    if (!u) fail(401, "bad_login");
-    const ok = crypto.timingSafeEqual(Buffer.from(hashPw(String(b.password || ""), u.salt), "hex"), Buffer.from(u.pass, "hex"));
-    if (!ok) fail(401, "bad_login");
-    const token = crypto.randomBytes(32).toString("hex");
-    db.sessions[token] = u.id;
-    saveDB();
-    return [200, { token, user: pubUser(u) }];
-  }
-  if (m === "POST" && p === "/api/logout") {
-    delete db.sessions[(req.headers.authorization || "").slice(7)];
-    saveDB();
-    return [200, { ok: true }];
-  }
-  if (m === "GET" && p === "/api/me") return [200, { user: pubUser(need()) }];
-  if (m === "PUT" && p === "/api/me") {
-    const u = need();
-    const b = await readBody(req, 80 * 1024);
-    u.nick = str(b.nick, 24) || u.nick;
-    u.mc = str(b.mc, 32); u.ff = str(b.ff, 32); u.so2 = str(b.so2, 32); u.tg = str(b.tg, 40); u.bio = str(b.bio, 200);
-    if (b.avatar !== undefined) u.avatar = b.avatar === "" ? "" : (safeImg(b.avatar) || u.avatar);
-    if (b.banner !== undefined) u.banner = b.banner === "" ? "" : (safeImg(b.banner) || u.banner);
-    if (AVATARS.includes(b.icon)) u.icon = b.icon;
-    saveDB();
-    return [200, { user: pubUser(u) }];
-  }
-  if (m === "POST" && p === "/api/me/daily") {
-    const u = need();
-    if (Date.now() - u.lastDaily < 864e5) fail(429, "daily_done");
-    u.lastDaily = Date.now(); u.tickets++;
-    saveDB();
-    return [200, { user: pubUser(u) }];
-  }
-  if (m === "POST" && p === "/api/me/exchange") {
-    const u = need();
-    const b = await readBody(req);
-    if (b.kind === "ticket") {
-      if (u.tokens < 50) fail(400, "not_enough");
-      u.tokens -= 50; u.tickets++;
-    } else if (b.kind === "coupon") {
-      if (u.tokens < 100) fail(400, "not_enough");
-      u.tokens -= 100;
-      const code = "EX-" + randCode();
-      u.codes[code] = 10;
-      u.wins.unshift({ id: uid(), title: L3("Купон 10%", "Купон 10%", "10% coupon"), code, date: new Date().toLocaleDateString("en-GB") });
-    } else fail(400, "invalid");
-    saveDB();
-    return [200, { user: pubUser(u) }];
-  }
-  if (m === "POST" && p === "/api/wheel/spin") {
-    const u = need(), b = await readBody(req);
-    const requestId = b.requestId;
-    if (typeof requestId !== 'string' || !/^[a-zA-Z0-9_-]{16,100}$/.test(requestId)) fail(400, "request_id_required");
-    const key = u.id + ':' + requestId;
-    const old = db.spinReceipts[key];
-    if (old) return [200, {...old, user: pubUser(u), replayed:true}];
-    if (Date.now() - (u.lastSpinAt || 0) < 6500) fail(409, "spin_busy");
-    if (!validChances(db.prizes)) fail(503, "invalid_chances");
-    if (u.tickets < db.wheelCost) fail(400, "no_tickets");
-    const idx = pickPrizeIndex(db.prizes);
-    const pz = structuredClone(db.prizes[idx]);
-    if (!['tokens','tickets','diamonds','coupon'].includes(pz.kind) || !Number.isFinite(pz.val) || pz.val < 0) fail(503, 'invalid_prize');
-    u.tickets -= db.wheelCost;
-    let code = null;
-    if (pz.kind === 'coupon') { code = 'CP-' + randCode(); (u.codes ||= {})[code] = pz.val; }
-    else u[pz.kind] = (Number(u[pz.kind]) || 0) + pz.val;
-    const winId = uid();
-    (u.wins ||= []).unshift({id:winId, title:pz.label, prizeId:pz.id, requestId, code:code||'', date:new Date().toLocaleDateString('en-GB')});
-    u.lastSpinAt = Date.now();
-    const receipt = {index:idx, prize:pz, code, winId, requestId, revision:db.wheelRevision};
-    db.spinReceipts[key] = receipt;
-    saveDB();
-    return [200, {...receipt, user:pubUser(u)}];
-  }
+ }
+ syncNexusPreview(form);studioFeedback(form,true);
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="mcQ")MC.q=e.target.value.trim();
+  const form=e.target.closest('form');
+  if(form && ADMIN_FORM_KINDS[form.getAttribute('id')])clearAdminFormError(form);
+});
+if(matchMedia("(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)").matches){
+ document.addEventListener("pointermove",e=>{
+  if(!S.motion)return;
+  const card=e.target.closest(".tilt-card");if(!card)return;
+  const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  card.style.setProperty("--ry",(x*7).toFixed(2)+"deg");card.style.setProperty("--rx",(-y*7).toFixed(2)+"deg");
+ },{passive:true});
+ document.addEventListener("pointerout",e=>{const card=e.target.closest(".tilt-card");if(card&&!card.contains(e.relatedTarget)){card.style.removeProperty("--rx");card.style.removeProperty("--ry")}});
+}
+// Countdown is cosmetic; the server is the authority and revokes expired VIP access.
+setInterval(()=>{document.querySelectorAll("[data-vip-countdown]").forEach(el=>{const end=Date.parse(el.dataset.vipCountdown);if(!Number.isFinite(end))return;let sec=Math.max(0,Math.floor((end-Date.now())/1000));const d=Math.floor(sec/86400);sec%=86400;const hrs=Math.floor(sec/3600);sec%=3600;el.textContent=d+tri(" күн "," дн. "," days ")+hrs+":"+String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")+(d===0&&hrs===0&&sec===0?" · expired":"")})},1000);
 
-  const en = p.match(/^\/api\/giveaways\/([\w-]+)\/enter$/);
-  if (m === "POST" && en) {
-    const u = need();
-    const g = db.giveaways.find(x => x.id === en[1]) || fail(404, "not_found");
-    if (g.winner) fail(400, "ended");
-    if (g.participants.some(x => x.uid === u.id)) fail(409, "already");
-    if (u.tickets < g.cost) fail(400, "no_tickets");
-    u.tickets -= g.cost;
-    g.participants.push({ uid: u.id, nick: u.nick });
-    saveDB();
-    return [200, { user: pubUser(u) }];
-  }
-
-  // Library works without VIP at a smaller limit, and remains intact when VIP expires.
-  if (m === "POST" && p === "/api/library") {
-    const u = need(), b = await readBody(req);
-    const kind = str(b.kind,20), id = str(b.id,80);
-    const dbKey = {product:"products",modpack:"modpacks",game:"games"}[kind];
-    if (!/^[\w-]{1,80}$/.test(id) || (kind!=="modrinth" && (!dbKey || !db[dbKey].some(x=>x.id===id)))) fail(400,"invalid");
-    u.library = publicLibrary(u);
-    const pos = u.library.findIndex(x=>x.kind===kind && x.id===id);
-    if (b.save === false) { if(pos>=0)u.library.splice(pos,1); }
-    else if (pos<0) {
-      if (u.library.length >= vipCaps(u).limit) fail(403,"library_limit");
-      u.library.push(kind==="modrinth"
-        ? {kind,id,title:str(b.title,90)||"Modrinth project"}
-        : {kind,id});
+document.addEventListener('input',e=>{if(e.target.closest('#chanceForm'))updateChanceTotal()});
+document.addEventListener('submit',async e=>{
+ const f=e.target;if(!['chanceForm','newWheelPrize'].includes(f.id))return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(f.dataset.busy)return;f.dataset.busy='1';const btn=f.querySelector('button[type="submit"]');btn.disabled=true;
+ try{
+  if(f.id==='chanceForm'){
+   const prizes=[...f.querySelectorAll('[data-chance-id]')].map(row=>({id:row.dataset.chanceId,percent:Number(row.querySelector('input').value),rarity:row.querySelector('select').value}));
+   if(prizes.reduce((a,p)=>a+Math.round(p.percent*100),0)!==10000)throw Object.assign(new Error(),{code:'chances_total'});
+   await api('PUT','/api/admin/wheel-chances',{revision:D.wheelRevision,prizes},true);
+  }else{const b=formObj(f);b.val=Number(b.val);await api('POST','/api/admin/wheel-prizes',b,true)}
+  await loadData();render(true);toast(t('saved'));
+ }catch(e){const el=document.getElementById('chanceError');if(el)el.textContent=errMsg(e);toast(errMsg(e),true)}
+ finally{delete f.dataset.busy;btn.disabled=false}
+},true);
+document.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const f=e.target,o=formObj(f);
+  try{
+    switch(f.getAttribute('id')){
+      case "pinForm":{
+        if(!ownerView()){toast(tri('Қолжетімсіз','Нет доступа','Access denied'),true);return}
+        const r=await api("POST","/api/admin/login",{pin:o.pin});
+        ADMIN=r.token;
+        sessionStorage.setItem("a782-admin",ADMIN);
+        const retry=pendingAdminSave;
+        pendingAdminSave=null;
+        render(true);
+        if(retry){
+          const target=document.getElementById(retry.id);
+          if(target){
+            for(const [name,value] of Object.entries(retry.fields)){
+              const field=target.elements.namedItem(name);
+              if(field && 'value' in field)field.value=String(value??'');
+            }
+            await submitAdminForm(target);
+          }
+        }
+        return;
+      }
+      case "authForm":{
+        const reg=AUTH==="reg";
+        const r=await api("POST",reg?"/api/register":"/api/login",reg?{email:o.email,password:o.password,nick:o.nick}:{email:o.email,password:o.password});
+        clearAdminSession();TOKEN=r.token;localStorage.setItem("a782-token",TOKEN);ME=r.user;
+        await loadData();render(true);return;
+      }
+      case "vipStudioForm":{
+        const shortcuts=[...f.querySelectorAll('input[name="shortcuts"]:checked')].map(x=>x.value);
+        const caps=vipCapsClient();
+        if(shortcuts.length>caps.count){toast(tri('Жылдам сілтемелер шегінен асты','Слишком много быстрых ссылок','Too many shortcuts'),true);return}
+        const submit=f.querySelector('button[type="submit"]');if(submit?.disabled)return;
+        if(submit)submit.disabled=true;
+        const message=document.getElementById('studioSaveStatus');
+        if(message)message.textContent=tri('Сақталып жатыр…','Сохраняется…','Saving…');
+        try{
+          const r=await api('POST','/api/vip/preferences',{preset:o.preset,statusEmoji:o.statusEmoji,status:o.status||'',headline:o.headline||'',shortcuts});
+          ME=r.user;toast(tri('Studio сақталды ✦','Studio сохранена ✦','Studio saved ✦'));
+          render(true);const status=document.getElementById('studioSaveStatus');
+          if(status)status.textContent=tri('Сақталды ✓','Сохранено ✓','Saved ✓');
+        }catch(error){if(message)message.textContent=tri('Сақталмады. Қайта көр.','Не сохранено. Попробуй снова.','Could not save. Try again.');throw error}
+        finally{if(submit?.isConnected)submit.disabled=false}
+        return;
+      }
+      case "profForm":{
+        const r=await api("PUT","/api/me",{nick:o.nick,mc:o.mc,ff:o.ff,so2:o.so2,tg:o.tg,bio:o.bio,avatar:o.avatar,banner:o.banner,icon:pendingIcon||ME.icon});
+        ME=r.user;pendingIcon=null;toast(t("saved"));render(true);return;
+      }
+      case "mcForm":{MC.q=$("#mcQ").value.trim();searchMC();return}
+      case "cartForm":{
+        if(!TOKEN){closeSheet();toast(t("login"),true);location.hash="#me";return}
+        const order=await api("POST","/api/orders",{items:cart.map(i=>({id:i.id,qty:i.qty})),coupon:o.coupon||"",method:o.method||"telegram",receipt:o.receipt||""});
+        cart=[];saveCart();closeSheet();
+        ME=(await api("GET","/api/me")).user;
+        if(order.method==="telegram"||order.method==="kaspi"){
+          const ok=await copyText(orderText(order));
+          window.open(D.owner.telegram,"_blank","noopener");
+          toast(t("tgok"),!ok);
+        } else toast(t("ok"));
+        render(true);return;
+      }
+      case "fSite":{await api("PUT","/api/admin/site",o,true);await loadData();toast(t("saved"));render(true);return}
+      case "fGame":case "fGw":case "fPr":case "fMp":{
+        try{await submitAdminForm(f)}catch(err){adminFormError(f,tri("Сақтау қатесі: ","Ошибка сохранения: ","Save error: ")+(err.code||err.message||"unknown"));console.error("A782 admin submit error",err)}return;
+      }
     }
-    await saveVipNow();
-    return [200,{user:pubUser(u)}];
-  }
-  if (m === "POST" && p === "/api/vip/preferences") {
-    const u=need(), vip=activeVip(u);
-    if(!vip) fail(403,"vip_required");
-    const caps=vipCaps(u), b=await readBody(req);
-    const preset=str(b.preset,24);
-    if(!caps.presets.includes(preset)) fail(400,"invalid");
-    const statusEmoji=str(b.statusEmoji,24);
-    if(!["✦","⚡","🎮","🚀","💎","👑","🌌","🛡️","🎨","✨"].includes(statusEmoji)) fail(400,"invalid");
-    const status=str(b.status,32), headline=str(b.headline,70);
-    // All user input is still escaped in the browser before inserting into HTML.
-    if(status.length>32 || headline.length>70)fail(400,"invalid");
-    const shortcuts=Array.isArray(b.shortcuts)?b.shortcuts:[];
-    if(shortcuts.length>caps.shortcuts || shortcuts.some(x=>!SHORTCUTS.includes(x)) || new Set(shortcuts).size!==shortcuts.length)fail(400,"invalid");
-    u.vipPrefs={preset,statusEmoji,status,headline:vip.visualTier==="VIP-PLUS"?"":headline,shortcuts};
-    await saveVipNow();
-    return [200,{user:pubUser(u)}];
-  }
-
-  if (m === "POST" && p === "/api/vip/trial") {
-    const u = need();
-    const free = db.vipPlans.find(x => tierOf(x)==="VIP-FREE" && x.active);
-    if (!free) fail(400,"not_found");
-    // Both the flag and historical grant are checked against old accounts.
-    if (u.vipTrialUsed || db.orders.some(o => o.type === "vip-trial" && o.userId === u.id)) fail(409,"trial_used");
-    if (activeVip(u)) fail(409,"vip_active");
-    const now = Date.now();
-    u.vipTrialUsed = true;
-    u.vip = { planId: free.id, name:"VIP-FREE", tier:"VIP-FREE", startedAt:new Date(now).toISOString(), expiresAt:new Date(now+7*86400000).toISOString(), trial:true };
-    db.orders.unshift({id:"TRIAL-"+randCode(),type:"vip-trial",userId:u.id,planId:free.id,planName:"VIP-FREE",nick:u.nick,date:new Date(now).toISOString(),total:0,status:"paid",approvedAt:new Date(now).toISOString()});
-    await saveVipNow();
-    return [200,{user:pubUser(u)}];
-  }
-  if (m === "POST" && p === "/api/vip/orders") {
-    const u = need();
-    const b = await readBody(req);
-    const plan = db.vipPlans.find(x => x.id === b.planId && x.active);
-    if (!plan || tierOf(plan)==="VIP-FREE") fail(404, "not_found");
-    if (!(plan.price > 0)) fail(400,"price_not_set");
-    const order = { id: "VIP-" + randCode(), type: "vip", planId: plan.id,
-      planName: plan.name, tier:tierOf(plan), durationDays: plan.durationDays, userId: u.id,
-      nick: u.nick, date: new Date().toISOString(), items: [],
-      subtotal: plan.price, discount: 0, total: plan.price,
-      method: "telegram", receipt: "", status: "pending" };
-    db.orders.unshift(order); saveDB();
-    return [201, { order, telegram: db.owner.telegram || "https://t.me/Asxm_A782" }];
-  }
-
-  if (m === "GET" && p === "/api/orders") {
-    const u = need();
-    return [200, { orders: db.orders.filter(o => o.userId === u.id) }];
-  }
-  if (m === "POST" && p === "/api/orders") {
-    const u = need();
-    const b = await readBody(req);
-    const lines = []; let sub = 0;
-    for (const it of (Array.isArray(b.items) ? b.items : []).slice(0, 30)) {
-      const pr = db.products.find(x => x.id === it.id);
-      if (!pr) continue;
-      const q = Math.min(20, Math.max(1, parseInt(it.qty) || 1));
-      lines.push({ id: pr.id, name: pr.name, qty: q, price: pr.price });
-      sub += pr.price * q;
-    }
-    if (!lines.length) fail(400, "empty_cart");
-    const code = str(b.coupon, 30).toUpperCase();
-    let pct = 0, used = null;
-    if (db.coupons[code]) pct = db.coupons[code];
-    else if (u.codes[code]) { pct = u.codes[code]; used = code; }
-    const disc = Math.round(sub * pct / 100);
-    const method = ["kaspi", "telegram", "demo"].includes(b.method) ? b.method : "telegram";
-    if (method === "demo" && !DEMO_PAY) fail(400, "invalid");
-    const receipt = str(b.receipt, 80);
-    if (method === "kaspi" && receipt.length < 3) fail(400, "receipt_required");
-    const order = {
-      id: "A782-" + randCode(), userId: u.id, nick: u.nick, date: new Date().toISOString(),
-      items: lines, subtotal: sub, discount: disc, total: sub - disc,
-      method, receipt, status: method === "demo" ? "paid" : "pending"
-    };
-    if (used) delete u.codes[used];
-    db.orders.unshift(order);
-    saveDB();
-    return [201, order];
-  }
-
-  if (m === "POST" && p === "/api/admin/login") {
-    if (!isOwnerAccount(user)) fail(403, "admin_required");
-    const ip = req.socket.remoteAddress;
-    const hit = pinHits.get(ip) || { n: 0, t: Date.now() };
-    if (Date.now() - hit.t > 15 * 60e3) { hit.n = 0; hit.t = Date.now(); }
-    if (hit.n >= 10) fail(429, "too_many");
-    const b = await readBody(req);
-    const pin = String(b.pin || "");
-    const ok = pin.length === ADMIN_PIN.length && crypto.timingSafeEqual(Buffer.from(pin), Buffer.from(ADMIN_PIN));
-    if (!ok) { hit.n++; pinHits.set(ip, hit); fail(403, "bad_pin"); }
-    const tok = crypto.randomBytes(24).toString("hex");
-    adminTokens.set(tok, { userId: user.id, exp: Date.now() + 12 * 3600e3 });
-    return [200, { token: tok }];
-  }
-  if (p.startsWith("/api/admin/")) {
-    if (!isAdmin(req)) fail(403, "admin_required");
-    return adminRoute(req, m, p);
-  }
-  return [404, { error: "not_found" }];
-}
-
-async function adminRoute(req, m, p) {
-  if (m === 'PUT' && p === '/api/admin/wheel-chances') {
-    const b = await readBody(req);
-    if (b.revision !== db.wheelRevision) fail(409, 'chances_changed');
-    if (!Array.isArray(b.prizes) || b.prizes.length !== db.prizes.length || new Set(b.prizes.map(x=>x.id)).size !== db.prizes.length) fail(400,'invalid_chances');
-    const updated = db.prizes.map(pz => {
-      const row = b.prizes.find(x=>x.id===pz.id);
-      if (!row || typeof row.percent !== 'number' || !Number.isFinite(row.percent) || row.percent<0 || row.percent>100 || Math.abs(row.percent*100-Math.round(row.percent*100))>1e-7 || !RARITIES.includes(row.rarity)) fail(400,'invalid_chances');
-      return {...pz, chanceBps:Math.round(row.percent*100), rarity:row.rarity};
-    });
-    if (!validChances(updated)) fail(400, 'chances_total');
-    db.prizes = updated; db.wheelRevision++; saveDB();
-    return [200,{ok:true, revision:db.wheelRevision}];
-  }
-  if (m === 'POST' && p === '/api/admin/wheel-prizes') {
-    const b = await readBody(req);
-    if (!['tokens','tickets','diamonds','coupon'].includes(b.kind) || !Number.isInteger(b.val) || b.val<1 || b.val>1000000 || (b.kind==='coupon' && b.val>100) || !RARITIES.includes(b.rarity)) fail(400,'invalid_prize');
-    const label=tr(b,'label',120);
-    if (!label.kk || !label.ru || !label.en) fail(400,'title_required');
-    db.prizes.push({id:uid(), label, kind:b.kind, val:b.val, weight:0, chanceBps:0, rarity:b.rarity});
-    db.wheelRevision++; saveDB(); return [200,{ok:true}];
-  }
-
-  if (m === "PUT" && p === "/api/admin/site") {
-    const b = await readBody(req);
-    const o = db.owner, s = db.stream;
-    db.owner = {
-      ...o,
-      name: str(b.name, 60) || o.name,
-      handle: str(b.handle, 40) || o.handle,
-      tiktok: safeUrl(b.tiktok) || o.tiktok,
-      telegram: safeUrl(b.telegram) || o.telegram,
-      kaspi: str(b.kaspi, 40),
-      avatar: b.avatar === undefined ? o.avatar : safeImg(b.avatar),
-      banner: b.banner === undefined ? o.banner : safeImg(b.banner),
-      bio: tr(b, "bio", 200)
-    };
-    db.stream = {
-      ...s,
-      live: !!b.live,
-      title: tr(b, "stitle", 120),
-      nextAt: str(b.nextAt, 40) || s.nextAt,
-      schedule: parseSchedule(b.sched)
-    };
-    db.server = { ip: str(b.ip, 80), version: str(b.version, 20) };
-    db.wheelCost = Math.max(1, parseInt(b.wheelCost) || 1);
-    saveDB();
-    return [200, { ok: true }];
-  }
-  if (m === "POST" && p === "/api/admin/giveaways") {
-    const b = await readBody(req);
-    const title = tr(b, "title", 120);
-    if (!title.kk && !title.ru && !title.en) fail(400, "title_required");
-    const old = db.giveaways.find(x => x.id === str(b.id, 40));
-    upsert(db.giveaways, {
-      id: old ? old.id : uid(),
-      icon: ICONS.includes(b.icon) ? b.icon : "gift",
-      title, desc: tr(b, "desc", 300), prize: tr(b, "prize", 120),
-      cost: Math.max(1, parseInt(b.cost) || 1),
-      participants: old ? old.participants : [], winner: old ? old.winner : null
-    });
-    saveDB();
-    return [200, { ok: true }];
-  }
-  if (m === "POST" && p === "/api/admin/products") {
-    const b = await readBody(req);
-    const name = tr(b, "name", 120);
-    if (!name.kk && !name.ru && !name.en) fail(400, "title_required");
-    const old = db.products.find(x => x.id === str(b.id, 40));
-    upsert(db.products, {
-      id: old ? old.id : uid(),
-      cat: P_CATS.includes(b.cat) ? b.cat : "pack",
-      name, desc: tr(b, "desc", 300),
-      price: Math.max(0, parseInt(b.price) || 0),
-      img: safeImg(b.img) || (old ? old.img : "")
-    });
-    saveDB();
-    return [200, { ok: true }];
-  }
-  if (m === "POST" && p === "/api/admin/modpacks") {
-    const b = await readBody(req);
-    const title = str(b.title, 120);
-    if (!title) fail(400, "title_required");
-    const old = db.modpacks.find(x => x.id === str(b.id, 40));
-    upsert(db.modpacks, {
-      id: old ? old.id : uid(),
-      cat: M_CATS.includes(b.cat) ? b.cat : "rpg",
-      title,
-      version: str(b.version, 20) || "1.20.1",
-      loader: str(b.loader, 20) || "Fabric",
-      mods: parseInt(b.mods) || 0,
-      sizeMb: parseInt(b.sizeMb) || 0,
-      downloads: old ? old.downloads : 0,
-      rating: old ? old.rating : 5,
-      file: safeUrl(b.file),
-      keyMods: str(b.keys, 400).split(",").map(x => x.trim()).filter(Boolean).slice(0, 12),
-      desc: tr(b, "desc", 300)
-    });
-    saveDB();
-    return [200, { ok: true }];
-  }
-  if (m === "POST" && p === "/api/admin/games") {
-    const b = await readBody(req);
-    const name = str(b.name, 40);
-    if (!name) fail(400, "title_required");
-    const old = db.games.find(x => x.id === str(b.id, 40));
-    upsert(db.games, {
-      id: old ? old.id : uid(),
-      name,
-      icon: ICONS.includes(b.icon) ? b.icon : "gamepad",
-      status: b.status === "live" ? "live" : "soon",
-      link: safeUrl(b.link),
-      desc: tr(b, "desc", 200)
-    });
-    saveDB();
-    return [200, { ok: true }];
-  }
-  const del = p.match(/^\/api\/admin\/(giveaways|products|modpacks|games)\/([\w-]+)$/);
-  if (m === "DELETE" && del) {
-    db[del[1]] = db[del[1]].filter(x => x.id !== del[2]);
-    saveDB();
-    return [200, { ok: true }];
-  }
-  const dr = p.match(/^\/api\/admin\/giveaways\/([\w-]+)\/draw$/);
-  if (m === "POST" && dr) {
-    const g = db.giveaways.find(x => x.id === dr[1]) || fail(404, "not_found");
-    if (!g.participants.length) fail(400, "no_participants");
-    const w = g.participants[crypto.randomInt(g.participants.length)];
-    g.winner = { name: w.nick, at: new Date().toISOString() };
-    const wu = db.users.find(u => u.id === w.uid);
-    if (wu) wu.wins.unshift({ id: uid(), title: g.title, code: "G-" + randCode(), date: new Date().toLocaleDateString("en-GB") });
-    saveDB();
-    return [200, { winner: g.winner }];
-  }
-  const bal = p.match(/^\/api\/admin\/users\/([\w-]+)\/balance$/);
-  if (m === "POST" && bal) {
-    const b = await readBody(req);
-    const u = db.users.find(x => x.id === bal[1]) || fail(404, "not_found");
-    if (!["tickets", "tokens", "diamonds"].includes(b.field)) fail(400, "invalid");
-    u[b.field] = Math.max(0, u[b.field] + (parseInt(b.delta) || 0));
-    saveDB();
-    return [200, { ok: true }];
-  }
-  if (m === "GET" && p === "/api/admin/vip-plans") return [200, { plans: db.vipPlans }];
-  if (m === "POST" && p === "/api/admin/vip-plans") {
-    const b = await readBody(req);
-    const old = db.vipPlans.find(x => x.id === b.id);
-    if (!old) fail(404,"not_found");
-    const tier = tierOf(old);
-    if (!VIP_TIERS.includes(tier)) fail(400,"invalid");
-    const price = Number(b.price), durationDays = Number(b.durationDays);
-    if (!Number.isSafeInteger(price) || price<0 || price>10000000 || !Number.isSafeInteger(durationDays) || durationDays<1 || durationDays>36500) fail(400,"invalid");
-    // FREE is always seven days, free, and one-time. The admin cannot accidentally alter that.
-    old.name=tier; old.tier=tier; old.price=tier==="VIP-FREE"?0:price;
-    old.durationDays=tier==="VIP-FREE"?7:durationDays;
-    old.active=b.active!==false;
-    await saveVipNow();
-    return [200,{plan:vipPublicPlan(old)}];
-  }
-  const vpDel = p.match(/^\/api\/admin\/vip-plans\/([\w-]+)$/);
-  if (m === "DELETE" && vpDel) {
-    const plan = db.vipPlans.find(x=>x.id===vpDel[1]) || fail(404,"not_found");
-    plan.active=false; await saveVipNow(); return [200,{ok:true}];
-  }
-  const vipGrant = p.match(/^\/api\/admin\/vip-orders\/([\w-]+)\/approve$/);
-  if (m === "POST" && vipGrant) {
-    const o = db.orders.find(x => x.id === vipGrant[1] && x.type === "vip") || fail(404, "not_found");
-    const u = db.users.find(x => x.id === o.userId) || fail(404, "not_found");
-    // A legacy VIP order may already be marked paid without a VIP grant.
-    // Reconcile it exactly once. Do not re-grant already approved or expired orders.
-    if (o.approvedAt) return [200, { ok: true, user: pubUser(u), alreadyApproved: true }];
-    const days = o.durationDays;
-    if (!Number.isSafeInteger(days) || days < 0 || days > 36500) fail(400, "invalid");
-    const now = Date.now(), prev = activeVip(u);
-    const start = prev && prev.expiresAt === null ? null : Math.max(now, prev ? Date.parse(prev.expiresAt) || now : now);
-    u.vip = { planId:o.planId, name:o.planName, tier:o.tier||tierOf(db.vipPlans.find(p=>p.id===o.planId)||{name:o.planName}), startedAt:new Date(now).toISOString(), expiresAt: days === 0 || start === null ? null : new Date(start + days * 86400000).toISOString() };
-    o.status = "paid"; o.approvedAt = new Date().toISOString();
-    await saveVipNow(); return [200, { ok: true, user: pubUser(u) }];
-  }
-  const ost = p.match(/^\/api\/admin\/orders\/([\w-]+)\/status$/);
-  if (m === "POST" && ost) {
-    const b = await readBody(req);
-    const o = db.orders.find(x => x.id === ost[1]) || fail(404, "not_found");
-    if (!["paid", "pending"].includes(b.status)) fail(400, "invalid");
-    if (o.type === "vip") fail(400, "invalid");
-    o.status = b.status;
-    saveDB();
-    return [200, { ok: true }];
-  }
-  if (m === "GET" && p === "/api/admin/users") {
-    return [200, { users: db.users.map(u => ({ id: u.id, email: u.email, nick: u.nick, vip: activeVip(u), tickets: u.tickets, tokens: u.tokens, diamonds: u.diamonds })) }];
-  }
-  if (m === "GET" && p === "/api/admin/orders") return [200, { orders: db.orders }];
-  fail(404, "not_found");
-}
-
-const MIME = {
-  ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
-  ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".ico": "image/x-icon"
-};
-function serveStatic(pathname, res) {
-  const rel = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
-  const full = path.resolve(PUBLIC_DIR, "." + rel);
-  const relative = path.relative(PUBLIC_DIR, full);
-  if (relative.startsWith("..") || path.isAbsolute(relative)) { res.writeHead(403); return res.end(); }
-  fs.readFile(full, (err, buf) => {
-    if (err) { res.writeHead(404); return res.end("Not found"); }
-    res.writeHead(200, { "Content-Type": MIME[path.extname(full)] || "application/octet-stream", "Cache-Control": "no-cache" });
-    res.end(buf);
-  });
-}
-
-const server = http.createServer(async (req, res) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  const url = new URL(req.url, "http://localhost");
-  if (!url.pathname.startsWith("/api/")) return serveStatic(url.pathname, res);
-  try {
-    const job = requestQueue.then(() => transaction(req, url));
-    requestQueue = job.catch(() => {});
-    const [status, out] = await job;
-    send(res, status, out);
-  } catch (e) {
-    const status = e.status || 500;
-    if (status === 500) console.error(e);
-    send(res, status, { error: status === 500 ? "generic" : (e.code || e.message) });
-  }
+  }catch(err){ toast(errMsg(err),true) }
 });
 
-loadDB()
-  .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: порт ${PORT}`)))
-  .catch(e => { console.error("Жүктеу қатесі: іске қосу тоқтатылды", e.message); process.exitCode=1; });
+function adminEdit(spec){
+  const [kind,id]=spec.split(":");
+  const item=(D[kind]||[]).find(x=>x.id===id);if(!item)return;
+  const form=document.getElementById(FORMS[kind]);if(!form)return;
+  fillForm(form,item);
+  if(form.elements.id) form.elements.id.value=item.id;
+  form.scrollIntoView({behavior:"smooth",block:"center"});
+}
+async function adminDelete(spec){
+  const [kind,id]=spec.split(":");
+  try{ await api("DELETE",`/api/admin/${kind}/${id}`,null,true); await loadData(); toast(t("deleted")); render(true) }
+  catch(e){ toast(errMsg(e),true) }
+}
+async function adminDraw(id){
+  try{ await api("POST",`/api/admin/giveaways/${id}/draw`,null,true); await loadData(); render(true) }
+  catch(e){ toast(errMsg(e),true) }
+}
+const busyBalanceActions = new Set();
+async function adminBal(spec){
+  // All balance changes go through the existing admin-only server endpoint.
+  // A pending click is locked so double-clicking can't subtract twice by accident.
+  if(busyBalanceActions.has(spec))return;
+  const [id,field,amount]=spec.split("|");
+  const delta=Number(amount);
+  if(!/^[a-zA-Z0-9_-]+$/.test(id)||!["tickets","tokens","diamonds"].includes(field)||!Number.isInteger(delta)||delta===0)return;
+  busyBalanceActions.add(spec);
+  const btn=[...document.querySelectorAll('[data-bal]')].find(b=>b.dataset.bal===spec);
+  if(btn)btn.disabled=true;
+  try{
+    await api("POST",`/api/admin/users/${id}/balance`,{field,delta},true);
+    await loadAdmin();
+    toast(delta<0?tri('Билет алынды ✓','Билеты списаны ✓','Tickets removed ✓'):tri('Баланс жаңартылды ✓','Баланс обновлён ✓','Balance updated ✓'));
+  }catch(e){toast(errMsg(e),true)}
+  finally{
+    busyBalanceActions.delete(spec);
+    if(btn&&btn.isConnected)btn.disabled=false;
+  }
+}
+async function adminOrder(spec){
+  const [id,status]=spec.split("|");
+  try{ await api("POST",`/api/admin/orders/${id}/status`,{status},true); loadAdmin() }
+  catch(e){ toast(errMsg(e),true) }
+}
+
+addEventListener("hashchange",()=>render());
+(async function init(){
+  initFx();
+  applySettings();
+  try{ await loadData() }
+  catch(e){ $("#splash").classList.add("off"); $("#main").innerHTML=`<div class="notice">${E[LANG].generic}</div>`; return }
+  if(TOKEN){ try{ ME=(await api("GET","/api/me")).user }catch(e){ TOKEN="";localStorage.removeItem("a782-token") } }
+  render();
+  setTimeout(()=>$("#splash").classList.add("off"),600);
+})();
+</script>
+</body>
+</html>
