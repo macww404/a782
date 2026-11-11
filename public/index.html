@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07080c">
-<title>A782 DIGITAL</title>
+<meta name="theme-color" content="#0c131a">
+<title>A782 DIGITAL · WINTER EDITION</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -789,12 +789,379 @@ body.vip-view .top{border-bottom-color:var(--line)!important}
 }
 @media(prefers-reduced-motion:reduce){.btn,.dnav a,.home-directory>a,.glass{transition:none!important}}
 
+
+/* ==================================================================
+ A782 DIGITAL — WINTER EDITION 2026–27
+ Sitewide visual refresh, one safe CSS layer. Existing APIs, admin and
+ VIP entitlements remain untouched. Animations respect reduced motion.
+ ================================================================== */
+:root{
+  color-scheme:dark;
+  --bg:#090f16;--bg2:#111b24;--ink:#f8fafb;--mute:#aab6c3;
+  --line:rgba(175,204,229,.18);--glass:#15212d;
+  --acc:#efd0a0;--acc2:#a7cbd9;--acc3:#c8cbd5;
+  --surface:#111a24;--surface2:#17232e;--surface3:#22303c;
+  --edge:rgba(175,204,229,.16);--edge-strong:rgba(228,215,184,.37);
+  --text-soft:#c0cbd3;
+  --nx-ink:#f8fafb;--nx-gold:#efd0a0;--nx-violet:#b1ceda;
+  --vip-accent:#efd0a0;--ultra-gold:#efd0a0;--ultra-violet:#b1ceda;
+  --winter-gold:#efd0a0;--winter-ice:#a9d6e8;--winter-pine:#7cb7a8;
+  --winter-night:#0b1119;--ok:#80d5b2;--bad:#ffa7a7;
+}
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef3f6;--bg2:#fff;--ink:#15212d;--mute:#526472;
+  --line:rgba(23,46,62,.15);--glass:#fff;
+  --acc:#73552c;--acc2:#456a81;--acc3:#626d7d;
+  --surface:#fff;--surface2:#f4f8fa;--surface3:#e8eff3;
+  --edge:rgba(23,46,62,.16);--edge-strong:rgba(115,85,44,.35);
+  --text-soft:#405664;--nx-ink:#15212d;--nx-gold:#73552c;--nx-violet:#456a81;
+  --vip-accent:#73552c;
+}
+html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 60% 26% at 94% -4%,rgba(209,163,95,.10),transparent 69%),
+    radial-gradient(ellipse 55% 25% at -8% 19%,rgba(114,164,190,.10),transparent 72%),
+    linear-gradient(155deg,#0b131c 0%,#091017 42%,#0b131b 100%)!important;
+  color:var(--ink);font-size:14px;line-height:1.65;letter-spacing:-.01em;
+}
+[data-theme="light"] body{
+  background:linear-gradient(160deg,#f5f8fb,#e8eff3)!important;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle at 20% 6%,rgba(255,236,199,.05) 0 1px,transparent 2px),
+    radial-gradient(circle at 66% 21%,rgba(201,231,244,.045) 0 1px,transparent 2px);
+  background-size:180px 190px,253px 289px;
+}
+.winter-sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.winter-sky i{position:absolute;display:block;width:3px;height:3px;border-radius:50%;background:#e7f5ff;opacity:.36;box-shadow:0 0 11px 2px rgba(155,209,228,.28);animation:winter-drift 21s ease-in-out infinite alternate}
+.winter-sky i:nth-child(1){left:6%;top:24%;animation-delay:-2s}
+.winter-sky i:nth-child(2){left:16%;top:62%;animation-delay:-10s;width:2px;height:2px}
+.winter-sky i:nth-child(3){left:33%;top:10%;animation-delay:-6s}
+.winter-sky i:nth-child(4){left:45%;top:77%;animation-delay:-15s;width:2px;height:2px}
+.winter-sky i:nth-child(5){left:55%;top:35%;animation-delay:-8s}
+.winter-sky i:nth-child(6){left:70%;top:15%;animation-delay:-12s;width:2px;height:2px}
+.winter-sky i:nth-child(7){left:78%;top:68%;animation-delay:-4s}
+.winter-sky i:nth-child(8){left:86%;top:30%;animation-delay:-17s;width:2px;height:2px}
+.winter-sky i:nth-child(9){left:94%;top:87%;animation-delay:-5s}
+.winter-sky i:nth-child(10){left:26%;top:92%;animation-delay:-19s;width:2px;height:2px}
+@keyframes winter-drift{0%{transform:translate3d(-4px,15px,0);opacity:.1}100%{transform:translate3d(15px,-21px,0);opacity:.65}}
+#fx,.aurora{display:none!important}
+#splash{background:#0b131b}
+#splash b{color:#f4f0e9}
+.ring{border-top-color:#efd0a0!important}
+/* Header, site navigation and mobile bar */
+.top{min-height:76px;padding:13px max(20px,calc((100vw - 1160px)/2));border-bottom:1px solid var(--line);
+  background:rgba(11,17,25,.86)!important;box-shadow:0 7px 40px rgba(0,0,0,.18);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+[data-theme="light"] .top{background:rgba(247,250,252,.89)!important}
+.brand{font:750 17px var(--fh);letter-spacing:-.045em}
+.mark{background:linear-gradient(145deg,#344550,#1c2a35)!important;color:#f4e5d1!important;border:1px solid rgba(239,208,160,.36)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.20)!important;border-radius:11px}
+.dnav a{font-size:13px;border-radius:10px}
+.dnav a.on,.dnav a:hover{background:rgba(219,226,235,.09);color:#f3e9da}
+.seg,.icon-btn,.ibtn{border-radius:10px;background:var(--surface2);border-color:var(--line)}
+.seg button.on{background:#efe5d6;color:#18212a}
+.icon-btn:hover{background:var(--surface3);border-color:var(--edge-strong)}
+main{position:relative;z-index:1;max-width:1220px;padding:30px 25px 50px}
+.pg{animation:none!important}
+.rv,.rv.in,.w,.w>span{opacity:1!important;filter:none!important;transform:none!important;animation:none!important;transition:none!important}
+.w{display:inline;padding:0;overflow:visible;vertical-align:baseline;margin-right:.16em}
+.w>span{display:inline}
+.grad{background:none!important;color:var(--ink)!important}
+/* Typography, visible page context */
+.eyebrow,.nexus-kicker{color:var(--winter-gold);letter-spacing:.12em;font-size:11px;font-weight:750}
+[data-theme="light"] .eyebrow{color:#73552c}
+.ph{position:relative;isolation:isolate;margin:15px 0 25px;padding:30px 31px 31px;
+ background:linear-gradient(120deg,rgba(28,43,56,.76),rgba(14,24,34,.55))!important;
+ border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.ph::after{content:"";position:absolute;z-index:-1;width:370px;height:370px;right:-150px;top:-210px;
+ border:1px solid rgba(239,208,160,.18);border-radius:50%;box-shadow:0 0 0 50px rgba(209,179,129,.015),0 0 0 115px rgba(209,179,129,.014)}
+[data-theme="light"] .ph{background:linear-gradient(125deg,#fff,#f0f4f8)!important}
+.ph h1{font-size:clamp(34px,5vw,56px);letter-spacing:-.055em;margin:14px 0 13px;line-height:1.09}
+.lead{color:var(--mute);line-height:1.7;max-width:720px;font-size:clamp(14px,1.65vw,17px)}
+.bl{margin-top:38px}
+h2.bl,h3{letter-spacing:-.03em;font-weight:750}
+h2.bl{display:flex;align-items:center;gap:12px}
+h2.bl::before{content:"";display:inline-block;width:6px;height:19px;background:var(--winter-gold);border-radius:6px;box-shadow:0 0 16px rgba(239,208,160,.16)}
+/* Buttons and cards */
+.btn,.nexus-tier-buy,.nexus-member-open,.nexus-desk-edit{
+  background:linear-gradient(145deg,#f7eddd,#ddc59f)!important;color:#17222b!important;
+  border:1px solid rgba(255,237,205,.5)!important;border-radius:11px;
+  box-shadow:inset 0 1px rgba(255,255,255,.55),0 7px 20px rgba(194,155,98,.07)!important;
+  transition:transform .18s ease,filter .18s ease,border-color .18s ease!important;
+  font-weight:750;transform:none!important}
+.btn:hover,.nexus-tier-buy:hover{filter:brightness(1.065);transform:translateY(-2px)!important}
+.btn:active{transform:translateY(0)!important}
+.btn.ghost{background:rgba(208,223,235,.055)!important;color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:none!important}
+.btn.ghost:hover{background:rgba(208,223,235,.12)!important;border-color:var(--edge-strong)!important}
+.btn.red{background:rgba(191,70,70,.1)!important;color:var(--bad)!important;border-color:rgba(255,167,167,.3)!important}
+.btn:disabled{opacity:.42;pointer-events:none}
+.rip{display:none!important}
+.glass,.nexus-why,.nexus-desk,.nexus-studio,.vip-desk,.studio,.nexus-member,.nexus-tier{
+ background:linear-gradient(145deg,rgba(26,39,51,.92),rgba(16,26,36,.97))!important;
+ border:1px solid var(--line)!important;border-radius:18px!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 32px rgba(0,0,0,.12)!important;
+ backdrop-filter:none;-webkit-backdrop-filter:none;will-change:auto;
+ transform:none!important;transform-style:flat!important}
+[data-theme="light"] .glass,[data-theme="light"] .nexus-tier,[data-theme="light"] .nexus-studio,[data-theme="light"] .nexus-member{
+ background:linear-gradient(145deg,#fff,#f5f8fa)!important;box-shadow:0 12px 28px rgba(37,60,77,.06)!important}
+.glass::before,.glow::after{display:none!important}
+.glass:hover,.glass.tilt-card:hover,.nexus-tier:hover{
+ border-color:var(--edge-strong)!important;box-shadow:inset 0 1px rgba(255,255,255,.05),0 17px 35px rgba(0,0,0,.17)!important;transform:translateY(-2px)!important}
+.tag{background:rgba(206,222,235,.075);border:1px solid var(--line);border-radius:8px;color:var(--text-soft)}
+.tag.a{color:var(--winter-gold)}.tag.g{color:var(--ok)}
+.ibox,.directory-icon,.library-icon{background:rgba(233,215,181,.075)!important;color:var(--winter-gold)!important;border:1px solid var(--line);border-radius:11px}
+.grid{gap:15px}
+.specs{border-color:var(--line)}
+.foot{border-color:var(--line)}
+.win{border:1px solid rgba(128,213,178,.3)}.win .ic{color:var(--ok)}
+/* Home page — editorial left column and cinematic CSS-only winter gift */
+.hero.winter-home-hero{padding:26px 0 15px;border-bottom:0;overflow:visible}
+.hero.winter-home-hero::before{display:none}
+.winter-hero-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(285px,.85fr);align-items:center;gap:28px;
+  padding:40px 40px 32px;min-height:435px;position:relative;overflow:hidden;border-radius:24px;border:1px solid rgba(190,210,226,.2);
+  background:radial-gradient(ellipse at 85% 12%,rgba(184,143,83,.16),transparent 48%),
+    radial-gradient(ellipse at 9% 96%,rgba(113,167,193,.10),transparent 50%),
+    linear-gradient(120deg,#131e29,#101922 66%,#18222d);
+  box-shadow:inset 0 1px rgba(255,255,255,.045),0 23px 70px rgba(0,0,0,.17)}
+.winter-hero-layout::after{content:"";position:absolute;left:15%;right:5%;bottom:0;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(239,208,160,.75),transparent);box-shadow:0 0 17px 2px rgba(239,208,160,.18)}
+[data-theme="light"] .winter-hero-layout{background:linear-gradient(120deg,#fcfaf7,#e1ebf1);border-color:var(--line)}
+.winter-hero-text{position:relative;z-index:2;min-width:0}
+.winter-edition-label{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;padding:7px 11px;margin-bottom:14px;
+ border:1px solid rgba(239,208,160,.24);border-radius:7px;background:rgba(209,183,142,.06);
+ color:#e9d9be;font-size:10px;letter-spacing:.115em;font-weight:750}
+[data-theme="light"] .winter-edition-label{color:#694f2e}
+.winter-mini-star{color:#efd0a0;font-size:13px;filter:drop-shadow(0 0 8px rgba(239,208,160,.5))}
+.winter-edition-label .sep{opacity:.32}
+.winter-hero-text .eyebrow{margin-top:3px;color:#a9c5d3}
+.winter-home-hero h1{font-size:clamp(36px,4.25vw,58px);max-width:715px;line-height:1.07;letter-spacing:-.06em;margin:14px 0 18px}
+.winter-home-hero .lead{max-width:640px;color:#b7c4cc;font-size:15px}
+[data-theme="light"] .winter-home-hero .lead{color:#455968}
+.winter-hero-points{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.winter-hero-points span{color:#bfcbd4;font-size:11px;border-radius:7px;border:1px solid rgba(180,208,226,.16);padding:6px 9px;background:rgba(255,255,255,.035)}
+[data-theme="light"] .winter-hero-points span{color:#455968}
+.winter-hero-art{position:relative;height:340px;min-width:0;display:grid;place-items:center;isolation:isolate}
+.winter-hero-art:before{content:"";position:absolute;inset:16px 0;border-radius:50%;background:radial-gradient(ellipse at center,rgba(200,165,104,.22),transparent 58%);filter:blur(22px)}
+.winter-halo{position:absolute;border:1px solid rgba(239,208,160,.28);border-radius:50%;pointer-events:none;transform:rotate(-22deg)}
+.winter-halo-a{width:320px;height:110px;top:90px;box-shadow:0 0 18px rgba(221,172,106,.08)}
+.winter-halo-b{width:370px;height:152px;top:88px;border-color:rgba(166,206,225,.15);transform:rotate(23deg)}
+.winter-stars{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:space-around;padding-top:32px;color:#f1d19c;
+ letter-spacing:18px;font-size:15px;filter:drop-shadow(0 0 8px rgba(242,192,114,.5));animation:star-breathe 6s ease-in-out infinite alternate}
+.winter-stars span{font-size:9px;color:#c5dfeb}
+@keyframes star-breathe{from{opacity:.36}to{opacity:.93}}
+.winter-gift{position:absolute;z-index:2;width:177px;height:148px;top:120px;left:50%;transform:translateX(-50%) rotate(-5deg);
+ border-radius:9px 9px 17px 17px;border:1px solid rgba(239,208,160,.48);
+ background:linear-gradient(125deg,#3a4b56 0%,#1b2934 39%,#101821 90%);
+ box-shadow:18px 20px 36px rgba(0,0,0,.33),inset 10px 0 17px rgba(255,255,255,.055),0 0 40px rgba(231,189,128,.10)}
+.winter-gift-lid{position:absolute;left:-11px;top:-23px;width:197px;height:40px;border:1px solid rgba(241,208,151,.5);
+ border-radius:7px;background:linear-gradient(155deg,#445666,#18232c 80%);box-shadow:0 8px 13px rgba(0,0,0,.28)}
+.winter-gift-ribbon-v{position:absolute;z-index:3;left:70px;top:-23px;width:36px;height:171px;background:linear-gradient(90deg,#866037,#f7e0ae 48%,#a17645);
+ opacity:.93;box-shadow:0 0 14px rgba(238,194,135,.11)}
+.winter-gift-ribbon-h{position:absolute;z-index:4;top:-5px;left:-10px;width:195px;height:19px;background:linear-gradient(#caa273,#795531)}
+.winter-gift-mark{position:absolute;z-index:5;bottom:25px;left:14px;font:800 23px var(--fh);letter-spacing:.09em;color:#f2ddb5;text-shadow:0 0 15px rgba(255,206,138,.2)}
+.winter-gift-mark span{display:block;font:600 10px var(--fh);letter-spacing:.31em;color:#dbc49d}
+.winter-gift-bow{position:absolute;z-index:5;top:-52px;left:78px;width:54px;height:31px;border:9px solid #e5c390;border-radius:45px 42px 15px 33px;transform:rotate(-34deg);box-shadow:inset 0 0 8px rgba(0,0,0,.17)}
+.winter-gift-bow.two{left:41px;transform:rotate(35deg) scaleX(-1)}
+.winter-art-caption{position:absolute;z-index:3;bottom:0;text-align:center;font:800 22px var(--fh);letter-spacing:.18em;color:#e9d7bc}
+.winter-art-caption b{font-size:30px;letter-spacing:.04em;color:#f5e9d5}
+.winter-art-caption small{display:block;font:650 9px var(--fh);letter-spacing:.18em;color:#9db0bd}
+.home-directory{margin:17px 0 0;gap:12px}
+.home-directory>a{border-radius:15px;min-height:140px;background:linear-gradient(135deg,#17232e,#121c26)!important;border:1px solid var(--line);
+  padding:19px 17px;box-shadow:inset 0 1px rgba(255,255,255,.03);transition:transform .18s,border-color .18s}
+.home-directory>a:hover{transform:translateY(-3px);border-color:var(--edge-strong)}
+.home-directory>a b{font-size:15px}.home-directory>a small{color:var(--mute);font-size:11px}
+[data-theme="light"] .home-directory>a{background:linear-gradient(140deg,#fff,#f4f8fa)!important}
+.stats{margin:26px 0 0;gap:12px}
+.stat{background:rgba(19,30,40,.9)!important;border-radius:14px!important;padding:19px 21px}
+.stat b{color:var(--ink)}.stat span{color:var(--mute)}
+.home-vip-beacon{border-color:var(--edge-strong)!important;background:linear-gradient(120deg,#222d37,#161e29)!important}
+.home-vip-emblem{color:var(--winter-gold);border-color:var(--line)}
+.home-vip-beacon .home-vip-title{color:var(--winter-gold)}
+.marquee{margin-top:42px;border-color:var(--line);background:rgba(26,39,52,.3);border-radius:9px;padding:10px 0}
+.marquee div{animation:none!important;font:600 13px var(--fh);letter-spacing:.11em}
+.marquee span{padding-right:45px}
+/* Prize reel, with real side-to-side scrolling and matching server-selected prize */
+.winter-page-head{padding-top:29px}
+.winter-page-kicker{font:750 10px var(--fh);letter-spacing:.17em;color:var(--winter-gold);margin-bottom:12px}
+.reel-panel{margin-top:18px;overflow:hidden;border-radius:25px;padding:25px 22px 23px;isolation:isolate;position:relative;
+ border:1px solid rgba(238,209,165,.27);background:radial-gradient(ellipse at 50% -14%,rgba(198,146,80,.11),transparent 53%),linear-gradient(145deg,#16222d,#0f1923 70%);
+ box-shadow:inset 0 1px rgba(255,255,255,.065),0 16px 50px rgba(0,0,0,.20)}
+.reel-panel:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+ background:radial-gradient(circle at 10% 20%,#eec995 0 1px,transparent 2px),radial-gradient(circle at 87% 39%,#a9d6e8 0 1px,transparent 2px);
+ background-size:137px 151px,205px 223px}
+.reel-head{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:21px}
+.reel-kicker{font-size:10px;font-weight:800;letter-spacing:.17em;color:var(--winter-gold)}
+.reel-head h2{font:800 clamp(25px,3.4vw,35px)/1.1 var(--fh);letter-spacing:-.05em;margin:9px 0}
+.reel-head p{color:#acb9c5;font-size:13px;line-height:1.6;max-width:590px}
+.reel-counter{display:flex;gap:9px;align-items:center;padding:10px 15px;border:1px solid rgba(208,226,236,.22);background:rgba(12,20,27,.67);border-radius:11px;
+ color:#c9d4dc;white-space:nowrap;font-size:12px}
+.reel-counter .ic{color:var(--winter-gold)}.reel-counter strong{color:#f8ead5;font:800 21px var(--fh);margin-left:10px}
+.reel-machine{position:relative;padding:21px 0;margin:8px 0 14px;border-radius:22px;background:linear-gradient(180deg,#0b131b,#15212c 49%,#0c141d);border:1px solid rgba(197,216,226,.21);
+ box-shadow:inset 0 13px 18px rgba(0,0,0,.28),inset 0 -12px 17px rgba(0,0,0,.24),0 12px 28px rgba(0,0,0,.16)}
+.reel-viewport{height:174px;overflow:hidden;position:relative;mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%)}
+.reel-track{position:relative;display:flex;align-items:center;gap:10px;width:max-content;height:100%;transform:translate3d(0,0,0);will-change:transform}
+.reel-prize{flex:0 0 159px;height:160px;padding:15px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;
+ border:1px solid rgba(179,201,216,.19);border-radius:16px;background:linear-gradient(140deg,#25313d,#17212b);
+ color:#edf4f9;box-shadow:inset 0 1px rgba(255,255,255,.055);transition:border-color .25s,background .25s,box-shadow .25s}
+.reel-prize-icon{display:grid;place-items:center;width:45px;height:45px;margin-bottom:5px;border:1px solid rgba(235,209,168,.18);border-radius:13px;background:rgba(239,208,160,.065);color:#efd0a0}
+.reel-prize-icon .ic{width:25px;height:25px}
+.reel-prize b{font-size:14px;font-weight:750;line-height:1.34;max-width:125px;overflow-wrap:anywhere}
+.reel-prize small{font-size:10px;color:#aab8c5;line-height:1.2}
+.reel-prize.is-selected{border-color:#f3cd92;background:linear-gradient(140deg,#4a3c30,#24242b);box-shadow:0 0 22px rgba(240,197,126,.40),inset 0 0 14px rgba(240,197,126,.09)}
+.reel-prize.is-selected .reel-prize-icon{border-color:rgba(244,209,148,.48)}
+.reel-upper-rail,.reel-lower-rail{position:absolute;left:7%;right:7%;height:2px;z-index:2;pointer-events:none;
+ background:linear-gradient(90deg,transparent,rgba(239,208,160,.6),rgba(175,216,230,.35),rgba(239,208,160,.6),transparent);
+ box-shadow:0 0 14px 2px rgba(239,208,160,.12)}
+.reel-upper-rail{top:8px}.reel-lower-rail{bottom:8px}
+.reel-marker{position:absolute;z-index:5;left:50%;transform:translateX(-50%);pointer-events:none;width:0;height:0;filter:drop-shadow(0 0 9px rgba(255,212,147,.8))}
+.reel-marker-top{top:1px;border-left:13px solid transparent;border-right:13px solid transparent;border-top:20px solid #f3d29c}
+.reel-marker-bottom{bottom:1px;border-left:13px solid transparent;border-right:13px solid transparent;border-bottom:20px solid #f3d29c}
+.reel-machine:after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;border-radius:inherit;
+ background:linear-gradient(90deg,rgba(10,18,26,.76) 0%,transparent 16%,transparent 84%,rgba(10,18,26,.76) 100%)}
+.reel-machine.is-spinning .reel-marker{filter:drop-shadow(0 0 15px rgba(255,223,156,1))}
+.reel-controls{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,1.15fr) minmax(0,1fr);align-items:center;gap:12px;margin-top:19px}
+.reel-price-note{display:flex;align-items:center;gap:8px;font-size:12px;color:#bbc8d1}
+.reel-price-note .ic{color:#efd0a0}
+.reel-spin-btn{min-height:55px;box-shadow:0 7px 28px rgba(226,188,123,.13)!important;display:flex;align-items:center;justify-content:center;gap:12px;font-size:15px}
+.reel-spin-btn.is-busy{opacity:.64;filter:saturate(.7)}
+.reel-spin-arrow{font-size:22px;margin-left:9px;font-weight:400}
+.reel-daily-btn{justify-self:end;max-width:100%;font-size:12px;padding:12px 14px}
+.reel-announcement{position:relative;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px 2px;color:#adbac5;font-size:12px;text-align:center}
+.reel-announcement b{color:#f0d1a2}.reel-announcement .ic{width:16px;height:16px;color:#7ed1ae}
+.winter-wallet{margin:11px 0;gap:8px}
+.winter-wallet .tag{padding:8px 12px}
+.reel-empty{padding:60px 10px;color:var(--mute)}
+[data-theme="light"] .reel-panel{background:linear-gradient(135deg,#fff,#e8edf1);border-color:var(--line)}
+[data-theme="light"] .reel-head p,[data-theme="light"] .reel-price-note,[data-theme="light"] .reel-announcement{color:#526472}
+[data-theme="light"] .reel-head h2,[data-theme="light"] .reel-counter strong{color:#192936}
+/* Rest of the site: improved readability and balance */
+.search,.pills,.filters{gap:9px}
+.search{background:var(--surface2);border-color:var(--line);border-radius:13px}
+select,input,textarea{border-radius:10px;background:var(--surface2);border:1px solid var(--line);min-height:43px;color:var(--ink)}
+input:focus,select:focus,textarea:focus{border-color:var(--edge-strong);box-shadow:0 0 0 3px rgba(239,208,160,.10)}
+:where(a,button,input,select,textarea,[role="button"]):focus-visible{outline:2px solid var(--winter-gold)!important;outline-offset:3px!important}
+.pill{background:var(--surface2);border:1px solid var(--line);border-radius:10px}
+.pill.on{background:rgba(239,208,160,.14);color:var(--winter-gold);border-color:rgba(239,208,160,.31)}
+.mr{border-radius:14px}.mr img{border-radius:11px}
+.prof-banner{background:linear-gradient(125deg,#314755,#15232e)!important}
+.avatar{border-color:var(--surface)}
+.vip-identity .prof-banner{background:linear-gradient(130deg,#263746,#1e2934)!important;animation:none!important}
+.nexus-landing,.nexus-member,.nexus-studio,.nexus-desk,.nexus-tier{animation:none!important}
+.nexus-landing{background:linear-gradient(140deg,#192632,#101c25)!important;border:1px solid var(--line)!important}
+.nexus-benefits,.nexus-benefit{background:var(--surface2)!important;border-color:var(--line)!important}
+.nexus-landing:before,.nexus-landing:after,.nexus-pass:before,.nexus-tier-pass:before,.membership-hero:before,.vip-card:after,.vip-status:after{display:none!important}
+.vip-card,.nexus-tier,.nexus-preview-card,.nexus-tier-pass,.membership-hero,.vip-reveal-card{
+ background:linear-gradient(140deg,#202d37,#121d26)!important;border-color:var(--line)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.055)!important}
+.nexus-preview-card,.nexus-tier-pass,.vip-mini-preview{transform:none!important}
+.membership-orbit,.membership-orbit-a,.membership-orbit-b,.membership-orbit-c,.orbit-star{animation:none!important}
+.membership-orbit-a,.membership-orbit-b,.membership-orbit:before,.membership-orbit:after{display:none!important}
+.nexus-member-title,.membership-title{background:none!important;-webkit-text-fill-color:var(--ink)!important;color:var(--ink)!important;filter:none!important;text-shadow:none!important}
+.nexus-tier-price{color:var(--winter-gold)!important}
+.nexus-tier:hover{border-color:var(--edge-strong)!important}
+.nexus-studio,.studio{background:var(--surface)!important}
+.vip-card .btn{background:linear-gradient(140deg,#f3e7d3,#cfb58d)!important}
+.vip-desk h3,.nexus-desk h3{color:var(--ink)}
+.studio-colors label:hover,.vip-desk-links a:hover{transform:translateY(-1px)!important}
+.cd div{background:var(--surface2);border-color:var(--line);border-radius:11px}
+.cart-bar{border-radius:15px;background:linear-gradient(120deg,#ebd7b7,#b6d0d8);color:#14222d}
+.empty,.notice{border-color:var(--line);border-radius:14px;color:var(--mute)}
+.table{overflow-x:auto}.table th{color:var(--mute)}
+.sheet-wrap{background:rgba(6,11,16,.7)}.sheet{background:#101a23;border-radius:22px 22px 0 0;border-color:var(--line)}
+[data-theme="light"] .sheet{background:#fff}
+.toast{border:1px solid var(--edge-strong);background:#17242e;color:#f6f7f8;box-shadow:0 10px 42px rgba(0,0,0,.35)}
+footer{border-color:var(--line)}.links a{color:var(--text-soft)}.links a:hover{color:var(--winter-gold)}
+.tabbar{background:rgba(14,23,31,.96);border-color:rgba(239,208,160,.20);box-shadow:0 10px 45px rgba(0,0,0,.32)}
+.tabbar .ind{background:rgba(239,208,160,.13);border-color:rgba(239,208,160,.30)}
+.tabbar a.on{color:#f4d9ae}
+/* Accessibility; no pseudo-element can block buttons. */
+@media(max-width:1060px){.winter-hero-layout{gap:13px;padding:34px 26px}.winter-hero-art{transform:scale(.87)}.reel-controls{grid-template-columns:1fr 1fr}.reel-price-note{grid-column:1/-1;justify-content:center}.reel-spin-btn{grid-column:1}.reel-daily-btn{grid-column:2}}
+@media(max-width:820px){
+ .top{min-height:61px;padding:10px 14px}
+ main{padding:16px 14px 122px}
+ .winter-hero-layout{grid-template-columns:1fr;gap:6px;padding:25px 22px 20px}
+ .winter-hero-art{height:205px;max-width:390px;width:100%;margin:0 auto;transform:none}
+ .winter-hero-art:before{inset:0}
+ .winter-gift{top:50px;transform:translateX(-50%) rotate(-5deg) scale(.72)}
+ .winter-halo-a{width:265px;top:43px;height:90px}.winter-halo-b{width:290px;top:55px;height:120px}
+ .winter-art-caption{bottom:1px;font-size:16px}.winter-art-caption b{font-size:22px}
+ .winter-stars{padding-top:4px}
+ .winter-home-hero h1{font-size:clamp(32px,6.8vw,45px)}
+ .home-directory{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .reel-panel{padding:21px 13px}
+ .reel-viewport{height:158px}
+ .reel-prize{flex-basis:137px;height:145px;padding:11px 8px}
+ .reel-prize b{font-size:13px}
+ .reel-prize-icon{width:39px;height:39px}
+ .reel-controls{display:flex;flex-direction:column;gap:9px;align-items:stretch}
+ .reel-price-note{justify-content:center;order:2}
+ .reel-spin-btn{order:0;min-height:53px}
+ .reel-daily-btn{order:1;justify-self:stretch;max-width:100%}
+ .ph{padding:22px 19px}
+}
+@media(max-width:550px){
+ .top{padding:9px 10px;gap:5px}
+ .brand{font-size:14px}.mark{width:32px;height:32px}
+ .winter-home-hero h1{font-size:clamp(30px,8.3vw,41px)}
+ .winter-edition-label{letter-spacing:.07em;font-size:9px}
+ .winter-hero-layout{padding:24px 17px 14px;border-radius:18px}
+ .winter-hero-points{margin-top:13px}
+ .winter-hero-points span{font-size:10px;padding:5px 7px}
+ .winter-hero-art{height:176px}
+ .winter-gift{top:35px;transform:translateX(-50%) rotate(-5deg) scale(.61)}
+ .winter-halo-a{top:29px;width:220px}.winter-halo-b{top:38px;width:260px}
+ .winter-art-caption small{font-size:8px}
+ .home-directory>a{padding:13px 12px;min-height:128px}
+ .home-directory>a b{font-size:13px}
+ .home-directory>a small{font-size:10px}
+ .hero-actions .btn{font-size:12px;min-width:0}
+ .stats{gap:8px}.stat{padding:12px 10px}.stat b{font-size:24px}
+ .reel-panel{border-radius:18px;padding:17px 10px 18px}
+ .reel-head{gap:10px;margin-bottom:16px}
+ .reel-head h2{font-size:24px}
+ .reel-head p{font-size:11px}
+ .reel-counter{width:100%;justify-content:space-between;padding:9px 11px}
+ .reel-machine{border-radius:16px;padding:16px 0}
+ .reel-viewport{height:142px}
+ .reel-prize{flex-basis:114px;height:132px;border-radius:11px;gap:4px}
+ .reel-prize-icon{height:32px;width:32px;border-radius:9px;margin-bottom:1px}
+ .reel-prize-icon .ic{height:19px;width:19px}
+ .reel-prize b{font-size:11px;max-width:96px}.reel-prize small{font-size:9px}
+ .reel-track{gap:8px}
+ .reel-announcement{font-size:11px}
+ .tabbar{left:8px;right:8px;bottom:calc(7px + env(safe-area-inset-bottom));padding:5px;border-radius:17px}
+ .tabbar .ind{border-radius:12px}
+ .tabbar a{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .winter-sky i,.winter-stars{animation:none!important}
+ .btn,.home-directory>a,.glass,.reel-prize{transition:none!important}
+}
+body.calm .winter-sky i,body.calm .winter-stars{animation:none!important}
+/* Final small-screen polish and light-mode readability. */
+[data-theme="light"] .winter-hero-text .eyebrow{color:#456a81}
+[data-theme="light"] .home-directory>a b,[data-theme="light"] .home-directory>a small{color:var(--ink)}
+[data-theme="light"] .stat{background:#fff!important}
+@media(max-width:560px){
+ .cd{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+ .cd div{min-width:0;padding:10px 2px}
+ .cd b{font-size:clamp(16px,5.4vw,22px)}
+ .cd span{font-size:9px}
+}
+
 </style>
 </head>
 <body>
 <div id="splash"><div class="ring"></div><b>A782</b></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="winter-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <header class="top">
   <a class="brand" href="#home"><span class="mark">A</span><span id="brand">A782</span></a>
   <nav class="dnav" id="dnav"></nav>
@@ -1128,11 +1495,23 @@ function ordersTable(list){
 function pHome(){
   const ga=D.giveaways.filter(g=>!g.winner);
   const dl=D.modpacks.reduce((s,m)=>s+m.downloads,0);
-  return `<section class="hero">
-    <p class="eyebrow rv">${t("tag")}</p>
-    <h1>${words(t("htitle"))}</h1>
-    <p class="lead rv">${t("hlead")}</p>
-    <div class="row rv hero-actions"><a class="btn" href="#store">${ic("bag")} ${t("store")} ${ic("arrow")}</a><a class="btn ghost" href="#minecraft">${ic("cube")} ${t("bmc")}</a></div>
+  return `<section class="hero winter-home-hero">
+    <div class="winter-hero-layout">
+      <div class="winter-hero-text">
+        <p class="winter-edition-label"><span class="winter-mini-star">✦</span> A782 DIGITAL <span class="sep">/</span> WINTER EDITION 2026–27</p>
+        <p class="eyebrow rv">${t("tag")}</p>
+        <h1>${words(t("htitle"))}</h1>
+        <p class="lead rv">${t("hlead")}</p>
+        <div class="row rv hero-actions"><a class="btn" href="#store">${ic("bag")} ${t("store")} ${ic("arrow")}</a><a class="btn ghost" href="#minecraft">${ic("cube")} ${t("bmc")}</a></div>
+        <div class="winter-hero-points"><span>✧ ${tri('Цифрлық тауарлар','Цифровые товары','Digital goods')}</span><span>✧ Minecraft</span><span>✧ ${t('gw')}</span></div>
+      </div>
+      <div class="winter-hero-art" aria-hidden="true">
+        <div class="winter-halo winter-halo-a"></div><div class="winter-halo winter-halo-b"></div>
+        <div class="winter-stars">✦ <span>✧</span> ✦ <span>✦</span> ✧</div>
+        <div class="winter-gift"><div class="winter-gift-lid"></div><div class="winter-gift-ribbon-v"></div><div class="winter-gift-ribbon-h"></div><div class="winter-gift-mark">A782<span>DIGITAL</span></div><div class="winter-gift-bow one"></div><div class="winter-gift-bow two"></div></div>
+        <div class="winter-art-caption">WINTER <b>2027</b><small>NEW SEASON · SAME A782</small></div>
+      </div>
+    </div>
     <div class="home-directory rv" aria-label="A782 sections">
       <a href="#store"><span class="directory-icon">${ic('bag')}</span><b>${t('store')}</b><small>${tri('Тауарлар мен қызметтер','Товары и услуги','Products & services')}</small>${ic('arrow','directory-arrow')}</a>
       <a href="#minecraft"><span class="directory-icon">${ic('cube')}</span><b>Minecraft</b><small>${tri('Модпактар мен модтар','Модпаки и моды','Mods & modpacks')}</small>${ic('arrow','directory-arrow')}</a>
@@ -1158,21 +1537,39 @@ function pHome(){
   <div class="marquee"><div><span>Minecraft · Shaders · Packs · Giveaways · Streams ✦</span><span>Minecraft · Shaders · Packs · Giveaways · Streams ✦</span></div></div>
   ${footer()}`;
 }
+function prizeIcon(kind){
+  return ({tokens:'star',tickets:'gift',diamonds:'gem',coupon:'tag'})[kind]||'gift';
+}
+function reelCards(){
+  const p=Array.isArray(D?.prizes)?D.prizes:[];
+  if(!p.length) return `<div class="reel-empty">${t('nores')}</div>`;
+  return Array.from({length:16},(_,cycle)=>p.map((pr,i)=>`<div class="reel-prize" data-reel-n="${cycle*p.length+i}" data-reel-idx="${i}"><div class="reel-prize-icon">${ic(prizeIcon(pr.kind))}</div><b>${esc(L(pr.label))}</b><small>${tri('Мүмкін сыйлық','Возможный приз','Possible reward')}</small></div>`).join('')).join('');
+}
 function pGw(){
-  return `<header class="ph rv"><p class="eyebrow">${ic("gift")} ${t("gw")}</p><h1>${t("gwtitle")}</h1><p class="lead">${t("gwlead")}</p></header>
-  ${ME?`<div class="row rv"><span class="tag">${t("tickets")} <b>${ME.tickets}</b></span><span class="tag">${t("tokens")} <b>${ME.tokens}</b></span><span class="tag">${t("diamonds")} <b>${ME.diamonds}</b></span></div>`:`<p class="notice rv">${t("login")}</p>`}
-  <section class="glass wheel-wrap rv" style="margin-top:20px">
-    <div class="wheel-box"><div class="ptr"></div><canvas id="wheel" width="600" height="600"></canvas><button class="hub" id="hub" aria-label="spin">${ic("refresh")}</button></div>
-    <div><h2 class="bl" style="margin:0">${t("wtitle")}</h2><p class="mute" style="margin:8px 0 16px">${t("wlead")}</p>
-      <button class="btn" id="spinBtn">${ic("play")} ${t("spin")} · ${D.wheelCost} ${t("tickets").toLowerCase()}</button>
-      ${ME?`<button class="btn ghost" id="daily" style="margin-top:10px;width:100%">${ic("plus")} ${t("daily")}</button>`:""}</div>
+  const price=Number(D.wheelCost)||1;
+  return `<header class="ph rv winter-page-head"><div class="winter-page-kicker">✦ A782 WINTER EVENT · 2026–27</div><p class="eyebrow">${ic('gift')} ${t('gw')}</p><h1>${t('gwtitle')}</h1><p class="lead">${tri('Жүлде лентасын айналдырып, виртуалды сыйлық алыңыз.','Запустите ленту призов и получите виртуальную награду.','Spin the prize reel for a virtual reward.')}</p></header>
+  <section class="reel-panel rv" id="reelPanel">
+    <div class="reel-head"><div><span class="reel-kicker">✦ A782 WINTER REWARDS</span><h2>${tri('Сыйлықтар лентасы','Лента наград','Prize reel')}</h2><p>${t('wlead')}</p></div><div class="reel-counter">${ic('gift')} <span>${t('tickets')}</span><strong id="reelTicketCount">${fmt(ME?.tickets??0)}</strong></div></div>
+    <div class="reel-machine" id="winterReel">
+      <div class="reel-upper-rail"></div>
+      <div class="reel-marker reel-marker-top" aria-hidden="true"></div>
+      <div class="reel-viewport" id="reelViewport"><div class="reel-track" id="reelTrack">${reelCards()}</div></div>
+      <div class="reel-marker reel-marker-bottom" aria-hidden="true"></div>
+      <div class="reel-lower-rail"></div>
+    </div>
+    <div class="reel-controls"><div class="reel-price-note">${ic('gift')} <span>${price} ${t('tickets').toLowerCase()} / ${tri('айналдыру','вращение','spin')}</span></div>
+      <button class="btn reel-spin-btn" id="spinBtn" ${!D.prizes?.length?'disabled':''}>${ic('play')} <span>${t('spin')}</span> <span class="reel-spin-arrow">→</span></button>
+      ${ME?`<button class="btn ghost reel-daily-btn" id="daily">${ic('plus')} ${t('daily')}</button>`:`<a href="#me" class="btn ghost reel-daily-btn">${ic('user')} ${t('login_b')}</a>`}
+    </div>
+    <div id="reelAnnouncement" role="status" aria-live="polite" class="reel-announcement">${REEL_LAST_WIN?`${ic('check')} ${tri('Соңғы ұтыс','Последний приз','Last reward')}: <b>${esc(L(REEL_LAST_WIN.label))}</b>`:tri('Ортасындағы белгі тоқтаған жүлдені көрсетеді.','Маркер в центре укажет на приз.','The center marker indicates your reward.')}</div>
   </section>
-  <section class="bl"><h3 class="rv">${t("exch")}</h3>
-    <div class="glass ex"><span>${t("ex1")}</span><button class="btn ghost sm" data-ex="ticket">${ic("refresh")}</button></div>
-    <div class="glass ex"><span>${t("ex2")}</span><button class="btn ghost sm" data-ex="coupon">${ic("refresh")}</button></div>
+  ${ME?`<div class="row rv winter-wallet"><span class="tag">${t('tokens')} <b>${fmt(ME.tokens)}</b></span><span class="tag">${t('diamonds')} <b>${fmt(ME.diamonds)}</b></span></div>`:`<p class="notice rv">${t('login')}</p>`}
+  <section class="bl"><h3 class="rv">${t('exch')}</h3>
+    <div class="glass ex"><span>${t('ex1')}</span><button class="btn ghost sm" data-ex="ticket">${ic('refresh')}</button></div>
+    <div class="glass ex"><span>${t('ex2')}</span><button class="btn ghost sm" data-ex="coupon">${ic('refresh')}</button></div>
   </section>
-  <section class="bl"><h2 class="bl rv">${t("secgw")}</h2><div class="grid">${D.giveaways.map(gwCard).join("")||`<div class="empty">${t("nores")}</div>`}</div></section>
-  ${ME?`<section class="glass bl rv"><h3>${t("mywins")}</h3>${winsHTML()}<p class="mute sm" style="margin-top:10px">${t("prizenote")}</p></section>`:""}
+  <section class="bl"><h2 class="bl rv">${t('secgw')}</h2><div class="grid">${D.giveaways.map(gwCard).join('')||`<div class="empty">${t('nores')}</div>`}</div></section>
+  ${ME?`<section class="glass bl rv"><h3>${t('mywins')}</h3>${winsHTML()}<p class="mute sm" style="margin-top:10px">${t('prizenote')}</p></section>`:''}
   ${footer()}`;
 }
 function pMc(){
@@ -1581,7 +1978,7 @@ function render(keep){
 }
 function bindPage(key){
   if(key==="home") setTimeout(countUp,300);
-  if(key==="gw") drawWheel();
+  if(key==="gw") requestAnimationFrame(initPrizeReel);
   if(key==="streams"||key==="home") startCd();
   if(key==="mc"&&MC.hits===null) searchMC();
   if(key==="store"||(key==="me"&&ME)) loadOrders();
@@ -1617,41 +2014,89 @@ function startCd(){
   tick(); cdT=setInterval(tick,1000);
 }
 
-/* ===================== WHEEL ===================== */
-const WCOL=["#f5b041","#7dd3fc","#34d399","#f472b6","#a78bfa","#fb923c"];
-function drawWheel(){
-  const c=$("#wheel"); if(!c) return;
-  const ctx=c.getContext("2d"),size=c.width,cen=size/2,r=cen-6,n=D.prizes.length,sl=Math.PI*2/n;
-  ctx.clearRect(0,0,size,size);
-  ctx.save();ctx.translate(cen,cen);ctx.rotate(WHEEL);
-  D.prizes.forEach((p,i)=>{
-    const a0=i*sl;
-    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,a0,a0+sl);ctx.closePath();
-    ctx.fillStyle=WCOL[i%WCOL.length];ctx.fill();
-    ctx.strokeStyle="rgba(0,0,0,.25)";ctx.lineWidth=3;ctx.stroke();
-    ctx.save();ctx.rotate(a0+sl/2);ctx.textAlign="right";ctx.fillStyle="#0a0b10";
-    ctx.font="bold 24px Inter, sans-serif";ctx.fillText(L(p.label),r-28,8);ctx.restore();
+/* ===================== HORIZONTAL PRIZE REEL ===================== */
+let REEL_LAST_WIN=null;
+let REEL_LAST_IDX=null;
+let reelAnchor=0;
+let reelRunId=0;
+function reelTranslateTo(n){
+  const viewport=document.getElementById('reelViewport');
+  const card=document.querySelector(`[data-reel-n="${n}"]`);
+  if(!viewport||!card)return 0;
+  return viewport.clientWidth/2-(card.offsetLeft+card.offsetWidth/2);
+}
+function initPrizeReel(){
+  const track=document.getElementById('reelTrack'),p=D?.prizes||[];
+  if(!track||!p.length)return;
+  reelAnchor=2*p.length+(Number.isInteger(REEL_LAST_IDX)?REEL_LAST_IDX:0);
+  track.style.transition='none';
+  track.style.transform=`translate3d(${reelTranslateTo(reelAnchor)}px,0,0)`;
+  document.querySelectorAll('.reel-prize.is-selected').forEach(el=>el.classList.remove('is-selected'));
+  document.querySelector(`[data-reel-n="${reelAnchor}"]`)?.classList.add(REEL_LAST_WIN?'is-selected':'is-at-rest');
+}
+function animateReelTo(index){
+  return new Promise(resolve=>{
+    const track=document.getElementById('reelTrack');
+    const items=Array.isArray(D?.prizes)?D.prizes:[];
+    const n=items.length;
+    if(!track||n===0){resolve();return}
+    // Eight to ten complete visual cycles before the server-selected reward.
+    const goal=12*n+((index%n+n)%n);
+    const duration=(!S.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches)?180:5200;
+    const run=++reelRunId;
+    document.getElementById('winterReel')?.classList.add('is-spinning');
+    track.querySelectorAll('.is-at-rest,.is-selected').forEach(el=>el.classList.remove('is-at-rest','is-selected'));
+    // Allow the browser to paint the initial state before starting the slide.
+    track.style.transition='none';
+    track.style.transform=`translate3d(${reelTranslateTo(reelAnchor)}px,0,0)`;
+    void track.offsetHeight;
+    track.style.transition=`transform ${duration}ms cubic-bezier(.10,.77,.11,1)`;
+    track.style.transform=`translate3d(${reelTranslateTo(goal)}px,0,0)`;
+    let done=false;
+    const finish=()=>{
+      if(done||run!==reelRunId)return;
+      done=true;
+      track.removeEventListener('transitionend',onEnd);
+      document.getElementById('winterReel')?.classList.remove('is-spinning');
+      track.querySelector(`[data-reel-n="${goal}"]`)?.classList.add('is-selected');
+      resolve();
+    };
+    const onEnd=ev=>{if(ev.target===track&&ev.propertyName==='transform')finish()};
+    track.addEventListener('transitionend',onEnd);
+    // Handles hidden tabs, transition interruption and reduced motion.
+    setTimeout(finish,duration+300);
   });
-  ctx.restore();
 }
 async function spin(){
-  if(SPIN) return;
-  if(!TOKEN){toast(t("login"),true);location.hash="#me";return}
-  let r;
-  try{ r=await api("POST","/api/wheel/spin") }catch(e){ toast(errMsg(e),true); return }
+  if(SPIN)return;
+  if(!TOKEN){toast(t('login'),true);location.hash='#me';return}
+  if(!Array.isArray(D?.prizes)||!D.prizes.length){toast(t('nores'),true);return}
   SPIN=true;
-  const n=D.prizes.length,sl=Math.PI*2/n,cur=WHEEL;
-  const base=1.5*Math.PI-(r.index*sl+sl/2);
-  const delta=((base-cur)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
-  const target=cur+Math.PI*2*5+delta;
-  const t0=performance.now(),dur=4000;
-  const step=now=>{
-    const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);
-    WHEEL=cur+(target-cur)*e;drawWheel();
-    if(p<1) requestAnimationFrame(step);
-    else{SPIN=false;ME=r.user;toast(L(r.prize.label)+(r.code?` · ${r.code}`:""));render(true)}
-  };
-  requestAnimationFrame(step);
+  const btn=document.getElementById('spinBtn');
+  const announcement=document.getElementById('reelAnnouncement');
+  if(btn){btn.disabled=true;btn.classList.add('is-busy')}
+  if(announcement)announcement.textContent=tri('Жүлде анықталып жатыр…','Выбираем приз…','Selecting reward…');
+  try{
+    // Keep the existing authenticated server endpoint; no prize is chosen by CSS/JS.
+    const r=await api('POST','/api/wheel/spin');
+    const index=Number(r.index);
+    if(!Number.isInteger(index)||index<0||index>=D.prizes.length){
+      ME=r.user;
+      REEL_LAST_WIN=r.prize;
+      REEL_LAST_IDX=D.prizes.findIndex(p=>p.kind===r.prize?.kind&&p.val===r.prize?.val);
+      toast(tri('Ұтыс жазылды, бетті жаңартыңыз','Приз записан, обновите страницу','Reward saved; refresh the page'));
+    }else{
+      await animateReelTo(index);
+      REEL_LAST_IDX=index;
+      ME=r.user;
+      REEL_LAST_WIN=r.prize;
+      // Briefly hold the selected tile in place for an understandable result.
+      if(S.motion && !window.matchMedia('(prefers-reduced-motion: reduce)').matches)await new Promise(resolve=>setTimeout(resolve,360));
+      toast(L(r.prize.label)+(r.code?` · ${r.code}`:''));
+    }
+    render(true);
+  }catch(e){toast(errMsg(e),true);if(announcement)announcement.textContent=errMsg(e)}
+  finally{SPIN=false;if(btn&&btn.isConnected){btn.disabled=false;btn.classList.remove('is-busy')}}
 }
 
 /* ===================== ӘРЕКЕТТЕР ===================== */
