@@ -213,12 +213,13 @@ async function commitDB() {
     fail(503, "storage_failed");
   }
 }
-async function transaction(req, url) {
-  if (storageBlocked && req.method !== "GET") fail(503, "storage_failed");
+async function transaction(req, url, body) {
+  if (req.method === "GET") return route(req, url, userFrom(req));
+  if (storageBlocked) fail(503, "storage_failed");
   const before = structuredClone(db);
   dirty = false;
   try {
-    const result = await route(req, url, userFrom(req));
+    const result = await route(req, url, userFrom(req), body);
     if (dirty) await commitDB();
     return result;
   } catch (error) { db = before; throw error; }
@@ -267,20 +268,49 @@ function parseSchedule(txt) {
     .map(a => ({ day: +a[0], time: a[1].slice(0, 5), topic: { kk: a[2].slice(0, 120), ru: a[3].slice(0, 120), en: a[4].slice(0, 120) } }));
 }
 
-function readBody(req, limit = 100 * 1024) {
+function readBody(req, limit) {
   return new Promise((resolve, reject) => {
-    let size = 0; const chunks = [];
-    req.on("data", c => {
-      size += c.length;
-      if (size > limit) { req.destroy(); reject(Object.assign(new Error("too_large"), { status: 413, code: "too_large" })); }
-      else chunks.push(c);
-    });
-    req.on("end", () => {
-      if (!size) return resolve({});
-      try { resolve(JSON.parse(Buffer.concat(chunks).toString("utf8"))); }
-      catch { reject(Object.assign(new Error("invalid"), { status: 400, code: "invalid" })); }
-    });
-    req.on("error", reject);
+    const chunks = [];
+    let size = 0;
+    function finish(error, body) {
+      clearTimeout(deadline);
+      req.off("data", onData);
+      req.off("end", onEnd);
+      req.off("close", onClose);
+      req.off("error", onClose);
+      if (error) reject(error);
+      else resolve(body);
+    }
+    function rejectBody(status, code) {
+      finish(Object.assign(new Error(code), { status, code }));
+    }
+    function onClose() { rejectBody(400, "request_closed"); }
+    function onData(chunk) {
+      size += chunk.length;
+      if (size > limit) {
+        rejectBody(413, "too_large");
+        req.resume();
+        return;
+      }
+      chunks.push(chunk);
+    }
+    function onEnd() {
+      if (!size) return finish(null, {});
+      try {
+        const body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+        if (!body || typeof body !== "object" || Array.isArray(body)) return rejectBody(400, "invalid");
+        finish(null, body);
+      } catch { rejectBody(400, "invalid"); }
+    }
+    const deadline = setTimeout(() => {
+      rejectBody(408, "request_timeout");
+      req.resume();
+    }, 10000);
+    if (req.aborted || req.destroyed) return onClose();
+    req.once("close", onClose);
+    req.once("error", onClose);
+    req.once("end", onEnd);
+    req.on("data", onData);
   });
 }
 function send(res, status, body) {
@@ -314,10 +344,14 @@ async function cached(key, load) {
   return v;
 }
 async function upstream(url) {
-  let r;
-  try { r = await fetch(url, { headers: { "User-Agent": UA } }); } catch { fail(502, "upstream"); }
-  if (!r.ok) fail(502, "upstream");
-  return r.json();
+  try {
+    const response = await fetch(url, {
+      headers: { "User-Agent": UA },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!response.ok) throw new Error("upstream");
+    return await response.json();
+  } catch { fail(502, "upstream"); }
 }
 async function mcSearch(sp) {
   const q = str(sp.get("q"), 80);
@@ -346,7 +380,7 @@ async function mcVersions(id) {
   });
 }
 
-async function route(req, url, user) {
+async function route(req, url, user, body) {
   const p = url.pathname, m = req.method;
   const need = () => user || fail(401, "login_required");
 
@@ -355,7 +389,7 @@ async function route(req, url, user) {
   if (m === "GET" && p === "/api/mc/versions") return [200, await mcVersions(url.searchParams.get("id"))];
 
   if (m === "POST" && p === "/api/register") {
-    const b = await readBody(req);
+    const b = body;
     const email = str(b.email, 120).toLowerCase(), pw = String(b.password || ""), nick = str(b.nick, 24);
     if (!/^\S+@\S+\.\S+$/.test(email) || pw.length < 6 || !nick) fail(400, "invalid");
     if (db.users.some(x => x.email === email)) fail(409, "exists");
@@ -371,7 +405,7 @@ async function route(req, url, user) {
     return [200, { token, user: pubUser(u) }];
   }
   if (m === "POST" && p === "/api/login") {
-    const b = await readBody(req);
+    const b = body;
     const u = db.users.find(x => x.email === str(b.email, 120).toLowerCase());
     if (!u) fail(401, "bad_login");
     const ok = crypto.timingSafeEqual(Buffer.from(hashPw(String(b.password || ""), u.salt), "hex"), Buffer.from(u.pass, "hex"));
@@ -389,7 +423,7 @@ async function route(req, url, user) {
   if (m === "GET" && p === "/api/me") return [200, { user: pubUser(need()) }];
   if (m === "PUT" && p === "/api/me") {
     const u = need();
-    const b = await readBody(req, 80 * 1024);
+    const b = body;
     u.nick = str(b.nick, 24) || u.nick;
     u.mc = str(b.mc, 32); u.ff = str(b.ff, 32); u.so2 = str(b.so2, 32); u.tg = str(b.tg, 40); u.bio = str(b.bio, 200);
     if (b.avatar !== undefined) u.avatar = b.avatar === "" ? "" : (safeImg(b.avatar) || u.avatar);
@@ -407,7 +441,7 @@ async function route(req, url, user) {
   }
   if (m === "POST" && p === "/api/me/exchange") {
     const u = need();
-    const b = await readBody(req);
+    const b = body;
     if (b.kind === "ticket") {
       if (u.tokens < 50) fail(400, "not_enough");
       u.tokens -= 50; u.tickets++;
@@ -422,7 +456,7 @@ async function route(req, url, user) {
     return [200, { user: pubUser(u) }];
   }
   if (m === "POST" && p === "/api/wheel/spin") {
-    const u = need(), b = await readBody(req);
+    const u = need(), b = body;
     const requestId = b.requestId;
     if (typeof requestId !== 'string' || !/^[a-zA-Z0-9_-]{16,100}$/.test(requestId)) fail(400, "request_id_required");
     const key = u.id + ':' + requestId;
@@ -462,7 +496,7 @@ async function route(req, url, user) {
 
   // Library works without VIP at a smaller limit, and remains intact when VIP expires.
   if (m === "POST" && p === "/api/library") {
-    const u = need(), b = await readBody(req);
+    const u = need(), b = body;
     const kind = str(b.kind,20), id = str(b.id,80);
     const dbKey = {product:"products",modpack:"modpacks",game:"games"}[kind];
     if (!/^[\w-]{1,80}$/.test(id) || (kind!=="modrinth" && (!dbKey || !db[dbKey].some(x=>x.id===id)))) fail(400,"invalid");
@@ -481,7 +515,7 @@ async function route(req, url, user) {
   if (m === "POST" && p === "/api/vip/preferences") {
     const u=need(), vip=activeVip(u);
     if(!vip) fail(403,"vip_required");
-    const caps=vipCaps(u), b=await readBody(req);
+    const caps=vipCaps(u), b=body;
     const preset=str(b.preset,24);
     if(!caps.presets.includes(preset)) fail(400,"invalid");
     const statusEmoji=str(b.statusEmoji,24);
@@ -512,7 +546,7 @@ async function route(req, url, user) {
   }
   if (m === "POST" && p === "/api/vip/orders") {
     const u = need();
-    const b = await readBody(req);
+    const b = body;
     const plan = db.vipPlans.find(x => x.id === b.planId && x.active);
     if (!plan || tierOf(plan)==="VIP-FREE") fail(404, "not_found");
     if (!(plan.price > 0)) fail(400,"price_not_set");
@@ -531,7 +565,7 @@ async function route(req, url, user) {
   }
   if (m === "POST" && p === "/api/orders") {
     const u = need();
-    const b = await readBody(req);
+    const b = body;
     const lines = []; let sub = 0;
     for (const it of (Array.isArray(b.items) ? b.items : []).slice(0, 30)) {
       const pr = db.products.find(x => x.id === it.id);
@@ -567,7 +601,7 @@ async function route(req, url, user) {
     const hit = pinHits.get(ip) || { n: 0, t: Date.now() };
     if (Date.now() - hit.t > 15 * 60e3) { hit.n = 0; hit.t = Date.now(); }
     if (hit.n >= 10) fail(429, "too_many");
-    const b = await readBody(req);
+    const b = body;
     const pin = String(b.pin || "");
     const ok = pin.length === ADMIN_PIN.length && crypto.timingSafeEqual(Buffer.from(pin), Buffer.from(ADMIN_PIN));
     if (!ok) { hit.n++; pinHits.set(ip, hit); fail(403, "bad_pin"); }
@@ -577,14 +611,14 @@ async function route(req, url, user) {
   }
   if (p.startsWith("/api/admin/")) {
     if (!isAdmin(req)) fail(403, "admin_required");
-    return adminRoute(req, m, p);
+    return adminRoute(req, m, p, body);
   }
   return [404, { error: "not_found" }];
 }
 
-async function adminRoute(req, m, p) {
+async function adminRoute(req, m, p, body) {
   if (m === 'PUT' && p === '/api/admin/wheel-chances') {
-    const b = await readBody(req);
+    const b = body;
     if (b.revision !== db.wheelRevision) fail(409, 'chances_changed');
     if (!Array.isArray(b.prizes) || b.prizes.length !== db.prizes.length || new Set(b.prizes.map(x=>x.id)).size !== db.prizes.length) fail(400,'invalid_chances');
     const updated = db.prizes.map(pz => {
@@ -597,7 +631,7 @@ async function adminRoute(req, m, p) {
     return [200,{ok:true, revision:db.wheelRevision}];
   }
   if (m === 'POST' && p === '/api/admin/wheel-prizes') {
-    const b = await readBody(req);
+    const b = body;
     if (!['tokens','tickets','diamonds','coupon'].includes(b.kind) || !Number.isInteger(b.val) || b.val<1 || b.val>1000000 || (b.kind==='coupon' && b.val>100) || !RARITIES.includes(b.rarity)) fail(400,'invalid_prize');
     const label=tr(b,'label',120);
     if (!label.kk || !label.ru || !label.en) fail(400,'title_required');
@@ -606,7 +640,7 @@ async function adminRoute(req, m, p) {
   }
 
   if (m === "PUT" && p === "/api/admin/site") {
-    const b = await readBody(req);
+    const b = body;
     const o = db.owner, s = db.stream;
     db.owner = {
       ...o,
@@ -632,7 +666,7 @@ async function adminRoute(req, m, p) {
     return [200, { ok: true }];
   }
   if (m === "POST" && p === "/api/admin/giveaways") {
-    const b = await readBody(req);
+    const b = body;
     const title = tr(b, "title", 120);
     if (!title.kk && !title.ru && !title.en) fail(400, "title_required");
     const old = db.giveaways.find(x => x.id === str(b.id, 40));
@@ -647,7 +681,7 @@ async function adminRoute(req, m, p) {
     return [200, { ok: true }];
   }
   if (m === "POST" && p === "/api/admin/products") {
-    const b = await readBody(req);
+    const b = body;
     const name = tr(b, "name", 120);
     if (!name.kk && !name.ru && !name.en) fail(400, "title_required");
     const old = db.products.find(x => x.id === str(b.id, 40));
@@ -662,7 +696,7 @@ async function adminRoute(req, m, p) {
     return [200, { ok: true }];
   }
   if (m === "POST" && p === "/api/admin/modpacks") {
-    const b = await readBody(req);
+    const b = body;
     const title = str(b.title, 120);
     if (!title) fail(400, "title_required");
     const old = db.modpacks.find(x => x.id === str(b.id, 40));
@@ -684,7 +718,7 @@ async function adminRoute(req, m, p) {
     return [200, { ok: true }];
   }
   if (m === "POST" && p === "/api/admin/games") {
-    const b = await readBody(req);
+    const b = body;
     const name = str(b.name, 40);
     if (!name) fail(400, "title_required");
     const old = db.games.find(x => x.id === str(b.id, 40));
@@ -718,7 +752,7 @@ async function adminRoute(req, m, p) {
   }
   const bal = p.match(/^\/api\/admin\/users\/([\w-]+)\/balance$/);
   if (m === "POST" && bal) {
-    const b = await readBody(req);
+    const b = body;
     const u = db.users.find(x => x.id === bal[1]) || fail(404, "not_found");
     if (!["tickets", "tokens", "diamonds"].includes(b.field)) fail(400, "invalid");
     u[b.field] = Math.max(0, u[b.field] + (parseInt(b.delta) || 0));
@@ -727,7 +761,7 @@ async function adminRoute(req, m, p) {
   }
   if (m === "GET" && p === "/api/admin/vip-plans") return [200, { plans: db.vipPlans }];
   if (m === "POST" && p === "/api/admin/vip-plans") {
-    const b = await readBody(req);
+    const b = body;
     const old = db.vipPlans.find(x => x.id === b.id);
     if (!old) fail(404,"not_found");
     const tier = tierOf(old);
@@ -763,7 +797,7 @@ async function adminRoute(req, m, p) {
   }
   const ost = p.match(/^\/api\/admin\/orders\/([\w-]+)\/status$/);
   if (m === "POST" && ost) {
-    const b = await readBody(req);
+    const b = body;
     const o = db.orders.find(x => x.id === ost[1]) || fail(404, "not_found");
     if (!["paid", "pending"].includes(b.status)) fail(400, "invalid");
     if (o.type === "vip") fail(400, "invalid");
@@ -799,13 +833,31 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (!url.pathname.startsWith("/api/")) return serveStatic(url.pathname, res);
   try {
-    const job = requestQueue.then(() => transaction(req, url));
+    // Modrinth uses its own cache and never reads or writes the site database.
+    const isModrinth = req.method === "GET" &&
+      ["/api/mc/search", "/api/mc/versions"].includes(url.pathname);
+    if (isModrinth) {
+      const [status, out] = await route(req, url, null);
+      if (!res.destroyed) send(res, status, out);
+      return;
+    }
+
+    // A slow or interrupted upload must not hold the database queue.
+    const body = req.method === "POST" || req.method === "PUT"
+      ? await readBody(req, req.method === "PUT" && url.pathname === "/api/me" ? 80 * 1024 : 100 * 1024)
+      : undefined;
+    const job = requestQueue.then(() => {
+      if (req.aborted || res.destroyed) return null;
+      return transaction(req, url, body);
+    });
     requestQueue = job.catch(() => {});
-    const [status, out] = await job;
-    send(res, status, out);
+    const result = await job;
+    if (result && !res.destroyed) send(res, ...result);
   } catch (e) {
     const status = e.status || 500;
     if (status === 500) console.error(e);
+    if (res.destroyed) return;
+    if (status === 408 || status === 413) res.setHeader("Connection", "close");
     send(res, status, { error: status === 500 ? "generic" : (e.code || e.message) });
   }
 });
