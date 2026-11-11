@@ -120,11 +120,40 @@ function seed() {
 
 let db = seed();
 let remoteReady = !REMOTE;
-let saveTimer = null;
+let dirty = false;
+let storageBlocked = false;
+let requestQueue = Promise.resolve();
+const RARITIES = ["Common", "Rare", "Epic", "Legendary"];
+function migrateWheel() {
+  if (!db.wheelRevision) db.wheelRevision = 1;
+  if (!db.spinReceipts) db.spinReceipts = {};
+  const weights = db.prizes.map(p => Math.max(0, Number(p.weight) || 0));
+  const total = weights.reduce((a,b) => a+b, 0);
+  const raw = weights.map(w => total ? w / total * 10000 : 0);
+  const points = raw.map(Math.floor);
+  if (total) {
+    const order = raw.map((v,i) => i).sort((a,b) => (raw[b]-points[b])-(raw[a]-points[a]));
+    for (let n = 10000-points.reduce((a,b)=>a+b,0), i=0; i<n; i++) points[order[i%order.length]]++;
+  }
+  db.prizes.forEach((p,i) => {
+    p.id ||= 'legacy-prize-' + i;
+    if (!Number.isInteger(p.chanceBps)) p.chanceBps = points[i];
+    if (!RARITIES.includes(p.rarity)) p.rarity = p.chanceBps <= 100 ? 'Legendary' : p.chanceBps <= 900 ? 'Epic' : p.chanceBps <= 2000 ? 'Rare' : 'Common';
+  });
+}
+function validChances(prizes) {
+  return prizes.length > 0 && prizes.every(p => Number.isInteger(p.chanceBps) && p.chanceBps >= 0 && p.chanceBps <= 10000) && prizes.reduce((a,p)=>a+p.chanceBps,0) === 10000;
+}
+function pickPrizeIndex(prizes, roll = crypto.randomInt(10000)) {
+  for (let i=0; i<prizes.length; i++) { roll -= prizes[i].chanceBps; if(roll<0)return i; }
+  fail(503, 'invalid_chances');
+}
+
 
 function migrate() {
   const s = seed();
   for (const k of Object.keys(s)) if (db[k] === undefined) db[k] = s[k];
+  migrateWheel();
   if (!db.owner.bio || typeof db.owner.bio !== "object") db.owner.bio = s.owner.bio;
   if (!db.stream.title || typeof db.stream.title !== "object") db.stream.title = s.stream.title;
   if (!Array.isArray(db.stream.schedule) || db.stream.schedule.some(x => typeof x.day !== "number")) db.stream.schedule = s.stream.schedule;
@@ -151,51 +180,49 @@ async function loadDB() {
   const r = await fetch(`https://api.jsonbin.io/v3/b/${JB_ID}/latest`, { headers: { "X-Master-Key": JB_KEY } });
   if (!r.ok) throw new Error("JSONBin " + r.status);
   const j = await r.json();
-  if (j.record && j.record.owner) db = j.record;
+  if (!j.record || !j.record.owner || !Array.isArray(j.record.users)) throw new Error("JSONBin record is invalid; refusing to overwrite");
+  db = j.record;
   migrate();
   remoteReady = true;
   console.log("JSONBin-нен деректер жүктелді");
 }
 
-function saveDB() {
+// All API requests run through one transaction queue. No delayed writes can
+// overtake a spin, balance update, login or admin edit. Deploy ONE instance.
+function saveDB() { dirty = true; }
+async function saveVipNow() { dirty = true; }
+async function commitDB() {
   if (!REMOTE) {
     const tmp = DATA_FILE + ".tmp";
-    fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+    fs.writeFileSync(tmp, JSON.stringify(db, null, 2), {mode:0o600});
     fs.renameSync(tmp, DATA_FILE);
     return;
   }
-  if (!remoteReady) return;
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    fetch(`https://api.jsonbin.io/v3/b/${JB_ID}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": JB_KEY },
-      body: JSON.stringify(db)
-    }).then(r => { if (!r.ok) console.error("JSONBin сақтау қатесі:", r.status); })
-      .catch(e => console.error("JSONBin сақтау қатесі:", e.message));
-  }, 500);
-}
-
-// VIP changes must be confirmed by persistent storage before reporting success.
-async function saveVipNow() {
-  if (!REMOTE) { saveDB(); return; }
-  if (!remoteReady) fail(503, "storage_failed");
-  clearTimeout(saveTimer);
-  saveTimer = null;
+  if (!remoteReady || storageBlocked) fail(503, "storage_failed");
   try {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${JB_ID}`, {
-      method: "PUT",
+      method: "PUT", signal: AbortSignal.timeout(15000),
       headers: { "Content-Type": "application/json", "X-Master-Key": JB_KEY },
       body: JSON.stringify(db)
     });
-    if (!response.ok) {
-      console.error("VIP JSONBin сақтау қатесі:", response.status);
-      fail(503, "storage_failed");
-    }
+    if (!response.ok) throw new Error("storage_failed");
   } catch (error) {
-    console.error("VIP сақтау қатесі:", error.message);
+    // A lost response may mean the write succeeded. Freeze writes until restart
+    // reloads authoritative JSONBin state; NEVER reroll an uncertain result.
+    storageBlocked = true;
     fail(503, "storage_failed");
   }
+}
+async function transaction(req, url) {
+  if (storageBlocked && req.method !== "GET") fail(503, "storage_failed");
+  const before = structuredClone(db);
+  dirty = false;
+  try {
+    const result = await route(req, url, userFrom(req));
+    if (dirty) await commitDB();
+    return result;
+  } catch (error) { db = before; throw error; }
+  finally { dirty = false; }
 }
 
 const uid = () => crypto.randomBytes(8).toString("hex");
@@ -230,7 +257,7 @@ const pubUser = u => ({
 const pubGw = g => ({ ...g, participants: g.participants.map(p => p.nick), winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null });
 const pubData = () => ({
   vipPlans: db.vipPlans.filter(p => p.active && VIP_TIERS.includes(tierOf(p)) && p.tier).map(vipPublicPlan).sort((a,b)=>VIP_TIERS.indexOf(a.tier)-VIP_TIERS.indexOf(b.tier)), owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
-  prizes: db.prizes, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
+  prizes: db.prizes, wheelRevision: db.wheelRevision, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
   giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
 });
 function parseSchedule(txt) {
@@ -395,21 +422,29 @@ async function route(req, url, user) {
     return [200, { user: pubUser(u) }];
   }
   if (m === "POST" && p === "/api/wheel/spin") {
-    const u = need();
+    const u = need(), b = await readBody(req);
+    const requestId = b.requestId;
+    if (typeof requestId !== 'string' || !/^[a-zA-Z0-9_-]{16,100}$/.test(requestId)) fail(400, "request_id_required");
+    const key = u.id + ':' + requestId;
+    const old = db.spinReceipts[key];
+    if (old) return [200, {...old, user: pubUser(u), replayed:true}];
+    if (Date.now() - (u.lastSpinAt || 0) < 6500) fail(409, "spin_busy");
+    if (!validChances(db.prizes)) fail(503, "invalid_chances");
     if (u.tickets < db.wheelCost) fail(400, "no_tickets");
+    const idx = pickPrizeIndex(db.prizes);
+    const pz = structuredClone(db.prizes[idx]);
+    if (!['tokens','tickets','diamonds','coupon'].includes(pz.kind) || !Number.isFinite(pz.val) || pz.val < 0) fail(503, 'invalid_prize');
     u.tickets -= db.wheelCost;
-    const total = db.prizes.reduce((s, x) => s + x.weight, 0);
-    let r = crypto.randomInt(total), idx = 0;
-    for (let i = 0; i < db.prizes.length; i++) { r -= db.prizes[i].weight; if (r < 0) { idx = i; break; } }
-    const pz = db.prizes[idx];
     let code = null;
-    if (pz.kind === "tokens") u.tokens += pz.val;
-    else if (pz.kind === "tickets") u.tickets += pz.val;
-    else if (pz.kind === "diamonds") u.diamonds += pz.val;
-    else if (pz.kind === "coupon") { code = "CP-" + randCode(); u.codes[code] = pz.val; }
-    u.wins.unshift({ id: uid(), title: pz.label, code: code || "", date: new Date().toLocaleDateString("en-GB") });
+    if (pz.kind === 'coupon') { code = 'CP-' + randCode(); (u.codes ||= {})[code] = pz.val; }
+    else u[pz.kind] = (Number(u[pz.kind]) || 0) + pz.val;
+    const winId = uid();
+    (u.wins ||= []).unshift({id:winId, title:pz.label, prizeId:pz.id, requestId, code:code||'', date:new Date().toLocaleDateString('en-GB')});
+    u.lastSpinAt = Date.now();
+    const receipt = {index:idx, prize:pz, code, winId, requestId, revision:db.wheelRevision};
+    db.spinReceipts[key] = receipt;
     saveDB();
-    return [200, { index: idx, prize: pz, code, user: pubUser(u) }];
+    return [200, {...receipt, user:pubUser(u)}];
   }
 
   const en = p.match(/^\/api\/giveaways\/([\w-]+)\/enter$/);
@@ -548,6 +583,28 @@ async function route(req, url, user) {
 }
 
 async function adminRoute(req, m, p) {
+  if (m === 'PUT' && p === '/api/admin/wheel-chances') {
+    const b = await readBody(req);
+    if (b.revision !== db.wheelRevision) fail(409, 'chances_changed');
+    if (!Array.isArray(b.prizes) || b.prizes.length !== db.prizes.length || new Set(b.prizes.map(x=>x.id)).size !== db.prizes.length) fail(400,'invalid_chances');
+    const updated = db.prizes.map(pz => {
+      const row = b.prizes.find(x=>x.id===pz.id);
+      if (!row || typeof row.percent !== 'number' || !Number.isFinite(row.percent) || row.percent<0 || row.percent>100 || Math.abs(row.percent*100-Math.round(row.percent*100))>1e-7 || !RARITIES.includes(row.rarity)) fail(400,'invalid_chances');
+      return {...pz, chanceBps:Math.round(row.percent*100), rarity:row.rarity};
+    });
+    if (!validChances(updated)) fail(400, 'chances_total');
+    db.prizes = updated; db.wheelRevision++; saveDB();
+    return [200,{ok:true, revision:db.wheelRevision}];
+  }
+  if (m === 'POST' && p === '/api/admin/wheel-prizes') {
+    const b = await readBody(req);
+    if (!['tokens','tickets','diamonds','coupon'].includes(b.kind) || !Number.isInteger(b.val) || b.val<1 || b.val>1000000 || (b.kind==='coupon' && b.val>100) || !RARITIES.includes(b.rarity)) fail(400,'invalid_prize');
+    const label=tr(b,'label',120);
+    if (!label.kk || !label.ru || !label.en) fail(400,'title_required');
+    db.prizes.push({id:uid(), label, kind:b.kind, val:b.val, weight:0, chanceBps:0, rarity:b.rarity});
+    db.wheelRevision++; saveDB(); return [200,{ok:true}];
+  }
+
   if (m === "PUT" && p === "/api/admin/site") {
     const b = await readBody(req);
     const o = db.owner, s = db.stream;
@@ -742,7 +799,9 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (!url.pathname.startsWith("/api/")) return serveStatic(url.pathname, res);
   try {
-    const [status, out] = await route(req, url, userFrom(req));
+    const job = requestQueue.then(() => transaction(req, url));
+    requestQueue = job.catch(() => {});
+    const [status, out] = await job;
     send(res, status, out);
   } catch (e) {
     const status = e.status || 500;
@@ -752,5 +811,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 loadDB()
-  .catch(e => { console.error("Жүктеу қатесі:", e.message); migrate(); })
-  .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: порт ${PORT}`)));
+  .then(() => server.listen(PORT, () => console.log(`A782 DIGITAL: порт ${PORT}`)))
+  .catch(e => { console.error("Жүктеу қатесі: іске қосу тоқтатылды", e.message); process.exitCode=1; });
