@@ -1156,7 +1156,33 @@ body.calm .winter-sky i,body.calm .winter-stars{animation:none!important}
 }
 
 </style>
-</head>
+<style>
+/* Winter refresh: restrained surfaces, compositor-only motion. */
+:root{--acc:#d9c294}
+.pg{animation:section-arrive .32s ease-out!important}
+@keyframes section-arrive{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.dnav a,.tabbar a,.btn,.icon-btn{transition:background .2s,color .2s,box-shadow .2s,transform .18s!important}
+.btn:active,.icon-btn:active{transform:scale(.975)!important}
+.dnav a:hover,.tabbar a:hover{background:rgba(186,208,225,.07)}
+.winter-stars,.marquee,.winter-gift-bow{display:none!important}
+.winter-hero-art{filter:saturate(.5)}
+.reel-prize{--rare:#9eabb8;border-top:2px solid var(--rare)!important}
+.reel-prize[data-rarity="Rare"]{--rare:#9fc8dd}
+.reel-prize[data-rarity="Epic"]{--rare:#b5aad1}
+.reel-prize[data-rarity="Legendary"]{--rare:#d9bc80}
+.reel-prize small{color:var(--rare);letter-spacing:.1em;font-size:10px;text-transform:uppercase}
+.reel-prize.is-selected{border-color:var(--rare)!important;box-shadow:inset 0 0 30px #d9bc8010,0 0 24px #d9bc8022!important}
+.reel-track{will-change:transform}
+.reel-rules{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
+.chance-row{display:grid;grid-template-columns:minmax(110px,1fr) 100px 130px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.chance-row input,.chance-row select{width:100%;min-width:0}
+.chance-row small{display:block;color:var(--muted);margin-top:4px}
+.odds-table{width:100%;border-collapse:collapse}.odds-table th,.odds-table td{padding:13px 8px;text-align:left;border-bottom:1px solid var(--line)}
+#chancesTotal{font-variant-numeric:tabular-nums;margin:16px 0}
+@media(max-width:600px){.chance-row{grid-template-columns:minmax(85px,1fr) 75px 100px;gap:7px}.winter-sky i:nth-child(n+9){display:none}.reel-prize{backdrop-filter:none!important}.reel-machine.is-spinning .reel-marker{filter:none!important}}
+@media(prefers-reduced-motion:reduce){.pg{animation:none!important}.dnav a,.tabbar a,.btn,.icon-btn{transition:none!important}}
+body.calm .pg{animation:none!important}
+</style></head>
 <body>
 <div id="splash"><div class="ring"></div><b>A782</b></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1382,6 +1408,14 @@ const money=n=>Number(n||0).toLocaleString("en-US")+" ₸";
 const fmt=n=>Number(n||0).toLocaleString("en-US");
 const words=s=>String(s).split(" ").map((w,i)=>`<span class="w"><span style="--i:${i}">${esc(w)}</span></span>`).join(" ");
 
+for(const [code,labels] of Object.entries({
+ invalid_chances:['Пайыз 0–100 аралығында, ең көбі 2 ондық таңбамен берілуі керек.','Процент от 0 до 100, максимум два знака после запятой.','Use 0–100 percent with at most two decimal places.'],
+ chances_total:['Шанстар қосындысы 100% болуы керек.','Сумма шансов должна быть 100%.','Probabilities must total 100%.'],
+ chances_changed:['Шанстар өзгерген. Бетті жаңартып, қайта енгізіңіз.','Шансы изменились. Обновите страницу.','Probabilities changed. Refresh before saving.'],
+ spin_busy:['Айналдыру аяқталғанша күтіңіз.','Дождитесь завершения вращения.','Wait for the current spin to finish.'],
+ storage_failed:['Сақтау расталмады. Кейін қайта басыңыз: сол сұраныс тексеріледі.','Сохранение не подтверждено. Повторите позже: будет проверен тот же запрос.','Save not confirmed. Retry later; the same request will be checked.'],
+ invalid_prize:['Сыйлық түрін және мөлшерін тексеріңіз.','Проверьте тип и количество приза.','Check the prize type and amount.']
+})){['kk','ru','en'].forEach((lang,i)=>E[lang][code]=labels[i])}
 let D=null, ME=null, TOKEN=localStorage.getItem("a782-token")||"", ADMIN=sessionStorage.getItem("a782-admin")||"";
 const ownerView=()=>!!ME?.isOwner;
 // Keep a clicked admin form only in memory while the owner renews an expired PIN session.
@@ -1540,10 +1574,30 @@ function pHome(){
 function prizeIcon(kind){
   return ({tokens:'star',tickets:'gift',diamonds:'gem',coupon:'tag'})[kind]||'gift';
 }
+function prizeCard(pr,n){
+ return `<div class="reel-prize" data-reel-n="${n}" data-prize-id="${esc(pr.id)}" data-rarity="${esc(pr.rarity||'Common')}"><div class="reel-prize-icon">${ic(prizeIcon(pr.kind))}</div><b>${esc(L(pr.label))}</b><small>${esc(pr.rarity||'Common')}</small></div>`;
+}
 function reelCards(){
-  const p=Array.isArray(D?.prizes)?D.prizes:[];
-  if(!p.length) return `<div class="reel-empty">${t('nores')}</div>`;
-  return Array.from({length:16},(_,cycle)=>p.map((pr,i)=>`<div class="reel-prize" data-reel-n="${cycle*p.length+i}" data-reel-idx="${i}"><div class="reel-prize-icon">${ic(prizeIcon(pr.kind))}</div><b>${esc(L(pr.label))}</b><small>${tri('Мүмкін сыйлық','Возможный приз','Possible reward')}</small></div>`).join('')).join('');
+ const prizes=D?.prizes||[];
+ return prizes.length?Array.from({length:72},(_,n)=>prizeCard(prizes[n%prizes.length],n)).join(''):`<div class="reel-empty">${t('nores')}</div>`;
+}
+function chanceAdmin(){
+ return `<section class="glass bl rv"><h3>${tri('Рулетка шанстары','Шансы рулетки','Roulette probabilities')}</h3><p class="mute">${tri('Барлығы 100%. 0% сыйлық ұтылмайды. Сиректік — бөлек белгі.','Сумма 100%. Призы с 0% не выпадают. Редкость — отдельная метка.','Total must be 100%. Zero-percent prizes cannot win. Rarity is a separate label.')}</p>
+ <form id="chanceForm">${D.prizes.map(p=>`<div class="chance-row" data-chance-id="${esc(p.id)}"><label for="chance-${esc(p.id)}">${esc(L(p.label))}</label><input id="chance-${esc(p.id)}" aria-label="${esc(L(p.label))} %" type="number" min="0" max="100" step="0.01" required value="${p.chanceBps/100}"><select aria-label="Rarity">${['Common','Rare','Epic','Legendary'].map(r=>`<option ${r===p.rarity?'selected':''}>${r}</option>`).join('')}</select></div>`).join('')}<p id="chancesTotal" role="status"></p><p id="chanceError" role="alert"></p><button class="btn" type="submit">${t('saved')==='Saved'?'Save':tri('Сақтау','Сохранить','Save')}</button></form>
+ <details class="bl"><summary>${tri('Жаңа сыйлық қосу','Добавить приз','Add prize')}</summary><form id="newWheelPrize" class="form">${ml('label',tri('Атауы','Название','Name'),{})}<label class="field">${tri('Түрі','Тип','Type')}<select name="kind"><option value="tickets">Tickets</option><option value="tokens">Tokens</option><option value="diamonds">Diamonds</option><option value="coupon">Coupon %</option></select></label><label class="field">${tri('Мөлшері','Количество','Amount')}<input name="val" type="number" min="1" max="1000000" required></label><label class="field">Rarity<select name="rarity"><option>Common</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label><p class="mute">${tri('0% шансымен қосылады. Содан кейін шанстарды реттеп сақтаңыз.','Добавляется с шансом 0%. Затем настройте и сохраните шансы.','Added at 0%. Then adjust and save the probabilities.')}</p><button class="btn" type="submit">${tri('Қосу','Добавить','Add')}</button></form></details></section>`;
+}
+function updateChanceTotal(){
+ const el=document.getElementById('chancesTotal'); if(!el)return;
+ const inputs=[...document.querySelectorAll('[data-chance-id] input')];
+ const sum=inputs.reduce((a,x)=>a+Math.round(Number(x.value)*100),0);
+ el.textContent=tri('Жалпы: ','Всего: ','Total: ')+(sum/100).toFixed(2)+'% / 100%';
+ el.style.color=sum===10000?'#b6d2c2':'#e2ae9f';
+}
+async function showOdds(){
+ try{
+  const fresh=await api('GET','/api/data');
+  openSheet(`<h2>${tri('Ұтыс ережелері','Правила розыгрыша','Draw rules')}</h2><p class="mute">${tri('Тегін қатысу билеттері. Ақша тігу және ақшалай ұтыс жоқ. Нәтижені сервер таңдап, аккаунтқа сақтайды.','Бесплатные билеты участия. Без денежных ставок и денежных выигрышей. Сервер выбирает и сохраняет приз.','Free participation tickets. No cash bets or cash payouts. The server selects and saves your reward.')}</p><table class="odds-table"><thead><tr><th>${tri('Сыйлық','Приз','Prize')}</th><th>Rarity</th><th>%</th></tr></thead><tbody>${fresh.prizes.map(p=>`<tr><td>${esc(L(p.label))}</td><td>${esc(p.rarity)}</td><td>${(p.chanceBps/100).toFixed(2)}%</td></tr>`).join('')}</tbody></table><p class="mute">${tri('Әр айналдыру тәуелсіз. Сиректік белгісі нақты пайызды алмастырмайды.','Каждое вращение независимо. Метка редкости не заменяет точный процент.','Each draw is independent. Rarity labels do not replace exact probabilities.')}</p><button class="btn ghost" onclick="closeSheet()">${tri('Жабу','Закрыть','Close')}</button>`);
+ }catch(e){toast(errMsg(e),true)}
 }
 function pGw(){
   const price=Number(D.wheelCost)||1;
@@ -1558,10 +1612,10 @@ function pGw(){
       <div class="reel-lower-rail"></div>
     </div>
     <div class="reel-controls"><div class="reel-price-note">${ic('gift')} <span>${price} ${t('tickets').toLowerCase()} / ${tri('айналдыру','вращение','spin')}</span></div>
-      <button class="btn reel-spin-btn" id="spinBtn" ${!D.prizes?.length?'disabled':''}>${ic('play')} <span>${t('spin')}</span> <span class="reel-spin-arrow">→</span></button>
+      <button class="btn reel-spin-btn" id="spinBtn" ${SPIN||!D.prizes?.length?'disabled':''}>${ic('play')} <span>${t('spin')}</span> <span class="reel-spin-arrow">→</span></button>
       ${ME?`<button class="btn ghost reel-daily-btn" id="daily">${ic('plus')} ${t('daily')}</button>`:`<a href="#me" class="btn ghost reel-daily-btn">${ic('user')} ${t('login_b')}</a>`}
     </div>
-    <div id="reelAnnouncement" role="status" aria-live="polite" class="reel-announcement">${REEL_LAST_WIN?`${ic('check')} ${tri('Соңғы ұтыс','Последний приз','Last reward')}: <b>${esc(L(REEL_LAST_WIN.label))}</b>`:tri('Ортасындағы белгі тоқтаған жүлдені көрсетеді.','Маркер в центре укажет на приз.','The center marker indicates your reward.')}</div>
+    <div class="reel-rules"><span class="mute">Common · Rare · Epic · Legendary</span><button class="btn ghost sm" type="button" onclick="showOdds()">${tri('Ұтыс ережелері','Правила розыгрыша','Draw rules')}</button></div><div id="reelAnnouncement" role="status" aria-live="polite" class="reel-announcement">${REEL_LAST_WIN?`${ic('check')} ${tri('Соңғы ұтыс','Последний приз','Last reward')}: <b>${esc(L(REEL_LAST_WIN.label))}</b>`:tri('Ортасындағы белгі тоқтаған жүлдені көрсетеді.','Маркер в центре укажет на приз.','The center marker indicates your reward.')}</div>
   </section>
   ${ME?`<div class="row rv winter-wallet"><span class="tag">${t('tokens')} <b>${fmt(ME.tokens)}</b></span><span class="tag">${t('diamonds')} <b>${fmt(ME.diamonds)}</b></span></div>`:`<p class="notice rv">${t('login')}</p>`}
   <section class="bl"><h3 class="rv">${t('exch')}</h3>
@@ -1849,7 +1903,7 @@ function pAdmin(){
   const sel=(name,opts)=>`<select name="${name}">${opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select>`;
   return `<header class="ph rv"><p class="eyebrow">${ic("lock")} ${t("adm")}</p><h1>${t("admt")}</h1>
     <div class="row"><button class="btn ghost sm" id="admOut">${ic("lock")} ${t("lock")}</button></div></header>
-  <section class="glass rv"><h3>${t("sec_site")}</h3>
+  ${chanceAdmin()}<section class="glass rv"><h3>${t("sec_site")}</h3>
     <form id="fSite" class="form"><div class="g2">
       <label class="field">${t("name")}<input name="name" value="${esc(o.name)}"></label>
       <label class="field">${t("handle")}<input name="handle" value="${esc(o.handle)}"></label>
@@ -1983,7 +2037,7 @@ function bindPage(key){
   if(key==="mc"&&MC.hits===null) searchMC();
   if(key==="store"||(key==="me"&&ME)) loadOrders();
   if(key==="me"&&ME) refreshVipProfile();
-  if(key==="admin"&&ADMIN&&ownerView()) loadAdmin();
+  if(key==="admin"&&ADMIN&&ownerView()){loadAdmin();updateChanceTotal();}
 }
 async function refreshVipProfile(){
   try {
@@ -2028,20 +2082,22 @@ function reelTranslateTo(n){
 function initPrizeReel(){
   const track=document.getElementById('reelTrack'),p=D?.prizes||[];
   if(!track||!p.length)return;
-  reelAnchor=2*p.length+(Number.isInteger(REEL_LAST_IDX)?REEL_LAST_IDX:0);
+  reelAnchor=4;
+  if(REEL_LAST_WIN) track.querySelector(`[data-reel-n="4"]`).outerHTML=prizeCard(REEL_LAST_WIN,4);
   track.style.transition='none';
   track.style.transform=`translate3d(${reelTranslateTo(reelAnchor)}px,0,0)`;
   document.querySelectorAll('.reel-prize.is-selected').forEach(el=>el.classList.remove('is-selected'));
   document.querySelector(`[data-reel-n="${reelAnchor}"]`)?.classList.add(REEL_LAST_WIN?'is-selected':'is-at-rest');
 }
-function animateReelTo(index){
+function animateReelTo(prize){
   return new Promise(resolve=>{
     const track=document.getElementById('reelTrack');
     const items=Array.isArray(D?.prizes)?D.prizes:[];
     const n=items.length;
     if(!track||n===0){resolve();return}
     // Eight to ten complete visual cycles before the server-selected reward.
-    const goal=12*n+((index%n+n)%n);
+    const goal=64;
+    track.querySelector(`[data-reel-n="${goal}"]`).outerHTML=prizeCard(prize,goal);
     const duration=(!S.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches)?180:5200;
     const run=++reelRunId;
     document.getElementById('winterReel')?.classList.add('is-spinning');
@@ -2056,6 +2112,8 @@ function animateReelTo(index){
     const finish=()=>{
       if(done||run!==reelRunId)return;
       done=true;
+      track.style.transition='none';
+      track.style.transform=`translate3d(${reelTranslateTo(goal)}px,0,0)`;
       track.removeEventListener('transitionend',onEnd);
       document.getElementById('winterReel')?.classList.remove('is-spinning');
       track.querySelector(`[data-reel-n="${goal}"]`)?.classList.add('is-selected');
@@ -2068,6 +2126,15 @@ function animateReelTo(index){
   });
 }
 async function spin(){
+ if(SPIN)return;
+ if(navigator.locks && ME){
+  return navigator.locks.request('a782-wheel:'+ME.id,{ifAvailable:true},async lock=>{
+   if(!lock){toast(E[LANG].spin_busy,true);return}await performSpin();
+  });
+ }
+ return performSpin();
+}
+async function performSpin(){
   if(SPIN)return;
   if(!TOKEN){toast(t('login'),true);location.hash='#me';return}
   if(!Array.isArray(D?.prizes)||!D.prizes.length){toast(t('nores'),true);return}
@@ -2077,25 +2144,20 @@ async function spin(){
   if(btn){btn.disabled=true;btn.classList.add('is-busy')}
   if(announcement)announcement.textContent=tri('Жүлде анықталып жатыр…','Выбираем приз…','Selecting reward…');
   try{
-    // Keep the existing authenticated server endpoint; no prize is chosen by CSS/JS.
-    const r=await api('POST','/api/wheel/spin');
-    const index=Number(r.index);
-    if(!Number.isInteger(index)||index<0||index>=D.prizes.length){
-      ME=r.user;
-      REEL_LAST_WIN=r.prize;
-      REEL_LAST_IDX=D.prizes.findIndex(p=>p.kind===r.prize?.kind&&p.val===r.prize?.val);
-      toast(tri('Ұтыс жазылды, бетті жаңартыңыз','Приз записан, обновите страницу','Reward saved; refresh the page'));
-    }else{
-      await animateReelTo(index);
-      REEL_LAST_IDX=index;
-      ME=r.user;
-      REEL_LAST_WIN=r.prize;
-      // Briefly hold the selected tile in place for an understandable result.
-      if(S.motion && !window.matchMedia('(prefers-reduced-motion: reduce)').matches)await new Promise(resolve=>setTimeout(resolve,360));
-      toast(L(r.prize.label)+(r.code?` · ${r.code}`:''));
-    }
+    const pendingKey='a782-spin-pending:'+ME.id;
+    let requestId=localStorage.getItem(pendingKey);
+    if(!requestId){requestId=crypto.randomUUID();localStorage.setItem(pendingKey,requestId)}
+    const r=await api('POST','/api/wheel/spin',{requestId});
+    ME=r.user;
+    localStorage.removeItem(pendingKey);
+    REEL_LAST_WIN=r.prize;
+    REEL_LAST_IDX=r.index;
+    await animateReelTo(r.prize);
+    if(S.motion && !matchMedia('(prefers-reduced-motion: reduce)').matches)await new Promise(resolve=>setTimeout(resolve,300));
+    toast(L(r.prize.label)+(r.code?` · ${r.code}`:''));
+
     render(true);
-  }catch(e){toast(errMsg(e),true);if(announcement)announcement.textContent=errMsg(e)}
+  }catch(e){if(e.status && e.status<500 && e.code!=='spin_busy')localStorage.removeItem('a782-spin-pending:'+ME.id);toast(errMsg(e),true);if(announcement)announcement.textContent=errMsg(e)}
   finally{SPIN=false;if(btn&&btn.isConnected){btn.disabled=false;btn.classList.remove('is-busy')}}
 }
 
@@ -2450,6 +2512,21 @@ if(matchMedia("(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-p
 // Countdown is cosmetic; the server is the authority and revokes expired VIP access.
 setInterval(()=>{document.querySelectorAll("[data-vip-countdown]").forEach(el=>{const end=Date.parse(el.dataset.vipCountdown);if(!Number.isFinite(end))return;let sec=Math.max(0,Math.floor((end-Date.now())/1000));const d=Math.floor(sec/86400);sec%=86400;const hrs=Math.floor(sec/3600);sec%=3600;el.textContent=d+tri(" күн "," дн. "," days ")+hrs+":"+String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")+(d===0&&hrs===0&&sec===0?" · expired":"")})},1000);
 
+document.addEventListener('input',e=>{if(e.target.closest('#chanceForm'))updateChanceTotal()});
+document.addEventListener('submit',async e=>{
+ const f=e.target;if(!['chanceForm','newWheelPrize'].includes(f.id))return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(f.dataset.busy)return;f.dataset.busy='1';const btn=f.querySelector('button[type="submit"]');btn.disabled=true;
+ try{
+  if(f.id==='chanceForm'){
+   const prizes=[...f.querySelectorAll('[data-chance-id]')].map(row=>({id:row.dataset.chanceId,percent:Number(row.querySelector('input').value),rarity:row.querySelector('select').value}));
+   if(prizes.reduce((a,p)=>a+Math.round(p.percent*100),0)!==10000)throw Object.assign(new Error(),{code:'chances_total'});
+   await api('PUT','/api/admin/wheel-chances',{revision:D.wheelRevision,prizes},true);
+  }else{const b=formObj(f);b.val=Number(b.val);await api('POST','/api/admin/wheel-prizes',b,true)}
+  await loadData();render(true);toast(t('saved'));
+ }catch(e){const el=document.getElementById('chanceError');if(el)el.textContent=errMsg(e);toast(errMsg(e),true)}
+ finally{delete f.dataset.busy;btn.disabled=false}
+},true);
 document.addEventListener("submit",async e=>{
   e.preventDefault();
   const f=e.target,o=formObj(f);
