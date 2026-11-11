@@ -39,11 +39,42 @@ const VIP_CAPS = {
   "VIP-ULTRA": {limit:500, presets:["cyan","ocean","mint","violet","rose","ember","gold","aurora","obsidian"], shortcuts:5}
 };
 const SHORTCUTS=["home","mc","store","streams","vip","me"];
+const SITE_COPY_KEYS = [
+  "seasonLabel", "homeTitle", "homeLead", "giveawayTitle", "giveawayLead",
+  "reelTitle", "reelLead", "minecraftTitle", "minecraftLead",
+  "streamsTitle", "streamsLead", "storeTitle", "storeLead", "premiumTitle", "premiumLead"
+];
+const PALETTES = ["cobalt", "aurora", "glacier"];
+const VIP_MOTIFS = ["glacier", "aurora", "prism", "solstice"];
+const DEFAULT_APPEARANCE = {
+  palette:"cobalt", defaultTheme:"dark", snow:"light", aurora:true, motion:"enhanced",
+  spinSound:true, soundVolume:24, logoText:"A", logoImage:"", heroImage:"", copy:{}
+};
+const VIP_DESIGN_DEFAULTS = {
+  "VIP-FREE": {
+    title:"FREE", motif:"glacier", accent:"#83ddff", highlight:"#c6f4ff",
+    description:L3("7 күнге ULTRA мүмкіндіктерін аш.", "7 дней возможностей ULTRA.", "Unlock ULTRA features for seven days.")
+  },
+  "VIP-PLUS": {
+    title:"PLUS", motif:"aurora", accent:"#55e8bd", highlight:"#75bbff",
+    description:L3("Жеке түстер, статус және сүйікті дүниелерің бір жерде.", "Свои цвета, статус и избранное в одном месте.", "Your colors, status, and saved items in one place.")
+  },
+  "VIP-PRO": {
+    title:"PRO", motif:"prism", accent:"#bb93ff", highlight:"#ff9fd6",
+    description:L3("Профиль ұранын қосып, жиі қолданатын бөлімдеріңді ретте.", "Добавь подпись профиля и настрой быстрые переходы.", "Add a profile headline and arrange your shortcuts.")
+  },
+  "VIP-ULTRA": {
+    title:"ULTRA", motif:"solstice", accent:"#ffbd57", highlight:"#fff0ba",
+    description:L3("Барлық палитра, ең үлкен таңдаулылар жинағы және бес жылдам сілтеме.", "Все палитры, самая большая коллекция и пять быстрых ссылок.", "Every palette, the largest saved collection, and five shortcuts.")
+  }
+};
 const vipPublicPlan = p => ({...p, tier:tierOf(p), ...VIP_META[tierOf(p)]});
 
 
 function seed() {
   return {
+    appearance: structuredClone(DEFAULT_APPEARANCE),
+    vipDesigns: structuredClone(VIP_DESIGN_DEFAULTS),
     owner: {
       name: "A782 DIGITAL", handle: "@a782_asxm",
       tiktok: "https://www.tiktok.com/@a782_asxm", telegram: "https://t.me/Asxm_A782",
@@ -154,6 +185,14 @@ function migrate() {
   const s = seed();
   for (const k of Object.keys(s)) if (db[k] === undefined) db[k] = s[k];
   migrateWheel();
+  db.owner.name = normalizeBrand(db.owner.name);
+  const storedAppearance = db.appearance && typeof db.appearance === "object" ? db.appearance : {};
+  db.appearance = { ...s.appearance, ...storedAppearance };
+  if (!db.appearance.copy || typeof db.appearance.copy !== "object") db.appearance.copy = {};
+  const storedDesigns = db.vipDesigns && typeof db.vipDesigns === "object" ? db.vipDesigns : {};
+  db.vipDesigns = Object.fromEntries(VIP_TIERS.map(tier => [
+    tier, { ...s.vipDesigns[tier], ...storedDesigns[tier] }
+  ]));
   if (!db.owner.bio || typeof db.owner.bio !== "object") db.owner.bio = s.owner.bio;
   if (!db.stream.title || typeof db.stream.title !== "object") db.stream.title = s.stream.title;
   if (!Array.isArray(db.stream.schedule) || db.stream.schedule.some(x => typeof x.day !== "number")) db.stream.schedule = s.stream.schedule;
@@ -231,6 +270,56 @@ const randCode = () => crypto.randomBytes(3).toString("hex").toUpperCase();
 const hashPw = (pw, salt) => crypto.scryptSync(pw, salt, 64).toString("hex");
 const str = (v, max = 200) => String(v ?? "").trim().slice(0, max);
 const tr = (b, base, max = 400) => ({ kk: str(b[base + "_kk"], max), ru: str(b[base + "_ru"], max), en: str(b[base + "_en"], max) });
+function normalizeBrand(value) {
+  const name = str(value, 60).replace(/\s+/g, " ");
+  if (!name || /^[aа][\s_-]*782[\s_-]*digi?tal$/iu.test(name)) return "A782 DIGITAL";
+  return name;
+}
+function translatedText(value, max) {
+  return Object.fromEntries(["kk", "ru", "en"].map(lang => [lang, str(value?.[lang], max)]));
+}
+function imageUrl(value) {
+  const input = str(value, 500);
+  if (!input) return "";
+  try {
+    const url = new URL(input);
+    if (url.protocol === "https:" && !url.username && !url.password) return url.href;
+  } catch {}
+  fail(400, "invalid_image_url");
+}
+function appearanceConfig(body) {
+  if (!PALETTES.includes(body.palette) || !["dark","light"].includes(body.defaultTheme) ||
+      !["off","light","full"].includes(body.snow) || !["off","soft","enhanced"].includes(body.motion) ||
+      typeof body.aurora !== "boolean" || typeof body.spinSound !== "boolean" ||
+      !Number.isInteger(body.soundVolume) || body.soundVolume < 0 || body.soundVolume > 60) {
+    fail(400, "invalid_appearance");
+  }
+  const copy = Object.fromEntries(SITE_COPY_KEYS.map(key => [
+    key, translatedText(body.copy?.[key], key.endsWith("Lead") ? 320 : 100)
+  ]));
+  return {
+    palette:body.palette, defaultTheme:body.defaultTheme, snow:body.snow, motion:body.motion,
+    aurora:body.aurora, spinSound:body.spinSound, soundVolume:body.soundVolume,
+    logoText:str(body.logoText, 3) || "A", logoImage:imageUrl(body.logoImage),
+    heroImage:imageUrl(body.heroImage), copy
+  };
+}
+function vipDesignConfig(tier, design) {
+  if (!design || typeof design !== "object" || !VIP_MOTIFS.includes(design.motif) ||
+      typeof design.accent !== "string" || typeof design.highlight !== "string" ||
+      !/^#[0-9a-f]{6}$/i.test(design.accent) || !/^#[0-9a-f]{6}$/i.test(design.highlight)) {
+    fail(400, "invalid_vip_design");
+  }
+  const defaults = VIP_DESIGN_DEFAULTS[tier];
+  const description = translatedText(design.description, 220);
+  for (const lang of ["kk","ru","en"]) {
+    if (!description[lang]) description[lang] = defaults.description[lang];
+  }
+  return {
+    title:str(design.title, 26) || defaults.title, motif:design.motif,
+    accent:design.accent.toLowerCase(), highlight:design.highlight.toLowerCase(), description
+  };
+}
 const safeUrl = v => (/^https?:\/\/\S+$/.test(str(v, 500)) ? str(v, 500) : "");
 const safeImg = v => {
   const s = str(v, 70000);
@@ -249,7 +338,7 @@ const activeVip = u => {
  return {...u.vip,tier,visualTier:tier==="VIP-FREE"?"VIP-ULTRA":tier};
 };
 const vipCaps = u => VIP_CAPS[activeVip(u)?.visualTier || "standard"];
-const publicLibrary = u => Array.isArray(u.library) ? u.library.filter(x=>x && typeof x === "object" && ["product","modpack","game","modrinth"].includes(x.kind) && /^[\w-]{1,80}$/.test(String(x.id||""))).slice(0,500) : [];
+const publicLibrary = u => Array.isArray(u.library) ? u.library.filter(x=>x && typeof x === "object" && ["product","modpack","game","modrinth","curseforge"].includes(x.kind) && /^[\w-]{1,80}$/.test(String(x.id||""))).slice(0,500) : [];
 const pubUser = u => ({
   id: u.id, isOwner: isOwnerAccount(u), vip: activeVip(u), vipPrefs:u.vipPrefs||{}, library:publicLibrary(u), libraryLimit:vipCaps(u).limit, vipTrialUsed:!!u.vipTrialUsed || db.orders.some(o=>o.type==="vip-trial"&&o.userId===u.id), nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
   avatar: u.avatar, banner: u.banner, icon: u.icon,
@@ -258,6 +347,7 @@ const pubUser = u => ({
 const pubGw = g => ({ ...g, participants: g.participants.map(p => p.nick), winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null });
 const pubData = () => ({
   vipPlans: db.vipPlans.filter(p => p.active && VIP_TIERS.includes(tierOf(p)) && p.tier).map(vipPublicPlan).sort((a,b)=>VIP_TIERS.indexOf(a.tier)-VIP_TIERS.indexOf(b.tier)), owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
+  appearance: db.appearance, vipDesigns: db.vipDesigns, minecraftSources:minecraftCatalog.sources,
   prizes: db.prizes, wheelRevision: db.wheelRevision, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
   giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
 });
@@ -335,58 +425,20 @@ function isAdmin(req) {
 }
 const pinHits = new Map();
 
-const mcCache = new Map();
-async function cached(key, load) {
-  const hit = mcCache.get(key);
-  if (hit && Date.now() - hit.t < 5 * 60e3) return hit.v;
-  const v = await load();
-  mcCache.set(key, { t: Date.now(), v });
-  return v;
-}
-async function upstream(url) {
-  try {
-    const response = await fetch(url, {
-      headers: { "User-Agent": UA },
-      signal: AbortSignal.timeout(8000)
-    });
-    if (!response.ok) throw new Error("upstream");
-    return await response.json();
-  } catch { fail(502, "upstream"); }
-}
-async function mcSearch(sp) {
-  const q = str(sp.get("q"), 80);
-  const type = ["mod", "modpack", "resourcepack", "shader"].includes(sp.get("type")) ? sp.get("type") : "mod";
-  const loader = ["fabric", "forge", "neoforge", "quilt"].includes(sp.get("loader")) ? sp.get("loader") : "";
-  const version = /^[\d.]{3,10}$/.test(sp.get("version") || "") ? sp.get("version") : "";
-  const sort = ["downloads", "follows", "newest", "updated"].includes(sp.get("sort")) ? sp.get("sort") : "downloads";
-  const facets = [[`project_type:${type}`]];
-  if (loader && (type === "mod" || type === "modpack")) facets.push([`categories:${loader}`]);
-  if (version) facets.push([`versions:${version}`]);
-  const url = `https://api.modrinth.com/v2/search?query=${encodeURIComponent(q)}&facets=${encodeURIComponent(JSON.stringify(facets))}&index=${q ? "relevance" : sort}&limit=20`;
-  return cached(url, async () => {
-    const d = await upstream(url);
-    return { hits: d.hits.map(h => ({ id: h.project_id, title: h.title, author: h.author, desc: h.description, icon: h.icon_url, downloads: h.downloads, license: h.license })) };
-  });
-}
-async function mcVersions(id) {
-  if (!/^[\w-]{1,64}$/.test(id || "")) fail(400, "invalid");
-  const url = `https://api.modrinth.com/v2/project/${id}/version`;
-  return cached(url, async () => {
-    const vs = await upstream(url);
-    return { versions: vs.slice(0, 12).map(v => ({
-      name: v.name, games: (v.game_versions || []).slice(0, 4), loaders: v.loaders || [],
-      file: ((v.files || []).find(f => f.primary) || (v.files || [])[0] || {}).url || ""
-    })) };
-  });
-}
+const {createMinecraftCatalog} = require("./minecraft");
+const minecraftCatalog = createMinecraftCatalog({
+  curseForgeKey:String(process.env.CURSEFORGE_API_KEY || "").trim(),
+  userAgent:UA
+});
 
 async function route(req, url, user, body) {
   const p = url.pathname, m = req.method;
   const need = () => user || fail(401, "login_required");
 
   if (m === "GET" && p === "/api/data") return [200, pubData()];
-  if (m === "GET" && p === "/api/mc/search") return [200, await mcSearch(url.searchParams)];
-  if (m === "GET" && p === "/api/mc/versions") return [200, await mcVersions(url.searchParams.get("id"))];
+  if (m === "GET" && p === "/api/mc/search") return [200, await minecraftCatalog.search(url.searchParams)];
+  if (m === "GET" && p === "/api/mc/versions") return [200, await minecraftCatalog.versions(url.searchParams)];
+  if (m === "GET" && p === "/api/mc/meta") return [200, await minecraftCatalog.metadata(url.searchParams)];
 
   if (m === "POST" && p === "/api/register") {
     const b = body;
@@ -498,15 +550,19 @@ async function route(req, url, user, body) {
   if (m === "POST" && p === "/api/library") {
     const u = need(), b = body;
     const kind = str(b.kind,20), id = str(b.id,80);
-    const dbKey = {product:"products",modpack:"modpacks",game:"games"}[kind];
-    if (!/^[\w-]{1,80}$/.test(id) || (kind!=="modrinth" && (!dbKey || !db[dbKey].some(x=>x.id===id)))) fail(400,"invalid");
+    const collections = {product:"products",modpack:"modpacks",game:"games"};
+    const dbKey = Object.hasOwn(collections,kind)?collections[kind]:null;
+    const catalog = kind==="modrinth" || kind==="curseforge";
+    const validId = kind==="curseforge"?/^[1-9]\d{0,9}$/:/^[\w-]{1,80}$/;
+    if (!validId.test(id) || (!catalog && (!dbKey || !db[dbKey].some(x=>x.id===id)))) fail(400,"invalid");
     u.library = publicLibrary(u);
     const pos = u.library.findIndex(x=>x.kind===kind && x.id===id);
     if (b.save === false) { if(pos>=0)u.library.splice(pos,1); }
     else if (pos<0) {
       if (u.library.length >= vipCaps(u).limit) fail(403,"library_limit");
-      u.library.push(kind==="modrinth"
-        ? {kind,id,title:str(b.title,90)||"Modrinth project"}
+      const type=["mod","modpack","resourcepack","shader"].includes(b.type)?b.type:"mod";
+      u.library.push(catalog
+        ? {kind,id,title:str(b.title,120)||(kind==="curseforge"?"CurseForge":"Modrinth"),type}
         : {kind,id});
     }
     await saveVipNow();
@@ -617,12 +673,36 @@ async function route(req, url, user, body) {
 }
 
 async function adminRoute(req, m, p, body) {
+  if (m === "PUT" && p === "/api/admin/appearance") {
+    const appearance = appearanceConfig(body);
+    db.owner.name = normalizeBrand(body.name || db.owner.name);
+    db.appearance = appearance;
+    saveDB();
+    return [200, {ok:true, appearance}];
+  }
+  if (m === "POST" && p === "/api/admin/coupons") {
+    const code = str(body.code, 30).toUpperCase();
+    if (!/^[A-Z0-9-]{2,30}$/.test(code) || /^(CP|EX)-/.test(code) ||
+        !Number.isInteger(body.percent) || body.percent < 1 || body.percent > 100) {
+      fail(400, "invalid_coupon");
+    }
+    db.coupons[code] = body.percent;
+    saveDB();
+    return [200, {ok:true}];
+  }
+  const removeCoupon = p.match(/^\/api\/admin\/coupons\/([A-Z0-9-]{2,30})$/);
+  if (m === "DELETE" && removeCoupon) {
+    if (!Object.hasOwn(db.coupons, removeCoupon[1])) fail(404, "not_found");
+    delete db.coupons[removeCoupon[1]];
+    saveDB();
+    return [200, {ok:true}];
+  }
   if (m === 'PUT' && p === '/api/admin/wheel-chances') {
     const b = body;
     if (b.revision !== db.wheelRevision) fail(409, 'chances_changed');
-    if (!Array.isArray(b.prizes) || b.prizes.length !== db.prizes.length || new Set(b.prizes.map(x=>x.id)).size !== db.prizes.length) fail(400,'invalid_chances');
+    if (!Array.isArray(b.prizes) || b.prizes.length !== db.prizes.length || new Set(b.prizes.map(x=>x?.id)).size !== db.prizes.length) fail(400,'invalid_chances');
     const updated = db.prizes.map(pz => {
-      const row = b.prizes.find(x=>x.id===pz.id);
+      const row = b.prizes.find(x=>x?.id===pz.id);
       if (!row || typeof row.percent !== 'number' || !Number.isFinite(row.percent) || row.percent<0 || row.percent>100 || Math.abs(row.percent*100-Math.round(row.percent*100))>1e-7 || !RARITIES.includes(row.rarity)) fail(400,'invalid_chances');
       return {...pz, chanceBps:Math.round(row.percent*100), rarity:row.rarity};
     });
@@ -635,8 +715,28 @@ async function adminRoute(req, m, p, body) {
     if (!['tokens','tickets','diamonds','coupon'].includes(b.kind) || !Number.isInteger(b.val) || b.val<1 || b.val>1000000 || (b.kind==='coupon' && b.val>100) || !RARITIES.includes(b.rarity)) fail(400,'invalid_prize');
     const label=tr(b,'label',120);
     if (!label.kk || !label.ru || !label.en) fail(400,'title_required');
-    db.prizes.push({id:uid(), label, kind:b.kind, val:b.val, weight:0, chanceBps:0, rarity:b.rarity});
-    db.wheelRevision++; saveDB(); return [200,{ok:true}];
+    const prize = {label, kind:b.kind, val:b.val, rarity:b.rarity};
+    if (b.id) {
+      if (b.revision !== db.wheelRevision) fail(409, "chances_changed");
+      const current = db.prizes.find(entry => entry.id === b.id);
+      if (!current) fail(404, "not_found");
+      Object.assign(current, prize);
+    } else {
+      db.prizes.push({id:uid(), weight:0, chanceBps:0, ...prize});
+    }
+    db.wheelRevision++;
+    saveDB();
+    return [200, {ok:true, revision:db.wheelRevision}];
+  }
+  const removePrize = p.match(/^\/api\/admin\/wheel-prizes\/([\w-]+)$/);
+  if (m === "DELETE" && removePrize) {
+    const prize = db.prizes.find(entry => entry.id === removePrize[1]);
+    if (!prize) fail(404, "not_found");
+    if (prize.chanceBps !== 0) fail(400, "prize_chance_not_zero");
+    db.prizes = db.prizes.filter(entry => entry.id !== prize.id);
+    db.wheelRevision++;
+    saveDB();
+    return [200, {ok:true, revision:db.wheelRevision}];
   }
 
   if (m === "PUT" && p === "/api/admin/site") {
@@ -644,7 +744,7 @@ async function adminRoute(req, m, p, body) {
     const o = db.owner, s = db.stream;
     db.owner = {
       ...o,
-      name: str(b.name, 60) || o.name,
+      name: normalizeBrand(b.name || o.name),
       handle: str(b.handle, 40) || o.handle,
       tiktok: safeUrl(b.tiktok) || o.tiktok,
       telegram: safeUrl(b.telegram) || o.telegram,
@@ -759,7 +859,9 @@ async function adminRoute(req, m, p, body) {
     saveDB();
     return [200, { ok: true }];
   }
-  if (m === "GET" && p === "/api/admin/vip-plans") return [200, { plans: db.vipPlans }];
+  if (m === "GET" && p === "/api/admin/vip-plans") {
+    return [200, {plans:db.vipPlans.map(plan => ({...plan, design:db.vipDesigns[tierOf(plan)]}))}];
+  }
   if (m === "POST" && p === "/api/admin/vip-plans") {
     const b = body;
     const old = db.vipPlans.find(x => x.id === b.id);
@@ -767,13 +869,14 @@ async function adminRoute(req, m, p, body) {
     const tier = tierOf(old);
     if (!VIP_TIERS.includes(tier)) fail(400,"invalid");
     const price = Number(b.price), durationDays = Number(b.durationDays);
-    if (!Number.isSafeInteger(price) || price<0 || price>10000000 || !Number.isSafeInteger(durationDays) || durationDays<1 || durationDays>36500) fail(400,"invalid");
-    // FREE is always seven days, free, and one-time. The admin cannot accidentally alter that.
+    if (!Number.isSafeInteger(price) || price<0 || price>10000000 || !Number.isSafeInteger(durationDays) || durationDays<0 || durationDays>36500) fail(400,"invalid");
+    if (b.design !== undefined) db.vipDesigns[tier] = vipDesignConfig(tier, b.design);
+    // The free trial keeps its existing entitlement and duration.
     old.name=tier; old.tier=tier; old.price=tier==="VIP-FREE"?0:price;
     old.durationDays=tier==="VIP-FREE"?7:durationDays;
     old.active=b.active!==false;
     await saveVipNow();
-    return [200,{plan:vipPublicPlan(old)}];
+    return [200,{plan:{...vipPublicPlan(old), design:db.vipDesigns[tier]}}];
   }
   const vpDel = p.match(/^\/api\/admin\/vip-plans\/([\w-]+)$/);
   if (m === "DELETE" && vpDel) {
@@ -833,10 +936,10 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (!url.pathname.startsWith("/api/")) return serveStatic(url.pathname, res);
   try {
-    // Modrinth uses its own cache and never reads or writes the site database.
-    const isModrinth = req.method === "GET" &&
-      ["/api/mc/search", "/api/mc/versions"].includes(url.pathname);
-    if (isModrinth) {
+    // Public catalogs never hold the database queue while waiting on a provider.
+    const isCatalogRead = req.method === "GET" &&
+      ["/api/mc/search", "/api/mc/versions", "/api/mc/meta"].includes(url.pathname);
+    if (isCatalogRead) {
       const [status, out] = await route(req, url, null);
       if (!res.destroyed) send(res, status, out);
       return;
