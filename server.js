@@ -438,6 +438,26 @@ async function route(req, url, user, body) {
   if (m === "GET" && p === "/api/mc/search") return [200, await minecraftCatalog.search(url.searchParams)];
   if (m === "GET" && p === "/api/mc/versions") return [200, await minecraftCatalog.versions(url.searchParams)];
   if (m === "GET" && p === "/api/mc/meta") return [200, await minecraftCatalog.metadata(url.searchParams)];
+    if (m === "GET" && p === "/api/translate") {
+    const from = url.searchParams.get("from"), to = url.searchParams.get("to");
+    const text = str(url.searchParams.get("text"), 400);
+    const langs = ["kk", "ru", "en"];
+    if (!langs.includes(from) || !langs.includes(to) || from === to || !text) return [200, { text }];
+    const key = from + "|" + to + "|" + text;
+    if (!translateCache.has(key)) {
+      try {
+        const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`,
+          { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(8000) });
+        const j = await r.json();
+        const out = j?.responseData?.translatedText;
+        if (translateCache.size > 2000) translateCache.clear();
+        translateCache.set(key, typeof out === "string" && out ? out : text);
+      } catch {
+        return [200, { text }];
+      }
+    }
+    return [200, { text: translateCache.get(key) }];
+  }
 
   if (m === "POST" && p === "/api/register") {
     const b = body;
@@ -950,7 +970,7 @@ const server = http.createServer(async (req, res) => {
   try {
     // Public catalogs never hold the database queue while waiting on a provider.
     const isCatalogRead = req.method === "GET" &&
-      ["/api/mc/search", "/api/mc/versions", "/api/mc/meta"].includes(url.pathname);
+      ["/api/mc/search", "/api/mc/versions", "/api/mc/meta", "/api/translate"].includes(url.pathname);
     if (isCatalogRead) {
       const [status, out] = await route(req, url, null);
       if (!res.destroyed) send(res, status, out);
