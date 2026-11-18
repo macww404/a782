@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, "data.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
 const ADMIN_PIN = process.env.ADMIN_PIN || crypto.randomBytes(3).toString("hex");
+const translateCache = new Map();
 // Configure ONLY in Render Environment. Fail closed when no owner email is configured.
 const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 const isOwnerAccount = u => !!(u && ADMIN_EMAIL && /^[^\s@]+@gmail\.com$/.test(ADMIN_EMAIL) && String(u.email || "").trim().toLowerCase() === ADMIN_EMAIL);
