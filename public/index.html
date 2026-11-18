@@ -2102,10 +2102,14 @@ const footer=()=>`<footer class="rv"><div class="links"><a href="${esc(D.owner.t
 
 function gameCard(g,i=0){
   const live=g.status==="live";
-  return `<article class="glass tilt card rv" style="--d:${i*70}ms">
-    <div class="between row"><span class="tag ${live?"g":""}">${live?t("live"):t("soon")}</span><span class="tag">${t("gamechat")}</span></div>
-    <div class="row" style="gap:12px"><div class="ibox">${ic(g.icon||"gamepad")}</div><h3 style="margin:0;font-size:19px">${esc(g.name)}</h3></div>
-    <p class="mute">${esc(L(g.desc))}</p>
+  return `<article class="glass game-card rv" style="--d:${i*70}ms">
+    <div class="game-banner">${siteArt(g.banner,"game-banner-img",true)}</div>
+    <div class="game-avatar">${siteArt(g.avatar,"game-avatar-img",true)||ic(g.icon||"gamepad")}</div>
+    <div class="game-body">
+      <span class="tag ${live?"g":""}">${live?t("live"):t("soon")}</span>
+      <h3>${esc(g.name)}</h3>
+      <p class="mute">${esc(L(g.desc))}</p>
+    </div>
     <div class="foot">${g.link?`<a class="btn sm" href="${esc(g.link)}" target="_blank" rel="noopener">${ic("ext")} ${t("gamechat")}</a>`:`<span class="tag">${t("soon")}</span>`}</div>
   </article>`;
 }
