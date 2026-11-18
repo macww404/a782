@@ -846,13 +846,16 @@ async function adminRoute(req, m, p, body) {
     const name = str(b.name, 40);
     if (!name) fail(400, "title_required");
     const old = db.games.find(x => x.id === str(b.id, 40));
-    upsert(db.games, {
+        upsert(db.games, {
       id: old ? old.id : uid(),
       name,
       icon: ICONS.includes(b.icon) ? b.icon : "gamepad",
       status: b.status === "live" ? "live" : "soon",
       link: safeUrl(b.link),
-      desc: tr(b, "desc", 200)
+      desc: tr(b, "desc", 200),
+      order: Number.isFinite(Number(b.order)) ? Number(b.order) : (old?.order ?? 0),
+      avatar: b.clearAvatar ? "" : (b.avatar !== undefined && b.avatar !== "" ? safeUrl(b.avatar) : (old?.avatar || "")),
+      banner: b.clearBanner ? "" : (b.banner !== undefined && b.banner !== "" ? safeUrl(b.banner) : (old?.banner || ""))
     });
     saveDB();
     return [200, { ok: true }];
