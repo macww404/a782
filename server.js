@@ -67,7 +67,7 @@ function seed() {
     appearance: structuredClone(DEFAULT_APPEARANCE),
     vipDesigns: structuredClone(VIP_DESIGN_DEFAULTS),
     owner: {
-      name: "A782", handle: "@a782_asxm",
+      name: "A782 DIGITAL", handle: "@a782_asxm",
       tiktok: "https://www.tiktok.com/@a782_asxm", telegram: "https://t.me/Asxm_A782",
       kaspi: "", avatar: "", banner: "",
       bio: L3("Minecraft РјРѕРґРїР°РєС‚Р°СЂС‹, С€РµР№РґРµСЂР»РµСЂ, СЃС‚СЂРёРјРґРµСЂ Р¶У™РЅРµ РґРёР·Р°Р№РЅ.", "РњРѕРґРїР°РєРё Minecraft, С€РµР№РґРµСЂС‹, СЃС‚СЂРёРјС‹ Рё РґРёР·Р°Р№РЅ.", "Minecraft modpacks, shaders, streams and design.")
@@ -118,18 +118,18 @@ function seed() {
         desc: L3("FPS Р°СЂС‚С‚С‹СЂР°С‚С‹РЅ С‚РѕРїС‚Р°РјР°.", "РЎР±РѕСЂРєР° РґР»СЏ СЂРѕСЃС‚Р° FPS.", "Pack for higher FPS.") }
     ],
     games: [
-      { id: "mc", name: "Minecraft", icon: "cube", status: "live", link: "https://t.me/Minecraft_A782",
-        desc: L3("Minecraft РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Minecraft.", "A dedicated Minecraft players chat.") },
-      { id: "so2", name: "Standoff 2", icon: "swords", status: "live", link: "https://t.me/Standoff_A782",
+      { id: "so2", name: "Standoff 2", icon: "swords", status: "soon", link: "",
         desc: L3("Standoff 2 РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Standoff 2.", "A dedicated Standoff 2 players chat.") },
-      { id: "coc", name: "Clash of Clans", icon: "shield", status: "live", link: "https://t.me/ClashOfClans_A782",
-        desc: L3("Clash of Clans РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Clash of Clans.", "A dedicated Clash of Clans players chat.") },
-      { id: "ff", name: "Free Fire", icon: "flame", status: "live", link: "https://t.me/FreeFire_A782",
-        desc: L3("Free Fire РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Free Fire.", "A dedicated Free Fire players chat.") },
-      { id: "roblox", name: "Roblox", icon: "gamepad", status: "live", link: "https://t.me/Roblox_A782",
+      { id: "roblox", name: "Roblox", icon: "gamepad", status: "soon", link: "",
         desc: L3("Roblox РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Roblox.", "A dedicated Roblox players chat.") },
-      { id: "brawl", name: "Brawl Stars", icon: "star", status: "live", link: "https://t.me/BrawlStars_A782",
-        desc: L3("Brawl Stars РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Brawl Stars.", "A dedicated Brawl Stars players chat.") }
+      { id: "ff", name: "Free Fire", icon: "flame", status: "soon", link: "",
+        desc: L3("Free Fire РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Free Fire.", "A dedicated Free Fire players chat.") },
+      { id: "brawl", name: "Brawl Stars", icon: "star", status: "soon", link: "",
+        desc: L3("Brawl Stars РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Brawl Stars.", "A dedicated Brawl Stars players chat.") },
+      { id: "coc", name: "Clash of Clans", icon: "shield", status: "soon", link: "",
+        desc: L3("Clash of Clans РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Clash of Clans.", "A dedicated Clash of Clans players chat.") },
+      { id: "mc", name: "Minecraft", icon: "cube", status: "live", link: "",
+        desc: L3("Minecraft РѕР№С‹РЅС€С‹Р»Р°СЂС‹РЅС‹ТЈ Р¶РµРєРµ С‡Р°С‚С‹.", "РћС‚РґРµР»СЊРЅС‹Р№ С‡Р°С‚ РёРіСЂРѕРєРѕРІ Minecraft.", "A dedicated Minecraft players chat.") }
     ],
     vipPlans: [
       { id: "vip-free", tier: "VIP-FREE", name: "VIP-FREE", price: 0, durationDays: 7, active: true },
@@ -197,19 +197,10 @@ function migrate() {
       if (template.tier === "VIP-FREE") { current.price = 0; current.durationDays = 7; }
     }
   }
-  if (!Array.isArray(db.games)) db.games = s.games;
-  if (!db.gameChatLinksMigrated) {
-    // Only upgrade untouched, unlinked legacy defaults. Admin edits and deletions are authoritative.
-    for (const game of db.games) {
-      const template = s.games.find(item => item.id === game.id);
-      if (!template || game.link !== "" || game.name !== template.name || game.icon !== template.icon ||
-          game.status !== (game.id === "mc" ? "live" : "soon") ||
-          Object.keys(game).some(key => !Object.hasOwn(template, key)) ||
-          !["kk", "ru", "en"].every(lang => game.desc?.[lang] === template.desc[lang])) continue;
-      game.link = template.link;
-      game.status = template.status;
-    }
-    db.gameChatLinksMigrated = true;
+  if (!Array.isArray(db.games)) db.games = [];
+  for (const game of s.games) {
+    const existing = db.games.find(x => x.id === game.id || x.name === game.name);
+    if (!existing) db.games.push(game);
   }
 }
 
@@ -344,7 +335,7 @@ const publicLibrary = u => Array.isArray(u.library)
   ? u.library.filter(x => x && typeof x === "object" && ["product", "modpack", "game", "modrinth", "curseforge"].includes(x.kind) && /^[\w-]{1,80}$/.test(String(x.id || ""))).slice(0, 500)
   : [];
 const pubUser = u => ({
-  id: u.id, isOwner: isOwnerAccount(u), vip: activeVip(u), vipPrefs: u.vipPrefs || {}, library: publicLibrary(u),
+  id: u.id, isOwner: isOwnerAccount(u), vip: null, vipPrefs: {}, library: publicLibrary(u),
   libraryLimit: vipCaps(u).limit,
   vipTrialUsed: !!u.vipTrialUsed || db.orders.some(o => o.type === "vip-trial" && o.userId === u.id),
   nick: u.nick, mc: u.mc, ff: u.ff, so2: u.so2, tg: u.tg, bio: u.bio,
@@ -353,10 +344,9 @@ const pubUser = u => ({
 });
 const pubGw = g => ({ ...g, participants: g.participants.map(p => p.nick), winner: g.winner ? { name: g.winner.name, at: g.winner.at } : null });
 const pubData = () => ({
-  vipPlans: db.vipPlans.filter(p => p.active && VIP_TIERS.includes(tierOf(p)) && p.tier).map(vipPublicPlan)
-    .sort((a, b) => VIP_TIERS.indexOf(a.tier) - VIP_TIERS.indexOf(b.tier)),
+  vipPlans: [],
   owner: db.owner, stream: db.stream, server: db.server, wheelCost: db.wheelCost,
-  appearance: db.appearance, vipDesigns: db.vipDesigns, minecraftSources: minecraftCatalog.sources,
+  appearance: db.appearance, vipDesigns: {}, minecraftSources: minecraftCatalog.sources,
   prizes: db.prizes, wheelRevision: db.wheelRevision, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
   giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
 });
@@ -598,6 +588,7 @@ async function route(req, url, user, body) {
     await saveVipNow();
     return [200, { user: pubUser(u) }];
   }
+  if (/^\/api\/(vip\/|admin\/vip-)/.test(p)) fail(404, "not_found");
   if (m === "POST" && p === "/api/vip/preferences") {
     const u = need(), vip = activeVip(u);
     if (!vip) fail(403, "vip_required");
@@ -818,12 +809,17 @@ async function adminRoute(req, m, p, body) {
     const name = tr(b, "name", 120);
     if (!name.kk && !name.ru && !name.en) fail(400, "title_required");
     const old = db.products.find(x => x.id === str(b.id, 40));
+    let images = old ? (Array.isArray(old.images) ? old.images : (old.img ? [old.img] : [])) : [];
+    if (b.images !== undefined) {
+      const list = Array.isArray(b.images) ? b.images : String(b.images || "").split(/\s+/);
+      images = list.map(safeImg).filter(Boolean).slice(0, 10);
+    } else if (safeImg(b.img)) images = [safeImg(b.img), ...images.filter(x => x !== safeImg(b.img))].slice(0, 10);
     upsert(db.products, {
       id: old ? old.id : uid(),
       cat: P_CATS.includes(b.cat) ? b.cat : "pack",
       name, desc: tr(b, "desc", 300),
       price: Math.max(0, parseInt(b.price) || 0),
-      img: safeImg(b.img) || (old ? old.img : "")
+      images, img: images[0] || ""
     });
     saveDB();
     return [200, { ok: true }];
