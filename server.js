@@ -6,9 +6,10 @@ const crypto = require("crypto");
 
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, "data.json");
-const PUBLIC_DIR = path.join(__dirname, "public");
+// Serve only the front end; the database stays private.
+const rootIndex = path.join(__dirname, "index.html");
+const indexFile = fs.existsSync(rootIndex) ? rootIndex : path.join(__dirname, "public", "index.html");
 const ADMIN_PIN = process.env.ADMIN_PIN || crypto.randomBytes(3).toString("hex");
-const translateCache = new Map();
 // Configure ONLY in Render Environment. Fail closed when no owner email is configured.
 const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 const isOwnerAccount = u => !!(u && ADMIN_EMAIL && /^[^\s@]+@gmail\.com$/.test(ADMIN_EMAIL) && String(u.email || "").trim().toLowerCase() === ADMIN_EMAIL);
@@ -16,6 +17,68 @@ const DEMO_PAY = process.env.DEMO_PAY !== "0";
 const JB_ID = process.env.JSONBIN_ID, JB_KEY = process.env.JSONBIN_KEY;
 const REMOTE = !!(JB_ID && JB_KEY);
 const UA = "A782DIGITAL/3.0 (+https://t.me/Asxm_A782)";
+// MyMemory accepts at most 500 UTF-8 bytes per query.
+function splitText(line) {
+  const chunks = [];
+  let rest = line;
+  while (Buffer.byteLength(rest) > 500) {
+    let bytes = 0, end = 0, boundary = 0;
+    for (const char of rest) {
+      bytes += Buffer.byteLength(char);
+      if (bytes > 500) break;
+      end += char.length;
+      if (/\s/u.test(char)) boundary = end;
+    }
+    const cut = boundary || end;
+    chunks.push(rest.slice(0, cut));
+    rest = rest.slice(cut);
+  }
+  if (rest) chunks.push(rest);
+  return chunks;
+}
+
+function createTranslator(userAgent, request = fetch) {
+  const cache = new Map();
+  const pending = new Map();
+  async function translatePart(text, from, to) {
+    const key = JSON.stringify([text, from, to]);
+    if (cache.has(key)) return cache.get(key);
+    if (pending.has(key)) return pending.get(key);
+    const job = (async () => {
+      const query = new URLSearchParams({q: text, langpair: from + "|" + to});
+      const response = await request("https://api.mymemory.translated.net/get?" + query, {
+        headers: {"User-Agent": userAgent}, signal: AbortSignal.timeout(10000)
+      });
+      if (!response.ok) throw new Error("translation_failed");
+      const data = await response.json();
+      const result = data.responseData?.translatedText;
+      if (Number(data.responseStatus) !== 200 || data.quotaFinished || typeof result !== "string" || !result.trim()) {
+        throw new Error("translation_failed");
+      }
+      const entities = {"&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'"};
+      const translated = result.trim().replace(/&(?:amp|lt|gt|quot|#39);/g, entity => entities[entity]);
+      if (cache.size >= 2000) cache.delete(cache.keys().next().value);
+      cache.set(key, translated);
+      return translated;
+    })();
+    pending.set(key, job);
+    try { return await job; }
+    finally { pending.delete(key); }
+  }
+  return async function translate(text, from, to) {
+    const output = [];
+    for (const line of text.split(/(\r\n|[\r\n])/)) {
+      for (const part of splitText(line)) {
+        if (!part.trim()) { output.push(part); continue; }
+        const translated = await translatePart(part.trim(), from, to);
+        output.push(part.match(/^\s*/)[0], translated, part.match(/\s*$/)[0]);
+      }
+    }
+    return output.join("");
+  };
+}
+
+const translate = createTranslator(UA);
 const ICONS = ["gift", "users", "gem", "bolt", "trophy", "shield", "star", "swords", "cube", "flame", "gamepad"];
 const AVATARS = ["user", "gem", "bolt", "cube", "trophy", "shield", "star", "swords"];
 const P_CATS = ["pack", "over", "design", "guide"];
@@ -283,6 +346,8 @@ function translatedText(value, max) {
   return Object.fromEntries(["kk", "ru", "en"].map(lang => [lang, str(value?.[lang], max)]));
 }
 function imageUrl(value) {
+  if (typeof value === "string" && /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/]+=*$/i.test(value) && value.length <= 60000) return value;
+  if (typeof value === "string" && value.length > 500) fail(400, "invalid_image_url");
   const input = str(value, 500);
   if (!input) return "";
   try {
@@ -360,11 +425,21 @@ const pubData = () => ({
   prizes: db.prizes, wheelRevision: db.wheelRevision, coupons: db.coupons, demoPay: DEMO_PAY, games: db.games,
   giveaways: db.giveaways.map(pubGw), products: db.products, modpacks: db.modpacks
 });
-function parseSchedule(txt) {
-  return str(txt, 3000).split("\n").map(l => l.split("|").map(x => x.trim()))
-    .filter(a => a.length >= 5 && /^[0-6]$/.test(a[0]))
-    .slice(0, 20)
-    .map(a => ({ day: +a[0], time: a[1].slice(0, 5), topic: { kk: a[2].slice(0, 120), ru: a[3].slice(0, 120), en: a[4].slice(0, 120) } }));
+function parseSchedule(value) {
+  // Keep accepting older clients that send five pipe-delimited columns.
+  const rows = Array.isArray(value) ? value : String(value ?? "").split("\n")
+    .filter(line => line.trim())
+    .map(line => {
+      const [day, time, kk, ru, en] = line.split("|").map(part => part.trim());
+      return {day, time, topic: {kk, ru, en}};
+    });
+  if (rows.length > 20) fail(400, "invalid_schedule_row");
+  return rows.map(row => {
+    if (!row || !/^[0-6]$/.test(String(row.day)) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(row.time)) {
+      fail(400, "invalid_schedule_row");
+    }
+    return {day: Number(row.day), time: row.time, topic: translatedText(row.topic, 120)};
+  });
 }
 
 function readBody(req, limit) {
@@ -433,7 +508,295 @@ function isAdmin(req) {
 }
 const pinHits = new Map();
 
-const { createMinecraftCatalog } = require("./minecraft");
+const createMinecraftCatalog = (() => {
+  const MODRINTH_API = "https://api.modrinth.com/v2";
+  const CURSEFORGE_API = "https://api.curseforge.com/v1";
+  const CURSEFORGE_MINECRAFT = 432;
+  const CURSEFORGE_LIMIT = 10000;
+  const PAGE_SIZE = 25;
+  const TYPE_INFO = {
+    mod: {classId:6, cursePath:"mc-mods"},
+    resourcepack: {classId:12, cursePath:"texture-packs"},
+    modpack: {classId:4471, cursePath:"modpacks"},
+    shader: {classId:6552, cursePath:"shaders"}
+  };
+  const LOADERS = {forge:1, fabric:4, quilt:5, neoforge:6, liteloader:3, cauldron:2};
+  const CURSEFORGE_SORT = {downloads:6, follows:2, newest:11, updated:3};
+  const SORTS = ["relevance","downloads","follows","newest","updated"];
+
+  function fail(status,code) {
+    throw Object.assign(new Error(code),{status,code});
+  }
+  function text(value,max) { return typeof value==="string"?value.trim().slice(0,max):""; }
+  function list(value) { return Array.isArray(value)?value:[]; }
+  function count(value) { return Number.isFinite(value)?Math.max(0,Math.trunc(value)):0; }
+  function validType(value) { return Object.hasOwn(TYPE_INFO,value)?value:"mod"; }
+  function versionName(value) {
+    return typeof value==="string"&&/^(?=.{1,40}$)(?=.*\d)[\w.+-]+$/.test(value);
+  }
+  function gameVersions(values) {
+    return [...new Set(values.filter(versionName))].sort((a,b)=>b.localeCompare(a,"en",{numeric:true}));
+  }
+  function knownLoaders(values) {
+    return [...new Set(values.map(value=>String(value||"").toLowerCase()).filter(value=>Object.hasOwn(LOADERS,value)))];
+  }
+  function httpsUrl(value,accept=()=>true) {
+    if(typeof value!=="string" || !value)return "";
+    try{
+      const url=new URL(value);
+      if(url.protocol==="https:" && !url.username && !url.password && accept(url.hostname,url))return url.href;
+    }catch{}
+    return "";
+  }
+  const onCurseForge = host=>host==="curseforge.com" || host.endsWith(".curseforge.com");
+  const onForgeCDN = host=>host==="forgecdn.net" || host.endsWith(".forgecdn.net");
+  const onModrinthCDN = host=>host==="cdn.modrinth.com";
+  function modrinthLink(type,slug) {
+    return "https://modrinth.com/"+validType(type)+"/"+encodeURIComponent(slug);
+  }
+  function curseForgeLink(project,type) {
+    const site=httpsUrl(project.links?.websiteUrl,(host,url)=>onCurseForge(host)&&url.pathname.startsWith("/minecraft/"));
+    const slug=text(project.slug,80);
+    return site || (slug?"https://www.curseforge.com/minecraft/"+TYPE_INFO[validType(type)].cursePath+"/"+encodeURIComponent(slug):"");
+  }
+  function projectFileLink(projectUrl,fileId) {
+    if(!projectUrl)return "";
+    const url=new URL(projectUrl);
+    url.pathname=url.pathname.replace(/\/+$/,"")+"/files/"+encodeURIComponent(fileId);
+    url.search="";
+    url.hash="";
+    return url.href;
+  }
+  function normalizePage(sp,source) {
+    const value=sp.get("page")||"0";
+    const page=Number(value);
+    if(!/^\d+$/.test(value)||!Number.isSafeInteger(page)||page>100000)fail(400,"invalid");
+    if(source==="curseforge" && page*PAGE_SIZE>=CURSEFORGE_LIMIT)fail(400,"mc_page_limit");
+    return page;
+  }
+  function pageInfo(page,total,resultCount,source) {
+    const limited=source==="curseforge" && total>=CURSEFORGE_LIMIT;
+    const accessible=limited?Math.min(CURSEFORGE_LIMIT,total):total;
+    return {page,size:PAGE_SIZE,total,limited,hasNext:resultCount>0&&(page+1)*PAGE_SIZE<accessible};
+  }
+  function filters(sp,source) {
+    const type=validType(sp.get("type"));
+    const loader=sp.get("loader")||"";
+    const game=text(sp.get("version"),40);
+    if(game&&!versionName(game))fail(400,"mc_invalid_version");
+    return {
+      source,type,game,page:normalizePage(sp,source),
+      loader:["mod","modpack"].includes(type)&&Object.hasOwn(LOADERS,loader)?loader:""
+    };
+  }
+  function sourceName(sp) {
+    const source=sp.get("source")||"modrinth";
+    if(source!=="modrinth" && source!=="curseforge")fail(400,"invalid");
+    return source;
+  }
+
+  function normalizeModrinthVersion(version,project) {
+    const files=list(version.files).map(file=>({
+      name:text(file.filename,180),size:count(file.size),
+      url:httpsUrl(file.url,onModrinthCDN),primary:file.primary===true
+    })).filter(file=>file.url);
+    files.sort((a,b)=>Number(b.primary)-Number(a.primary));
+    const id=text(version.id,64);
+    return {
+      id, name:text(version.name,140)||text(version.version_number,80),
+      number:text(version.version_number,80), games:gameVersions(list(version.game_versions)),
+      loaders:knownLoaders(list(version.loaders)), downloads:count(version.downloads),
+      channel:["release","beta","alpha"].includes(version.version_type)?version.version_type:"",
+      files, file:files[0]?.url||"", sourceUrl:id?project.url+"/version/"+encodeURIComponent(id):project.url
+    };
+  }
+  function curseFileGames(file) {
+    return gameVersions([
+      ...list(file.gameVersions),
+      ...list(file.sortableGameVersions).map(version=>version.gameVersionName||version.gameVersion)
+    ]);
+  }
+  function normalizeCurseVersion(file,project,requestedLoader) {
+    const allowed=project.allowDirect&&file.isAvailable!==false&&!file.isEarlyAccessContent;
+    const url=allowed?httpsUrl(file.downloadUrl,onForgeCDN):"";
+    const name=text(file.fileName,180);
+    const id=String(file.id||"");
+    return {
+      id, name:text(file.displayName,140)||name, number:name, games:curseFileGames(file),
+      loaders:knownLoaders([...list(file.gameVersions),requestedLoader]), downloads:count(file.downloadCount),
+      channel:({1:"release",2:"beta",3:"alpha"})[file.releaseType]||"",
+      files:url?[{name,size:count(file.fileLength),url,primary:true}]:[],
+      file:url, sourceUrl:projectFileLink(project.url,id)
+    };
+  }
+
+  function createMinecraftCatalog({curseForgeKey="",userAgent,fetcher=globalThis.fetch}={}) {
+    const sources={modrinth:true,curseforge:!!curseForgeKey};
+    const cache=new Map();
+    const pending=new Map();
+
+    async function cached(key,load,ttl=300000) {
+      const hit=cache.get(key);
+      if(hit && hit.expires>Date.now()){
+        cache.delete(key);
+        cache.set(key,hit);
+        return hit.value;
+      }
+      if(pending.has(key))return pending.get(key);
+      const job=load().then(value=>{
+        cache.set(key,{value,expires:Date.now()+ttl});
+        if(cache.size>96)cache.delete(cache.keys().next().value);
+        return value;
+      }).finally(()=>pending.delete(key));
+      pending.set(key,job);
+      return job;
+    }
+
+    function requireSource(source) {
+      if(source==="curseforge"&&!sources.curseforge)fail(503,"mc_provider_unconfigured");
+    }
+
+    async function request(source,path,params) {
+      requireSource(source);
+      const url=new URL((source==="curseforge"?CURSEFORGE_API:MODRINTH_API)+path);
+      if(params)url.search=new URLSearchParams(params).toString();
+      const headers={"Accept":"application/json","User-Agent":userAgent||"A782DIGITAL/3.0"};
+      if(source==="curseforge")headers["x-api-key"]=curseForgeKey;
+      let response;
+      try {
+        response=await fetcher(url.toString(),{headers,signal:AbortSignal.timeout(8000),redirect:"error"});
+      } catch { fail(502,"upstream"); }
+      if(response.status===404)fail(404,"mc_project_missing");
+      if(response.status===429)fail(503,"mc_rate_limited");
+      if(source==="curseforge"&&(response.status===401||response.status===403))fail(502,"mc_provider_auth");
+      if(!response.ok)fail(502,"upstream");
+      try{return await response.json()}catch{fail(502,"upstream")}
+    }
+
+    async function search(sp) {
+      const source=sourceName(sp);
+      requireSource(source);
+      const {type,game,loader,page}=filters(sp,source);
+      const q=text(sp.get("q"),80);
+      const requestedSort=sp.get("sort");
+      const sort=SORTS.includes(requestedSort)?requestedSort:"downloads";
+      const offset=page*PAGE_SIZE;
+      if(source==="modrinth"){
+        const facets=[["project_type:"+type]];
+        if(loader)facets.push(["categories:"+loader]);
+        if(game)facets.push(["versions:"+game]);
+        const params={query:q,facets:JSON.stringify(facets),index:sort,limit:PAGE_SIZE,offset};
+        return cached("mr-search:"+JSON.stringify(params),async()=>{
+          const data=await request(source,"/search",params);
+          const hits=list(data.hits).map(hit=>({
+            id:String(hit.project_id),source,type,title:text(hit.title,140),author:text(hit.author,90),
+            desc:text(hit.description,360),icon:httpsUrl(hit.icon_url),downloads:count(hit.downloads),
+            license:text(hit.license,50),games:gameVersions(list(hit.versions)),
+            loaders:knownLoaders(list(hit.categories)),url:modrinthLink(type,hit.slug||hit.project_id)
+          }));
+          const total=Number.isFinite(data.total_hits)?count(data.total_hits):offset+hits.length;
+          return {source,hits,pagination:pageInfo(page,total,hits.length,source)};
+        });
+      }
+
+      if(loader&&!game)fail(400,"mc_filter_version");
+      const params={gameId:CURSEFORGE_MINECRAFT,classId:TYPE_INFO[type].classId,index:offset,pageSize:PAGE_SIZE};
+      if(q)params.searchFilter=q;
+      if(game)params.gameVersion=game;
+      if(loader)params.modLoaderType=LOADERS[loader];
+      if(CURSEFORGE_SORT[sort])Object.assign(params,{sortField:CURSEFORGE_SORT[sort],sortOrder:"desc"});
+      return cached("cf-search:"+JSON.stringify(params),async()=>{
+        const data=await request(source,"/mods/search",params);
+        const hits=list(data.data).map(project=>({
+          id:String(project.id),source,type,title:text(project.name,140),desc:text(project.summary,360),
+          author:list(project.authors).map(author=>text(author.name,50)).filter(Boolean).slice(0,3).join(", "),
+          icon:httpsUrl(project.logo?.thumbnailUrl||project.logo?.url),downloads:count(project.downloadCount),
+          games:gameVersions(list(project.latestFilesIndexes).map(file=>file.gameVersion)),
+          loaders:knownLoaders(list(project.latestFilesIndexes).map(file=>
+            Object.keys(LOADERS).find(loader=>LOADERS[loader]===file.modLoader))),
+          license:"",url:curseForgeLink(project,type)
+        }));
+        return {source,hits,pagination:pageInfo(page,count(data.pagination?.totalCount),hits.length,source)};
+      });
+    }
+
+    async function projectInfo(source,id,fallbackType) {
+      return cached(source+"-project:"+id+":"+fallbackType,async()=>{
+        if(source==="modrinth"){
+          const data=await request(source,"/project/"+encodeURIComponent(id));
+          const type=validType(data.project_type||fallbackType);
+          return {
+            id,source,type,title:text(data.title,140),icon:httpsUrl(data.icon_url),
+            downloads:count(data.downloads),games:gameVersions(list(data.game_versions)),
+            loaders:knownLoaders(list(data.loaders)),url:modrinthLink(type,data.slug||id)
+          };
+        }
+        const {data}=await request(source,"/mods/"+id);
+        if(!data)fail(404,"mc_project_missing");
+        const type=Object.keys(TYPE_INFO).find(key=>TYPE_INFO[key].classId===data.classId)||fallbackType;
+        const index=list(data.latestFilesIndexes);
+        return {
+          id,source,type,title:text(data.name,140),icon:httpsUrl(data.logo?.thumbnailUrl||data.logo?.url),
+          downloads:count(data.downloadCount),url:curseForgeLink(data,type),allowDirect:data.allowModDistribution!==false,
+          games:gameVersions([...index.map(file=>file.gameVersion),...list(data.latestFiles).flatMap(curseFileGames)]),
+          loaders:knownLoaders([...list(data.latestFiles).flatMap(file=>list(file.gameVersions)),
+            ...index.map(file=>Object.keys(LOADERS).find(key=>LOADERS[key]===file.modLoader))])
+        };
+      });
+    }
+
+    async function versions(sp) {
+      const source=sourceName(sp);
+      requireSource(source);
+      const id=sp.get("id")||"";
+      if(!(source==="curseforge"?/^[1-9]\d{0,9}$/:/^[\w-]{1,64}$/).test(id))fail(400,"invalid");
+      const {type,game,loader,page}=filters(sp,source);
+      const offset=page*PAGE_SIZE;
+      if(source==="modrinth"){
+        const params={include_changelog:"false"};
+        if(game)params.game_versions=JSON.stringify([game]);
+        if(loader)params.loaders=JSON.stringify([loader]);
+        const [project,all]=await Promise.all([
+          projectInfo(source,id,type),
+          cached("mr-versions:"+id+":"+JSON.stringify(params),async()=>{
+            const values=await request(source,"/project/"+encodeURIComponent(id)+"/version",params);
+            if(!Array.isArray(values))fail(502,"upstream");
+            return values;
+          })
+        ]);
+        const rows=all.slice(offset,offset+PAGE_SIZE).map(version=>normalizeModrinthVersion(version,project));
+        return {project,versions:rows,pagination:pageInfo(page,all.length,rows.length,source)};
+      }
+
+      const params={index:offset,pageSize:PAGE_SIZE};
+      if(game)params.gameVersion=game;
+      if(loader)params.modLoaderType=LOADERS[loader];
+      const [project,data]=await Promise.all([
+        projectInfo(source,id,type),
+        cached("cf-files:"+id+":"+JSON.stringify(params),()=>request(source,"/mods/"+id+"/files",params))
+      ]);
+      const rows=list(data.data).map(file=>normalizeCurseVersion(file,project,loader));
+      return {project,versions:rows,pagination:pageInfo(page,count(data.pagination?.totalCount),rows.length,source)};
+    }
+
+    async function metadata(sp) {
+      const source=sourceName(sp);
+      requireSource(source);
+      return cached(source+"-game-versions",async()=>{
+        const data=source==="modrinth"
+          ? await request(source,"/tag/game_version")
+          : await request(source,"/games/"+CURSEFORGE_MINECRAFT+"/versions");
+        const names=source==="modrinth"
+          ? list(data).map(version=>version.version)
+          : list(data.data).flatMap(group=>list(group.versions));
+        return {source,games:gameVersions(names)};
+      },12*60*60*1000);
+    }
+
+    return {sources,search,versions,metadata};
+  }
+  return createMinecraftCatalog;
+})();
 const minecraftCatalog = createMinecraftCatalog({
   curseForgeKey: String(process.env.CURSEFORGE_API_KEY || "").trim(),
   userAgent: UA
@@ -447,25 +810,17 @@ async function route(req, url, user, body) {
   if (m === "GET" && p === "/api/mc/search") return [200, await minecraftCatalog.search(url.searchParams)];
   if (m === "GET" && p === "/api/mc/versions") return [200, await minecraftCatalog.versions(url.searchParams)];
   if (m === "GET" && p === "/api/mc/meta") return [200, await minecraftCatalog.metadata(url.searchParams)];
-    if (m === "GET" && p === "/api/translate") {
+  if (m === "GET" && p === "/api/translate") {
     const from = url.searchParams.get("from"), to = url.searchParams.get("to");
-    const text = str(url.searchParams.get("text"), 400);
+    const text = (url.searchParams.get("text") || "").trim();
     const langs = ["kk", "ru", "en"];
-    if (!langs.includes(from) || !langs.includes(to) || from === to || !text) return [200, { text }];
-    const key = from + "|" + to + "|" + text;
-    if (!translateCache.has(key)) {
-      try {
-        const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`,
-          { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(8000) });
-        const j = await r.json();
-        const out = j?.responseData?.translatedText;
-        if (translateCache.size > 2000) translateCache.clear();
-        translateCache.set(key, typeof out === "string" && out ? out : text);
-      } catch {
-        return [200, { text }];
-      }
+    if (!langs.includes(from) || !langs.includes(to) || text.length > 2000) fail(400, "invalid");
+    if (from === to || !text) return [200, {text}];
+    try {
+      return [200, {text: await translate(text, from, to)}];
+    } catch {
+      fail(503, "translation_failed");
     }
-    return [200, { text: translateCache.get(key) }];
   }
 
   if (m === "POST" && p === "/api/register") {
@@ -855,7 +1210,7 @@ async function adminRoute(req, m, p, body) {
     const name = str(b.name, 40);
     if (!name) fail(400, "title_required");
     const old = db.games.find(x => x.id === str(b.id, 40));
-        upsert(db.games, {
+    upsert(db.games, {
       id: old ? old.id : uid(),
       name,
       icon: ICONS.includes(b.icon) ? b.icon : "gamepad",
@@ -863,8 +1218,8 @@ async function adminRoute(req, m, p, body) {
       link: safeUrl(b.link),
       desc: tr(b, "desc", 200),
       order: Number.isFinite(Number(b.order)) ? Number(b.order) : (old?.order ?? 0),
-      avatar: b.clearAvatar ? "" : (b.avatar !== undefined && b.avatar !== "" ? safeUrl(b.avatar) : (old?.avatar || "")),
-      banner: b.clearBanner ? "" : (b.banner !== undefined && b.banner !== "" ? safeUrl(b.banner) : (old?.banner || ""))
+      avatar: b.clearAvatar ? "" : (b.avatar !== undefined && b.avatar !== "" ? imageUrl(b.avatar) : (old?.avatar || "")),
+      banner: b.clearBanner ? "" : (b.banner !== undefined && b.banner !== "" ? imageUrl(b.banner) : (old?.banner || ""))
     });
     saveDB();
     return [200, { ok: true }];
@@ -959,26 +1314,30 @@ async function adminRoute(req, m, p, body) {
   fail(404, "not_found");
 }
 
-const MIME = {
-  ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
-  ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".ico": "image/x-icon"
-};
-function serveStatic(pathname, res) {
-  const rel = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
-  const full = path.resolve(PUBLIC_DIR, "." + rel);
-  const relative = path.relative(PUBLIC_DIR, full);
-  if (relative.startsWith("..") || path.isAbsolute(relative)) { res.writeHead(403); return res.end(); }
-  fs.readFile(full, (err, buf) => {
-    if (err) { res.writeHead(404); return res.end("Not found"); }
-    res.writeHead(200, { "Content-Type": MIME[path.extname(full)] || "application/octet-stream", "Cache-Control": "no-cache" });
-    res.end(buf);
-  });
+const html = fs.readFileSync(indexFile);
+const gzip = require("node:zlib").gzipSync(html);
+function serveSite(req, pathname, res) {
+  if (!["/", "/index.html", "/public/index.html"].includes(pathname)) {
+    res.writeHead(404);
+    return res.end();
+  }
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    res.writeHead(405, {Allow: "GET, HEAD"});
+    return res.end();
+  }
+  const acceptsGzip = String(req.headers["accept-encoding"] || "").split(",")
+    .some(encoding => /^\s*gzip\s*(?:;\s*q=(?:1(?:\.0*)?|0?\.\d*[1-9]\d*))?\s*$/i.test(encoding));
+  const data = acceptsGzip ? gzip : html;
+  if (acceptsGzip) res.setHeader("Content-Encoding", "gzip");
+  res.writeHead(200, {"Content-Type": "text/html; charset=utf-8", "Content-Length": data.length,
+    "Cache-Control": "no-cache", Vary: "Accept-Encoding"});
+  res.end(req.method === "HEAD" ? undefined : data);
 }
 
 const server = http.createServer(async (req, res) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   const url = new URL(req.url, "http://localhost");
-  if (!url.pathname.startsWith("/api/")) return serveStatic(url.pathname, res);
+  if (!url.pathname.startsWith("/api/")) return serveSite(req, url.pathname, res);
   try {
     // Public catalogs never hold the database queue while waiting on a provider.
     const isCatalogRead = req.method === "GET" &&
@@ -991,7 +1350,7 @@ const server = http.createServer(async (req, res) => {
 
     // A slow or interrupted upload must not hold the database queue.
     const body = req.method === "POST" || req.method === "PUT"
-      ? await readBody(req, req.method === "PUT" && url.pathname === "/api/me" ? 80 * 1024 : 100 * 1024)
+      ? await readBody(req, req.method === "PUT" && url.pathname === "/api/me" ? 150 * 1024 : 160 * 1024)
       : undefined;
     const job = requestQueue.then(() => {
       if (req.aborted || res.destroyed) return null;
