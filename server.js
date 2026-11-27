@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, "data.json");
 // Serve only the front end; the database stays private.
-const rootIndex = path.join(__dirname, "index.html");
+const rootIndex = path.join(__dirname, "public", "index.html");
 const indexFile = fs.existsSync(rootIndex) ? rootIndex : path.join(__dirname, "public", "index.html");
 const ADMIN_PIN = process.env.ADMIN_PIN || crypto.randomBytes(3).toString("hex");
 // Configure ONLY in Render Environment. Fail closed when no owner email is configured.
